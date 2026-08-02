@@ -1,0 +1,138 @@
+<?php
+
+use App\Models\Booking;
+use App\Models\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+function makeEvent(array $overrides = []): Event
+{
+    return Event::create(array_merge([
+        'title' => 'Test Event',
+        'slug' => 'test-event',
+        'type' => 'event',
+        'summary' => 'A test event summary.',
+        'description' => 'Full description.',
+        'location' => 'Nairobi, Kenya',
+        'start_date' => now()->addDays(7),
+        'end_date' => now()->addDays(8),
+        'price' => '1500.00',
+        'capacity' => 10,
+        'booked_slots' => 0,
+        'status' => 'published',
+        'liability_waiver_text' => 'I agree to the waiver.',
+    ], $overrides));
+}
+
+function validPayload(array $overrides = []): array
+{
+    return array_merge([
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'emergency_contact_name' => 'John Doe',
+        'emergency_contact_phone' => '+254700000002',
+        'quantity' => 1,
+        'responses' => [],
+        'consent' => [
+            'agreed' => true,
+            'signer_name' => 'Jane Doe',
+        ],
+    ], $overrides);
+}
+
+// --- store() ---
+
+test('store creates booking and returns 201 with booking reference', function () {
+    $event = makeEvent();
+
+    $response = $this->postJson("/events/{$event->id}/bookings", validPayload());
+
+    $response->assertStatus(201)
+        ->assertJsonStructure(['booking_reference', 'booking_id']);
+
+    $this->assertDatabaseHas('bookings', ['contact_email' => 'jane@example.com']);
+});
+
+test('store returns 422 when event is sold out', function () {
+    $event = makeEvent(['capacity' => 2, 'booked_slots' => 2]);
+
+    $response = $this->postJson("/events/{$event->id}/bookings", validPayload());
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'No seats remaining for this event.']);
+});
+
+test('store returns 422 when requested quantity exceeds available slots', function () {
+    $event = makeEvent(['capacity' => 1, 'booked_slots' => 0]);
+
+    $response = $this->postJson("/events/{$event->id}/bookings", validPayload(['quantity' => 5]));
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'No seats remaining for this event.']);
+});
+
+test('store returns 422 validation error when required fields are missing', function () {
+    $event = makeEvent();
+
+    $response = $this->postJson("/events/{$event->id}/bookings", [
+        'contact_name' => '',
+        'quantity' => 1,
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['contact_email', 'contact_phone']);
+});
+
+// --- downloadPass() ---
+
+test('downloadPass returns HTML file with correct content-disposition header', function () {
+    $event = makeEvent();
+
+    $booking = Booking::create([
+        'event_id' => $event->id,
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'emergency_contact_name' => 'John Doe',
+        'emergency_contact_phone' => '+254700000002',
+        'quantity' => 1,
+        'total_price' => '1500.00',
+        'payment_status' => 'paid',
+    ]);
+
+    $response = $this->get("/bookings/{$booking->id}/pass");
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/html; charset=utf-8')
+        ->assertHeader('Content-Disposition', "attachment; filename=\"pass-{$booking->booking_reference}.html\"");
+});
+
+test('downloadPass response contains required booking and event fields', function () {
+    $event = makeEvent();
+
+    $booking = Booking::create([
+        'event_id' => $event->id,
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'emergency_contact_name' => 'John Doe',
+        'emergency_contact_phone' => '+254700000002',
+        'quantity' => 1,
+        'total_price' => '1500.00',
+        'payment_status' => 'paid',
+    ]);
+
+    $response = $this->get("/bookings/{$booking->id}/pass");
+
+    $content = $response->getContent();
+
+    expect($content)
+        ->toContain($booking->booking_reference)
+        ->toContain($event->title)
+        ->toContain($event->start_date->format('D, M j Y'))
+        ->toContain($event->location)
+        ->toContain($booking->contact_name)
+        ->toContain($booking->contact_email);
+});
