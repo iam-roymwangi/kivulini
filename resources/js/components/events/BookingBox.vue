@@ -57,8 +57,8 @@ function proceedToBooking() {
 
         <!-- Seat counter -->
         <div class="mb-5">
-            <p v-if="!isSoldOut" class="text-sm text-slate-400">
-                <span class="font-bold text-white">{{ event.available_slots }}</span>
+            <p v-if="!isSoldOut" class="text-sm text-slate-500 dark:text-slate-400">
+                <span class="font-bold text-slate-900 dark:text-white">{{ event.available_slots }}</span>
                 seat{{ event.available_slots === 1 ? '' : 's' }} remaining
             </p>
             <p v-else class="text-sm font-bold text-red-500">Sold Out</p>
@@ -66,13 +66,13 @@ function proceedToBooking() {
 
         <!-- Quantity selector -->
         <div v-if="!isSoldOut && isPublished" class="mb-5">
-            <label for="booking-quantity" class="mb-2 block text-sm font-medium text-slate-300">
+            <label for="booking-quantity" class="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 Number of seats
             </label>
             <div class="flex items-center gap-3">
                 <button
                     type="button"
-                    class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-600 text-slate-300 transition hover:border-amber-400 hover:text-amber-400 disabled:opacity-40"
+                    class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-amber-400 hover:text-amber-400 dark:border-slate-600 dark:text-slate-300 disabled:opacity-40"
                     :disabled="quantity <= 1"
                     aria-label="Decrease quantity"
                     @click="quantity = Math.max(1, quantity - 1)"
@@ -81,10 +81,10 @@ function proceedToBooking() {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                     </svg>
                 </button>
-                <span id="booking-quantity" class="w-8 text-center text-lg font-bold text-white">{{ quantity }}</span>
+                <span id="booking-quantity" class="w-8 text-center text-lg font-bold text-slate-900 dark:text-white">{{ quantity }}</span>
                 <button
                     type="button"
-                    class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-600 text-slate-300 transition hover:border-amber-400 hover:text-amber-400 disabled:opacity-40"
+                    class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:border-amber-400 hover:text-amber-400 dark:border-slate-600 dark:text-slate-300 disabled:opacity-40"
                     :disabled="quantity >= maxQuantity"
                     aria-label="Increase quantity"
                     @click="quantity = Math.min(maxQuantity, quantity + 1)"

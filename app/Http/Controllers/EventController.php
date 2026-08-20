@@ -6,6 +6,7 @@ use App\Http\Resources\EventMediaResource;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\EventMedia;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,15 +19,36 @@ class EventController extends Controller
     {
         $events = Event::published()
             ->with('media')
-            ->paginate(12);
+            ->paginate(3, ['*'], 'events_page');
 
-        $featuredMedia = EventMedia::where('is_featured', true)
+        $pastEventsMedia = EventMedia::whereHas('event', function ($query) {
+            $query->where('status', 'completed');
+        })
             ->orderBy('sort_order')
-            ->get();
+            ->paginate(3, ['*'], 'gallery_page');
 
         return Inertia::render('events/Index', [
             'events' => EventResource::collection($events),
-            'featuredMedia' => EventMediaResource::collection($featuredMedia),
+            'pastEventsMedia' => EventMediaResource::collection($pastEventsMedia),
+        ]);
+    }
+
+    /**
+     * Display the dedicated paginated events list.
+     */
+    public function list(Request $request): Response
+    {
+        $query = Event::published()->with('media');
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $events = $query->paginate(6, ['*'], 'page')->withQueryString();
+
+        return Inertia::render('events/List', [
+            'events' => EventResource::collection($events),
+            'filters' => $request->only(['type']),
         ]);
     }
 
@@ -46,5 +68,29 @@ class EventController extends Controller
             'event' => new EventResource($event),
             'availableSlots' => $event->available_slots,
         ]);
+    }
+
+    /**
+     * Display the dedicated paginated past trips gallery.
+     */
+    public function galleryPage(Request $request): Response
+    {
+        $pastEventsMedia = EventMedia::whereHas('event', function ($query) {
+            $query->where('status', 'completed');
+        })
+            ->orderBy('sort_order')
+            ->paginate(9, ['*'], 'page')->withQueryString();
+
+        return Inertia::render('events/Gallery', [
+            'pastEventsMedia' => EventMediaResource::collection($pastEventsMedia),
+        ]);
+    }
+
+    /**
+     * Display the dedicated contact page.
+     */
+    public function contactPage(): Response
+    {
+        return Inertia::render('events/Contact');
     }
 }

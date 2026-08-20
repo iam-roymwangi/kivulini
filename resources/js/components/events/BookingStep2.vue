@@ -49,8 +49,8 @@ function submit() {
 <template>
     <div class="space-y-6 px-1 pb-4">
         <div>
-            <h2 class="text-xl font-bold text-white">Participant Details</h2>
-            <p class="mt-1 text-sm text-slate-400">Help us tailor the experience for you.</p>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Participant Details</h2>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Help us tailor the experience for you.</p>
         </div>
 
         <form class="space-y-5" novalidate @submit.prevent="submit">
@@ -61,7 +61,7 @@ function submit() {
             >
                 <label
                     :for="`q-${question.id}`"
-                    class="mb-1.5 block text-sm font-medium text-slate-300"
+                    class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
                 >
                     {{ question.question_text }}
                     <span v-if="question.is_required" class="text-amber-400" aria-hidden="true"> *</span>
@@ -73,8 +73,8 @@ function submit() {
                     :id="`q-${question.id}`"
                     v-model="answers[question.id]"
                     type="text"
-                    class="w-full rounded-xl border bg-slate-900 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors focus:border-amber-400 focus:outline-none"
-                    :class="errors[question.id] ? 'border-red-500' : 'border-slate-700'"
+                    class="w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground placeholder-slate-400 dark:placeholder-slate-500 transition-colors focus:border-amber-400 focus:outline-none"
+                    :class="errors[question.id] ? 'border-red-500' : 'border-border dark:border-slate-700'"
                     :aria-invalid="!!errors[question.id]"
                     :aria-describedby="errors[question.id] ? `err-q-${question.id}` : undefined"
                 />
@@ -85,8 +85,8 @@ function submit() {
                     :id="`q-${question.id}`"
                     v-model="answers[question.id]"
                     rows="3"
-                    class="w-full rounded-xl border bg-slate-900 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors focus:border-amber-400 focus:outline-none resize-none"
-                    :class="errors[question.id] ? 'border-red-500' : 'border-slate-700'"
+                    class="w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground placeholder-slate-400 dark:placeholder-slate-500 transition-colors focus:border-amber-400 focus:outline-none resize-none"
+                    :class="errors[question.id] ? 'border-red-500' : 'border-border dark:border-slate-700'"
                     :aria-invalid="!!errors[question.id]"
                     :aria-describedby="errors[question.id] ? `err-q-${question.id}` : undefined"
                 />
@@ -96,8 +96,8 @@ function submit() {
                     v-else-if="question.type === 'select'"
                     :id="`q-${question.id}`"
                     v-model="answers[question.id]"
-                    class="w-full rounded-xl border bg-slate-900 px-4 py-3 text-sm text-white transition-colors focus:border-amber-400 focus:outline-none"
-                    :class="errors[question.id] ? 'border-red-500' : 'border-slate-700'"
+                    class="w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground transition-colors focus:border-amber-400 focus:outline-none"
+                    :class="errors[question.id] ? 'border-red-500' : 'border-border dark:border-slate-700'"
                     :aria-invalid="!!errors[question.id]"
                     :aria-describedby="errors[question.id] ? `err-q-${question.id}` : undefined"
                 >
@@ -124,7 +124,7 @@ function submit() {
             <div class="flex gap-3 pt-2">
                 <button
                     type="button"
-                    class="flex-1 rounded-xl border border-slate-700 py-3.5 text-sm font-bold text-slate-300 transition-colors hover:border-slate-500 hover:text-white active:scale-95"
+                    class="flex-1 rounded-xl border border-border py-3.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white active:scale-95"
                     @click="emit('back')"
                 >
                     Back

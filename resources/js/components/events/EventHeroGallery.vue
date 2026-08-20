@@ -6,8 +6,17 @@ const props = defineProps<{
     media: EventMedia[];
 }>();
 
+const mediaList = computed(() => {
+    if (!props.media) { return []; }
+    if (Array.isArray(props.media)) { return props.media; }
+    if (typeof props.media === 'object' && props.media !== null && 'data' in props.media) {
+        return (props.media as any).data || [];
+    }
+    return [];
+});
+
 const sortedMedia = computed(() =>
-    [...props.media].sort((a, b) => a.sort_order - b.sort_order),
+    [...mediaList.value].sort((a, b) => a.sort_order - b.sort_order),
 );
 
 const selectedIndex = ref(0);

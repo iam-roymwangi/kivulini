@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useForm } from '@inertiajs/vue3';
 import type { BookingPayload, PlatformEvent } from '@/types';
 
 const props = defineProps<{
@@ -9,108 +8,138 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'confirmed', reference: string): void;
+    (e: 'confirmed', reference: string, bookingId: number): void;
     (e: 'back'): void;
 }>();
 
 type PaymentMethod = 'mpesa' | 'card';
 const paymentMethod = ref<PaymentMethod>('mpesa');
 const mpesaPhone = ref('');
+const submitting = ref(false);
+const serverErrors = ref<string[]>([]);
+const phoneError = ref('');
 
 const unitPrice = computed(() => parseFloat(props.event.price));
 const totalPrice = computed(() => unitPrice.value * props.payload.quantity);
 
-const formatKES = (amount: number) =>
-    new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(amount);
+const formatKES = (n: number) =>
+    new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(n);
 
 const formattedUnit = computed(() => formatKES(unitPrice.value));
 const formattedTotal = computed(() => formatKES(totalPrice.value));
+
 const formattedDate = computed(() =>
     new Date(props.event.start_date).toLocaleDateString('en-KE', {
         day: 'numeric', month: 'long', year: 'numeric',
     }),
 );
 
-const phoneError = ref('');
-
-// Use Inertia useForm for submission — endpoint built from event id
-const form = useForm({});
-
-function submit() {
+async function submit() {
     phoneError.value = '';
+    serverErrors.value = [];
 
     if (paymentMethod.value === 'mpesa' && !mpesaPhone.value.trim()) {
         phoneError.value = 'M-Pesa phone number is required.';
         return;
     }
 
-    const data = {
-        ...props.payload,
-        payment_method: paymentMethod.value,
-        mpesa_phone: paymentMethod.value === 'mpesa' ? mpesaPhone.value.trim() : undefined,
-    };
+    submitting.value = true;
 
-    form.transform(() => data).post(`/events/${props.event.id}/bookings`, {
-        preserveScroll: true,
-        onSuccess: (page) => {
-            const flash = page.props.flash as Record<string, unknown> | undefined;
-            const ref = (flash?.booking_reference as string) ?? '';
-            emit('confirmed', ref);
-        },
-    });
+    try {
+        const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
+        const csrf = csrfMeta?.content ?? '';
+
+        const body = JSON.stringify({
+            ...props.payload,
+            payment_method: paymentMethod.value,
+            mpesa_phone: paymentMethod.value === 'mpesa' ? mpesaPhone.value.trim() : undefined,
+        });
+
+        const res = await fetch(`/events/${props.event.id}/bookings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf,
+                'X-Inertia': 'false',
+            },
+            body,
+        });
+
+        const json = await res.json();
+
+        if (res.ok) {
+            emit('confirmed', json.booking_reference, json.booking_id);
+        } else if (res.status === 422) {
+            // Validation errors
+            const errs = json.errors ?? {};
+            const msgs = Object.values(errs).flat() as string[];
+            serverErrors.value = msgs.length ? msgs : [json.message ?? 'Validation failed.'];
+        } else {
+            serverErrors.value = [json.message ?? 'Something went wrong. Please try again.'];
+        }
+    } catch {
+        serverErrors.value = ['Network error. Please check your connection.'];
+    } finally {
+        submitting.value = false;
+    }
 }
 </script>
 
 <template>
-    <div class="space-y-6 px-1 pb-4">
+    <div class="space-y-6 px-1 pb-6">
         <div>
-            <h2 class="text-xl font-bold text-white">Payment</h2>
-            <p class="mt-1 text-sm text-slate-400">Review your order and complete payment.</p>
+            <h2 class="text-xl font-bold text-foreground">Payment</h2>
+            <p class="mt-1 text-sm text-muted-foreground">Review your order and complete payment.</p>
         </div>
 
         <!-- Order summary -->
-        <div class="rounded-xl border border-slate-700 bg-slate-900 p-4 space-y-3">
-            <p class="text-xs font-semibold uppercase tracking-widest text-slate-500">Order Summary</p>
-            <div class="space-y-1.5 text-sm">
+        <div class="rounded-2xl border border-border bg-muted/30 p-4 space-y-3">
+            <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Order Summary</p>
+            <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                    <span class="text-slate-300">{{ event.title }}</span>
+                    <span class="font-semibold text-foreground">{{ event.title }}</span>
                 </div>
-                <div class="flex justify-between text-slate-400">
+                <div class="flex justify-between text-muted-foreground">
                     <span>Date</span>
                     <span>{{ formattedDate }}</span>
                 </div>
-                <div class="flex justify-between text-slate-400">
-                    <span>Quantity</span>
-                    <span>{{ payload.quantity }} seat{{ payload.quantity === 1 ? '' : 's' }}</span>
+                <div class="flex justify-between text-muted-foreground">
+                    <span>Location</span>
+                    <span>{{ event.location }}</span>
                 </div>
-                <div class="flex justify-between text-slate-400">
+                <div class="flex justify-between text-muted-foreground">
+                    <span>Seats</span>
+                    <span>{{ payload.quantity }}</span>
+                </div>
+                <div class="flex justify-between text-muted-foreground">
                     <span>Unit price</span>
                     <span>{{ formattedUnit }}</span>
                 </div>
             </div>
-            <div class="border-t border-slate-700 pt-3 flex justify-between font-bold">
-                <span class="text-white">Total</span>
-                <span class="text-amber-400 text-lg">{{ formattedTotal }}</span>
+            <div class="border-t border-border pt-3 flex justify-between font-bold">
+                <span class="text-foreground">Total</span>
+                <span class="text-lg text-amber-500">{{ formattedTotal }}</span>
             </div>
         </div>
 
         <!-- Server errors -->
-        <div v-if="Object.keys(form.errors).length > 0" class="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-            <p v-for="(msg, field) in form.errors" :key="field" class="text-sm text-red-400">{{ msg }}</p>
+        <div v-if="serverErrors.length > 0" class="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+            <p v-for="(msg, i) in serverErrors" :key="i" class="text-sm text-red-400">{{ msg }}</p>
         </div>
 
         <!-- Payment method toggle -->
         <div>
-            <p class="mb-3 text-sm font-medium text-slate-300">Payment method</p>
-            <div class="flex gap-3">
+            <p class="mb-3 text-sm font-semibold text-foreground">Payment method</p>
+            <div class="grid grid-cols-2 gap-3">
                 <button
                     v-for="method in [{ id: 'mpesa', label: 'M-Pesa' }, { id: 'card', label: 'Card' }]"
                     :key="method.id"
                     type="button"
-                    class="flex-1 rounded-xl border py-3 text-sm font-bold transition-all"
+                    class="rounded-xl border py-3 text-sm font-bold transition-all"
                     :class="paymentMethod === method.id
-                        ? 'border-amber-400 bg-amber-400/10 text-amber-400'
-                        : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200'"
+                        ? 'border-amber-400 bg-amber-400/10 text-amber-500'
+                        : 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'"
                     @click="paymentMethod = method.id as PaymentMethod"
                 >
                     {{ method.label }}
@@ -118,51 +147,45 @@ function submit() {
             </div>
         </div>
 
-        <!-- M-Pesa phone input -->
+        <!-- M-Pesa phone -->
         <div v-if="paymentMethod === 'mpesa'">
-            <label for="mpesa_phone" class="mb-1.5 block text-sm font-medium text-slate-300">
-                M-Pesa phone number <span class="text-amber-400" aria-hidden="true">*</span>
+            <label for="mpesa_phone" class="mb-1.5 block text-sm font-medium text-foreground">
+                M-Pesa phone number <span class="text-amber-500" aria-hidden="true">*</span>
             </label>
             <input
                 id="mpesa_phone"
                 v-model="mpesaPhone"
                 type="tel"
                 placeholder="+254 700 000 000"
-                class="w-full rounded-xl border bg-slate-900 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors focus:border-amber-400 focus:outline-none"
-                :class="phoneError ? 'border-red-500' : 'border-slate-700'"
-                :aria-invalid="!!phoneError"
-                aria-describedby="err-mpesa"
+                class="w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground placeholder-muted-foreground transition-colors focus:border-amber-400 focus:outline-none"
+                :class="phoneError ? 'border-red-500' : 'border-border'"
             />
-            <p v-if="phoneError" id="err-mpesa" class="mt-1 text-xs text-red-400" role="alert">
-                {{ phoneError }}
-            </p>
-            <p class="mt-2 text-xs text-slate-500">
-                You will receive an STK push prompt on this number.
-            </p>
+            <p v-if="phoneError" class="mt-1 text-xs text-red-400" role="alert">{{ phoneError }}</p>
+            <p class="mt-2 text-xs text-muted-foreground">An STK push will be sent to this number.</p>
         </div>
 
         <!-- Card placeholder -->
-        <div v-else class="rounded-xl border border-slate-700 bg-slate-900 p-4 text-center text-sm text-slate-500">
-            Card payment coming soon. Please use M-Pesa for now.
+        <div v-else class="rounded-xl border border-border bg-muted/20 p-4 text-center text-sm text-muted-foreground">
+            Card payments coming soon. Please use M-Pesa for now.
         </div>
 
+        <!-- Actions -->
         <div class="flex gap-3 pt-2">
             <button
                 type="button"
-                :disabled="form.processing"
-                class="flex-1 rounded-xl border border-slate-700 py-3.5 text-sm font-bold text-slate-300 transition-colors hover:border-slate-500 hover:text-white active:scale-95 disabled:opacity-50"
+                :disabled="submitting"
+                class="flex-1 rounded-xl border border-border py-3.5 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground active:scale-95 disabled:opacity-50"
                 @click="emit('back')"
             >
                 Back
             </button>
             <button
                 type="button"
-                :disabled="form.processing"
+                :disabled="submitting"
                 class="flex-1 rounded-xl bg-amber-400 py-3.5 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-300 active:scale-95 disabled:opacity-60"
                 @click="submit"
             >
-                <span v-if="form.processing">Processing...</span>
-                <span v-else>Confirm &amp; Pay</span>
+                {{ submitting ? 'Processing...' : 'Confirm & Pay' }}
             </button>
         </div>
     </div>

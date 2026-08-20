@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
             $table->string('question_text');
-            $table->enum('type', ['text', 'select', 'checkbox', 'radio'])->default('text');
+            $table->enum('type', ['text', 'textarea', 'select', 'checkbox', 'radio'])->default('text');
             $table->json('options')->nullable(); // Holds choices for select/radio, e.g. ["Vegetarian", "Vegan"]
             $table->boolean('is_required')->default(true);
             $table->integer('sort_order')->default(0);

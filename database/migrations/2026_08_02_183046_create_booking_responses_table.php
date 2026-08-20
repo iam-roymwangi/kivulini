@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('booking_responses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
-            $table->longText('agreed_terms_text'); // Snapshot of waiver text at the time of signing
-            $table->string('signer_name');
-            $table->string('signer_ip_address');
-            $table->timestamp('signed_at');
+            $table->foreignId('event_question_id')->constrained()->cascadeOnDelete();
+            $table->text('answer');
             $table->timestamps();
         });
     }

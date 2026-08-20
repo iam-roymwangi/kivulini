@@ -3,6 +3,7 @@ import type { PlatformEvent } from '@/types';
 
 const props = defineProps<{
     bookingReference: string;
+    bookingId: number;
     event: PlatformEvent;
 }>();
 
@@ -10,7 +11,7 @@ const emit = defineEmits<{
     (e: 'close'): void;
 }>();
 
-const passUrl = `/bookings/${props.bookingReference}/pass`;
+const passUrl = `/bookings/${props.bookingId}/pass`;
 
 const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE', {
     weekday: 'long',
@@ -30,12 +31,12 @@ const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE
         </div>
 
         <div class="space-y-1">
-            <h2 class="text-2xl font-black text-white">You're In.</h2>
-            <p class="text-slate-400">Your seat is confirmed. Get ready.</p>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white">You're In.</h2>
+            <p class="text-slate-500 dark:text-slate-400">Your seat is confirmed. Get ready.</p>
         </div>
 
         <!-- Booking reference -->
-        <div class="w-full rounded-2xl border border-slate-700 bg-slate-900 p-5">
+        <div class="w-full rounded-2xl border border-border bg-slate-50 dark:border-slate-700 dark:bg-slate-900 p-5">
             <p class="mb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Booking Reference</p>
             <p class="text-2xl font-black tracking-widest text-amber-400">
                 {{ bookingReference }}
@@ -46,15 +47,15 @@ const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE
         <div class="w-full space-y-2 text-sm">
             <div class="flex justify-between">
                 <span class="text-slate-500">Event</span>
-                <span class="font-semibold text-white text-right max-w-[60%]">{{ event.title }}</span>
+                <span class="font-semibold text-slate-900 dark:text-white text-right max-w-[60%]">{{ event.title }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="text-slate-500">Date</span>
-                <span class="text-white">{{ formattedDate }}</span>
+                <span class="text-slate-900 dark:text-white">{{ formattedDate }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="text-slate-500">Location</span>
-                <span class="text-white">{{ event.location }}</span>
+                <span class="text-slate-900 dark:text-white">{{ event.location }}</span>
             </div>
         </div>
 
@@ -74,7 +75,7 @@ const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE
 
             <button
                 type="button"
-                class="w-full rounded-xl border border-slate-700 py-3 text-sm font-bold text-slate-300 transition-colors hover:border-slate-500 hover:text-white"
+                class="w-full rounded-xl border border-border py-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                 @click="emit('close')"
             >
                 Done

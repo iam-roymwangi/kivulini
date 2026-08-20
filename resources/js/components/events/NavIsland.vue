@@ -33,34 +33,27 @@ function toggleTheme() {
 }
 
 const navLinks = [
-    { title: 'Events', href: '/' },
-    { title: 'Road Trips', href: '/?type=road_trip' },
+    { title: 'Home', href: '/' },
+    { title: 'Events', href: '/events' },
+    { title: 'Gallery', href: '/gallery' },
+    { title: 'Contact', href: '/contact' },
 ];
 </script>
 
 <template>
     <div class="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
-        <nav
-            class="flex w-full max-w-4xl items-center justify-between rounded-full border border-slate-200/60 bg-white/80 px-6 py-3 shadow-lg backdrop-blur-md transition-colors dark:border-slate-700/50 dark:bg-slate-900/80 dark:shadow-2xl"
-            aria-label="Main navigation"
-        >
+        <nav class="flex w-full max-w-4xl items-center justify-between rounded-full border border-slate-200/60 bg-white/80 px-6 py-3 shadow-lg backdrop-blur-md transition-colors dark:border-slate-700/50 dark:bg-slate-900/80 dark:shadow-2xl"
+            aria-label="Main navigation">
             <!-- Logo -->
             <Link href="/" class="flex shrink-0 items-center gap-2">
-                <img
-                    src="/assets/images/logo-dark.png"
-                    alt="Kivulini"
-                    class="h-12 w-auto object-contain"
-                />
+                <img :src="resolvedAppearance === 'dark' ? '/assets/images/kivulini_logo.png' : '/assets/images/logo-dark.png'"
+                    alt="Kivulini" class="h-12 w-auto object-contain" />
             </Link>
 
             <!-- Desktop nav links -->
             <div class="hidden items-center gap-6 md:flex">
-                <Link
-                    v-for="link in navLinks"
-                    :key="link.title"
-                    :href="link.href"
-                    class="text-sm font-medium text-slate-600 transition-colors hover:text-amber-500 dark:text-slate-300 dark:hover:text-amber-400"
-                >
+                <Link v-for="link in navLinks" :key="link.title" :href="link.href"
+                    class="text-sm font-medium text-slate-600 transition-colors hover:text-amber-500 dark:text-slate-300 dark:hover:text-amber-400">
                     {{ link.title }}
                 </Link>
             </div>
@@ -71,18 +64,12 @@ const navLinks = [
                 <template v-if="user">
                     <DropdownMenu>
                         <DropdownMenuTrigger :as-child="true">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                class="relative size-9 rounded-full p-0.5 focus-within:ring-2 focus-within:ring-amber-400"
-                            >
+                            <Button variant="ghost" size="icon"
+                                class="relative size-9 rounded-full p-0.5 focus-within:ring-2 focus-within:ring-amber-400">
                                 <Avatar class="size-8 overflow-hidden rounded-full">
-                                    <AvatarImage
-                                        v-if="user.avatar"
-                                        :src="user.avatar"
-                                        :alt="user.name"
-                                    />
-                                    <AvatarFallback class="rounded-full bg-amber-400 text-xs font-semibold text-slate-900">
+                                    <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
+                                    <AvatarFallback
+                                        class="rounded-full bg-amber-400 text-xs font-semibold text-slate-900">
                                         {{ getInitials(user.name) }}
                                     </AvatarFallback>
                                 </Avatar>
@@ -97,29 +84,22 @@ const navLinks = [
                 <!-- Auth: guest (desktop) -->
                 <template v-else>
                     <div class="hidden items-center gap-3 md:flex">
-                        <Link
-                            href="/login"
-                            class="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-                        >
+                        <Link href="/login"
+                            class="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
                             Log In
                         </Link>
-                        <Link
-                            href="/register"
-                            class="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-400 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300"
-                        >
+                        <Link href="/register"
+                            class="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-400 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300">
                             Sign Up
                         </Link>
                     </div>
                 </template>
 
                 <!-- Theme toggle -->
-                <Button
-                    variant="ghost"
-                    size="icon"
+                <Button variant="ghost" size="icon"
                     class="h-9 w-9 text-slate-600 hover:text-amber-500 dark:text-slate-300 dark:hover:text-amber-400"
                     :aria-label="resolvedAppearance === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-                    @click="toggleTheme"
-                >
+                    @click="toggleTheme">
                     <Sun v-if="resolvedAppearance === 'dark'" class="h-4 w-4" />
                     <Moon v-else class="h-4 w-4" />
                 </Button>
@@ -128,36 +108,28 @@ const navLinks = [
                 <div class="md:hidden">
                     <Sheet v-model:open="mobileMenuOpen">
                         <SheetTrigger :as-child="true">
-                            <Button variant="ghost" size="icon" class="h-9 w-9 text-slate-300">
+                            <Button variant="ghost" size="icon" class="h-9 w-9 text-slate-600 dark:text-slate-300">
                                 <Menu class="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="right" class="w-72 border-slate-700 bg-slate-900 p-6 text-white">
                             <SheetTitle class="sr-only">Navigation menu</SheetTitle>
                             <nav class="mt-8 flex flex-col gap-4">
-                                <Link
-                                    v-for="link in navLinks"
-                                    :key="link.title"
-                                    :href="link.href"
+                                <Link v-for="link in navLinks" :key="link.title" :href="link.href"
                                     class="text-base font-medium text-slate-300 transition-colors hover:text-amber-400"
-                                    @click="mobileMenuOpen = false"
-                                >
+                                    @click="mobileMenuOpen = false">
                                     {{ link.title }}
                                 </Link>
                                 <hr class="border-slate-700" />
                                 <template v-if="!user">
-                                    <Link
-                                        href="/login"
+                                    <Link href="/login"
                                         class="text-base font-medium text-slate-300 transition-colors hover:text-white"
-                                        @click="mobileMenuOpen = false"
-                                    >
+                                        @click="mobileMenuOpen = false">
                                         Log In
                                     </Link>
-                                    <Link
-                                        href="/register"
+                                    <Link href="/register"
                                         class="rounded-full bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
-                                        @click="mobileMenuOpen = false"
-                                    >
+                                        @click="mobileMenuOpen = false">
                                         Sign Up
                                     </Link>
                                 </template>
