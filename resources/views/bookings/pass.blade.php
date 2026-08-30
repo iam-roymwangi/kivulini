@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Pass — {{ $booking->booking_reference }}</title>
+    <title>Booking Pass — {{ $booking->booking_reference }}</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: #0f172a;
-            color: #f1f5f9;
+            background: #f1f5f9;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
@@ -18,185 +17,248 @@
             padding: 2rem 1rem;
         }
 
-        .pass {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid #fbbf24;
-            border-radius: 1.25rem;
-            max-width: 480px;
+        .ticket {
             width: 100%;
+            max-width: 520px;
+            border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(251, 191, 36, 0.15);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08);
         }
 
-        .pass-header {
-            background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
-            padding: 1.75rem 2rem;
+        /* ── Header ── */
+        .ticket-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #292524 100%);
+            padding: 2rem 2rem 3rem;
             position: relative;
+            overflow: hidden;
         }
 
-        .pass-header::after {
+        .ticket-header::before {
             content: '';
             position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 24px;
-            background: #1e293b;
-            border-radius: 50% 50% 0 0 / 0 0 100% 100%;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: rgba(251, 191, 36, 0.07);
+            border-radius: 50%;
         }
 
-        .pass-label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.75);
-            margin-bottom: 0.375rem;
+        .ticket-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 32px;
+            background: #ffffff;
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
 
-        .pass-title {
-            font-size: 1.75rem;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .brand-name {
+            font-size: 1rem;
             font-weight: 800;
-            color: #fff;
-            line-height: 1.2;
+            color: #f8fafc;
+            letter-spacing: 0.02em;
         }
 
-        .pass-body {
-            padding: 2rem;
-        }
-
-        .pass-reference {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px dashed rgba(251, 191, 36, 0.3);
-        }
-
-        .pass-reference .ref-label {
+        .event-label {
             font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: #94a3b8;
+            color: #fbbf24;
             margin-bottom: 0.5rem;
         }
 
-        .pass-reference .ref-value {
+        .event-title {
+            font-size: 1.625rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.25;
+        }
+
+        /* ── Body ── */
+        .ticket-body {
+            background: #ffffff;
+            padding: 1.75rem 2rem;
+        }
+
+        .confirmed-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            border-radius: 9999px;
+            padding: 0.3rem 0.875rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .ref-block {
+            background: #f8fafc;
+            border: 1.5px dashed #e2e8f0;
+            border-radius: 0.875rem;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .ref-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 0.375rem;
+        }
+
+        .ref-value {
             font-size: 1.75rem;
             font-weight: 800;
-            letter-spacing: 0.1em;
-            color: #fbbf24;
+            letter-spacing: 0.12em;
+            color: #0f172a;
             font-family: 'Courier New', Courier, monospace;
         }
 
-        .pass-fields {
+        /* ── Detail grid ── */
+        .detail-grid {
             display: grid;
-            gap: 1.25rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem 1.5rem;
         }
 
-        .pass-field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
+        .detail-grid .full-width {
+            grid-column: 1 / -1;
         }
 
-        .field-label {
-            font-size: 0.65rem;
+        .detail-item {}
+
+        .detail-label {
+            font-size: 0.625rem;
             font-weight: 700;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: #64748b;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
         }
 
-        .field-value {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #e2e8f0;
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
             line-height: 1.4;
         }
 
-        .pass-divider {
+        .divider {
             height: 1px;
-            background: rgba(251, 191, 36, 0.15);
-            margin: 1.25rem 0;
+            background: #f1f5f9;
+            margin: 1.5rem 0;
+            grid-column: 1 / -1;
         }
 
-        .pass-footer {
+        /* ── Footer ── */
+        .ticket-footer {
+            background: #f8fafc;
+            border-top: 1.5px dashed #e2e8f0;
             padding: 1rem 2rem;
-            background: rgba(15, 23, 42, 0.6);
-            border-top: 1px dashed rgba(251, 191, 36, 0.2);
-            text-align: center;
-            font-size: 0.7rem;
-            color: #475569;
-            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
         }
 
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            color: #fbbf24;
-            border-radius: 9999px;
-            padding: 0.25rem 0.75rem;
+        .footer-text {
             font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
+            color: #94a3b8;
+            letter-spacing: 0.04em;
+        }
+
+        .footer-brand {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.06em;
         }
     </style>
 </head>
 <body>
-    <div class="pass">
-        <div class="pass-header">
-            <div class="pass-label">Digital Pass</div>
-            <div class="pass-title">{{ $booking->event->title }}</div>
+    <div class="ticket">
+        <!-- Header -->
+        <div class="ticket-header">
+            <div class="brand">
+                <img src="{{ asset('assets/images/kivulini_logo.png') }}" alt="Kivulini" class="brand-logo" />
+                <span class="brand-name">Kivulini Adventures</span>
+            </div>
+            <div class="event-label">Your Event Pass</div>
+            <div class="event-title">{{ $booking->event->title }}</div>
         </div>
 
-        <div class="pass-body">
-            <div style="text-align:center;">
-                <span class="badge">✓ Confirmed</span>
+        <!-- Body -->
+        <div class="ticket-body">
+            <div>
+                <span class="confirmed-badge">&#10003; Booking Confirmed</span>
             </div>
 
-            <div class="pass-reference">
+            <div class="ref-block">
                 <div class="ref-label">Booking Reference</div>
                 <div class="ref-value">{{ $booking->booking_reference }}</div>
             </div>
 
-            <div class="pass-fields">
-                <div class="pass-field">
-                    <span class="field-label">Event</span>
-                    <span class="field-value">{{ $booking->event->title }}</span>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Date</div>
+                    <div class="detail-value">{{ $booking->event->start_date->format('D, M j Y') }}</div>
                 </div>
 
-                <div class="pass-field">
-                    <span class="field-label">Date</span>
-                    <span class="field-value">{{ $booking->event->start_date->format('D, M j Y') }}</span>
+                <div class="detail-item">
+                    <div class="detail-label">Slots</div>
+                    <div class="detail-value">{{ $booking->quantity }} {{ Str::plural('ticket', $booking->quantity) }}</div>
                 </div>
 
-                <div class="pass-field">
-                    <span class="field-label">Location</span>
-                    <span class="field-value">{{ $booking->event->location }}</span>
+                <div class="detail-item full-width">
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">{{ $booking->event->location }}</div>
                 </div>
 
-                <div class="pass-divider"></div>
+                <div class="divider"></div>
 
-                <div class="pass-field">
-                    <span class="field-label">Attendee</span>
-                    <span class="field-value">{{ $booking->contact_name }}</span>
+                <div class="detail-item">
+                    <div class="detail-label">Attendee</div>
+                    <div class="detail-value">{{ $booking->contact_name }}</div>
                 </div>
 
-                <div class="pass-field">
-                    <span class="field-label">Email</span>
-                    <span class="field-value">{{ $booking->contact_email }}</span>
+                <div class="detail-item">
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value">{{ $booking->contact_phone }}</div>
+                </div>
+
+                <div class="detail-item full-width">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ $booking->contact_email }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="pass-footer">
-            Present this pass at the event entrance &bull; Non-transferable
+        <!-- Footer -->
+        <div class="ticket-footer">
+            <span class="footer-text">Present this pass at the event entrance &bull; Non-transferable</span>
+            <span class="footer-brand">Kivulini Adventures</span>
         </div>
     </div>
 </body>

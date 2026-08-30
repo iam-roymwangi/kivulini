@@ -19,7 +19,6 @@ const emit = defineEmits<{
 const pills = [
     { label: 'All Events', value: 'all', disabled: false },
     { label: 'Road Trips', value: 'road_trip', disabled: false },
-    { label: 'Vacations', value: 'vacation', disabled: true, suffix: 'Coming Soon' },
 ];
 
 function select(value: string, disabled: boolean) {

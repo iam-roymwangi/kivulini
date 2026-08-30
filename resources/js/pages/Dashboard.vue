@@ -149,7 +149,7 @@ function formatDate(dateStr: string) {
                     <h3 class="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                         {{ metrics.tickets_sold }}
                     </h3>
-                    <p class="text-xs text-muted-foreground">Total seats occupied</p>
+                    <p class="text-xs text-muted-foreground">Total slots occupied</p>
                 </div>
             </div>
 

@@ -112,14 +112,7 @@ function handleClose() {
                     </p>
                     <p class="mt-0.5 text-sm font-bold text-foreground line-clamp-1">{{ event.title }}</p>
                 </div>
-                <button
-                    type="button"
-                    class="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    aria-label="Close"
-                    @click="handleClose"
-                >
-                    <X class="h-4 w-4" />
-                </button>
+                
             </div>
 
             <!-- Progress bar (not shown on confirmation) -->

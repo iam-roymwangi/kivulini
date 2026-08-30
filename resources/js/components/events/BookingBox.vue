@@ -45,7 +45,7 @@ function proceedToBooking() {
 
 <template>
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg transition-colors dark:border-slate-700 dark:bg-slate-900 dark:shadow-2xl">
-        <h3 class="mb-4 text-lg font-bold text-slate-900 dark:text-white">Book Your Spot</h3>
+        <h3 class="mb-4 text-lg font-bold text-slate-900 dark:text-white">Book Your Slot</h3>
 
         <!-- Date -->
         <div class="mb-4 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -59,7 +59,7 @@ function proceedToBooking() {
         <div class="mb-5">
             <p v-if="!isSoldOut" class="text-sm text-slate-500 dark:text-slate-400">
                 <span class="font-bold text-slate-900 dark:text-white">{{ event.available_slots }}</span>
-                seat{{ event.available_slots === 1 ? '' : 's' }} remaining
+                slot{{ event.available_slots === 1 ? '' : 's' }} remaining
             </p>
             <p v-else class="text-sm font-bold text-red-500">Sold Out</p>
         </div>
@@ -67,7 +67,7 @@ function proceedToBooking() {
         <!-- Quantity selector -->
         <div v-if="!isSoldOut && isPublished" class="mb-5">
             <label for="booking-quantity" class="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
-                Number of seats
+                Number of slots
             </label>
             <div class="flex items-center gap-3">
                 <button

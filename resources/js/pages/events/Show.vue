@@ -92,7 +92,7 @@ function openBooking(qty: number) {
                     </div>
 
                     <!-- Organizer -->
-                    <div class="flex items-center gap-4 rounded-xl border border-border bg-card dark:border-slate-800 dark:bg-slate-900/50 p-5">
+                    <!-- <div class="flex items-center gap-4 rounded-xl border border-border bg-card dark:border-slate-800 dark:bg-slate-900/50 p-5">
                         <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-400 text-lg font-black text-slate-900">
                             K
                         </div>
@@ -100,7 +100,7 @@ function openBooking(qty: number) {
                             <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Organizer</p>
                             <p class="font-bold text-foreground">Kivulini Adventures</p>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Reviews placeholder -->
                     <div>

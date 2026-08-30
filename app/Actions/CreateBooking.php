@@ -34,8 +34,6 @@ class CreateBooking
                 'contact_name' => $data['contact_name'],
                 'contact_email' => $data['contact_email'],
                 'contact_phone' => $data['contact_phone'],
-                'emergency_contact_name' => $data['emergency_contact_name'],
-                'emergency_contact_phone' => $data['emergency_contact_phone'],
                 'quantity' => $data['quantity'],
                 'total_price' => $event->price * $data['quantity'],
                 'payment_status' => 'pending',

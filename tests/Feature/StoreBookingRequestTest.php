@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Validator;
  *
  * @param  array<string, mixed>  $data
  */
-function validateBookingRequest(array $data): \Illuminate\Contracts\Validation\Validator
+function validateBookingRequest(array $data): Illuminate\Contracts\Validation\Validator
 {
-    $request = new StoreBookingRequest();
+    $request = new StoreBookingRequest;
 
     return Validator::make($data, $request->rules());
 }
@@ -26,8 +26,6 @@ function validBookingPayload(): array
         'contact_name' => 'Jane Doe',
         'contact_email' => 'jane@example.com',
         'contact_phone' => '+254700000001',
-        'emergency_contact_name' => 'John Doe',
-        'emergency_contact_phone' => '+254700000002',
         'quantity' => 2,
         'responses' => [],
         'consent' => [
@@ -38,7 +36,7 @@ function validBookingPayload(): array
 }
 
 test('authorize returns true for public bookings', function () {
-    $request = new StoreBookingRequest();
+    $request = new StoreBookingRequest;
 
     expect($request->authorize())->toBeTrue();
 });
@@ -82,24 +80,6 @@ test('contact_phone is required', function () {
     $validator = validateBookingRequest($data);
 
     expect($validator->errors()->has('contact_phone'))->toBeTrue();
-});
-
-test('emergency_contact_name is required', function () {
-    $data = validBookingPayload();
-    unset($data['emergency_contact_name']);
-
-    $validator = validateBookingRequest($data);
-
-    expect($validator->errors()->has('emergency_contact_name'))->toBeTrue();
-});
-
-test('emergency_contact_phone is required', function () {
-    $data = validBookingPayload();
-    unset($data['emergency_contact_phone']);
-
-    $validator = validateBookingRequest($data);
-
-    expect($validator->errors()->has('emergency_contact_phone'))->toBeTrue();
 });
 
 test('quantity must be an integer of at least 1', function () {
@@ -166,12 +146,4 @@ test('contact_phone max 30 characters enforced', function () {
     $validator = validateBookingRequest($data);
 
     expect($validator->errors()->has('contact_phone'))->toBeTrue();
-});
-
-test('emergency_contact_phone max 30 characters enforced', function () {
-    $data = array_merge(validBookingPayload(), ['emergency_contact_phone' => str_repeat('1', 31)]);
-
-    $validator = validateBookingRequest($data);
-
-    expect($validator->errors()->has('emergency_contact_phone'))->toBeTrue();
 });

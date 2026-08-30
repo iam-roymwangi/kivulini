@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import { Search, SlidersHorizontal, X } from '@lucide/vue';
 import CategoryFilter from '@/components/events/CategoryFilter.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
@@ -21,39 +22,83 @@ const props = defineProps<{
     pastEventsMedia: Paginator<EventMedia>;
 }>();
 
-const activeFilter = ref('all');
+// ── Filters ──────────────────────────────────────────────────────────────────
+const activeFilter = ref('all');   // category: all | event | road_trip | vacation
+const searchQuery = ref('');
+const priceRange = ref<'all' | 'low' | 'mid' | 'high'>('all');
+const sortOrder = ref<'date-asc' | 'date-desc' | 'price-asc' | 'price-desc'>('date-asc');
+const showMobileFilters = ref(false);
+
+const hasActiveFilters = computed(
+    () => searchQuery.value.trim() !== '' || priceRange.value !== 'all' || sortOrder.value !== 'date-asc',
+);
+
+function clearFilters() {
+    searchQuery.value = '';
+    priceRange.value = 'all';
+    sortOrder.value = 'date-asc';
+    activeFilter.value = 'all';
+}
+
+// Price buckets in KES
+const priceBuckets = {
+    all: [0, Infinity],
+    low:  [0, 3000],
+    mid:  [3001, 8000],
+    high: [8001, Infinity],
+} as const;
 
 const filteredEvents = computed(() => {
-    const data = props.events?.data || [];
-    if (activeFilter.value === 'all') { return data; }
-    return data.filter((e) => e.type === activeFilter.value);
+    let data = [...(props.events?.data ?? [])];
+
+    // Category
+    if (activeFilter.value !== 'all') {
+        data = data.filter((e) => e.type === activeFilter.value);
+    }
+
+    // Search (title + location)
+    const q = searchQuery.value.trim().toLowerCase();
+    if (q) {
+        data = data.filter(
+            (e) =>
+                e.title.toLowerCase().includes(q) ||
+                e.location.toLowerCase().includes(q) ||
+                e.summary.toLowerCase().includes(q),
+        );
+    }
+
+    // Price range
+    if (priceRange.value !== 'all') {
+        const [min, max] = priceBuckets[priceRange.value];
+        data = data.filter((e) => {
+            const p = parseFloat(e.price);
+            return p >= min && p <= max;
+        });
+    }
+
+    // Sort
+    data.sort((a, b) => {
+        switch (sortOrder.value) {
+            case 'date-asc':  return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+            case 'date-desc': return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+            case 'price-asc': return parseFloat(a.price) - parseFloat(b.price);
+            case 'price-desc': return parseFloat(b.price) - parseFloat(a.price);
+        }
+    });
+
+    return data;
+});
+
+const activeFilterLabel = computed(() => {
+    const map: Record<string, string> = { all: 'Events', event: 'Events', road_trip: 'Road Trips', vacation: 'Vacations' };
+    return map[activeFilter.value] ?? 'Events';
 });
 
 const testimonials = [
-    {
-        name: 'Wanjiku N.',
-        location: 'Nairobi, Kenya',
-        initials: 'WN',
-        text: 'The Mt. Longonot hike was perfectly organized! The guides were very professional and the bonfire at night was magical.',
-    },
-    {
-        name: 'David K.',
-        location: 'Kisumu, Kenya',
-        initials: 'DK',
-        text: 'Kivulini makes booking trips so simple. The digital consent and STK push payments are seamless!',
-    },
-    {
-        name: 'Sarah M.',
-        location: 'Mombasa, Kenya',
-        initials: 'SM',
-        text: 'An absolute 10/10 experience! I met amazing people and saw the most beautiful sunsets on the Rift Valley road trip.',
-    },
-    {
-        name: 'John O.',
-        location: 'Eldoret, Kenya',
-        initials: 'JO',
-        text: 'Highly recommend Kivulini for anyone looking to explore Kenya in groups. Great vibe, safe environment!',
-    },
+    { name: 'Wanjiku N.', location: 'Nairobi, Kenya', initials: 'WN', text: 'The Mt. Longonot hike was perfectly organized! The guides were very professional and the bonfire at night was magical.' },
+    { name: 'David K.', location: 'Kisumu, Kenya', initials: 'DK', text: 'Kivulini makes booking trips so simple. The digital consent and STK push payments are seamless!' },
+    { name: 'Sarah M.', location: 'Mombasa, Kenya', initials: 'SM', text: 'An absolute 10/10 experience! I met amazing people and saw the most beautiful sunsets on the Rift Valley road trip.' },
+    { name: 'John O.', location: 'Eldoret, Kenya', initials: 'JO', text: 'Highly recommend Kivulini for anyone looking to explore Kenya in groups. Great vibe, safe environment!' },
 ];
 </script>
 
@@ -66,16 +111,113 @@ const testimonials = [
     <!-- Event grid -->
     <section id="events" class="bg-background px-4 py-16 transition-colors md:px-8 lg:px-12">
         <div class="mx-auto max-w-7xl">
-            <!-- Section header -->
-            <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <h2 class="text-3xl font-black text-foreground">
-                    Upcoming
-                    <span class="text-amber-500">
-                        {{ activeFilter === 'all' ? 'Events' : activeFilter === 'road_trip' ? 'Road Trips' : 'Vacations' }}
-                    </span>
-                </h2>
-                <!-- Inline filter for the grid section -->
-                <CategoryFilter v-model="activeFilter" />
+
+            <!-- ── Search & Filter Toolbar ── -->
+            <div class="mb-8 space-y-4">
+                <!-- Row 1: heading + mobile filter toggle -->
+                <div class="flex items-center justify-between gap-4">
+                    <h2 class="text-3xl font-black text-foreground">
+                        Upcoming
+                        <span class="text-amber-500">{{ activeFilterLabel }}</span>
+                    </h2>
+                    <button
+                        type="button"
+                        class="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground transition hover:border-amber-400 hover:text-amber-500 sm:hidden"
+                        :class="showMobileFilters ? 'border-amber-400 text-amber-500' : ''"
+                        @click="showMobileFilters = !showMobileFilters"
+                    >
+                        <SlidersHorizontal class="h-4 w-4" />
+                        Filters
+                        <span v-if="hasActiveFilters" class="flex h-2 w-2 rounded-full bg-amber-400" />
+                    </button>
+                </div>
+
+                <!-- Row 2: search bar (always visible) -->
+                <div class="relative">
+                    <Search class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                        v-model="searchQuery"
+                        type="search"
+                        placeholder="Search events, locations..."
+                        class="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
+                    />
+                    <button
+                        v-if="searchQuery"
+                        type="button"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:text-foreground"
+                        aria-label="Clear search"
+                        @click="searchQuery = ''"
+                    >
+                        <X class="h-4 w-4" />
+                    </button>
+                </div>
+
+                <!-- Row 3: filter pills (desktop always, mobile collapsible) -->
+                <div
+                    class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+                    :class="showMobileFilters ? 'flex' : 'hidden sm:flex'"
+                >
+                    <!-- Category -->
+                    <CategoryFilter v-model="activeFilter" />
+
+                    <div class="hidden h-5 w-px bg-border sm:block" />
+
+                    <!-- Price range -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Price:</span>
+                        <button
+                            v-for="opt in [
+                                { value: 'all', label: 'Any' },
+                                { value: 'low', label: 'Under KES 3k' },
+                                { value: 'mid', label: 'KES 3–8k' },
+                                { value: 'high', label: 'Over KES 8k' },
+                            ]"
+                            :key="opt.value"
+                            type="button"
+                            class="rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
+                            :class="priceRange === opt.value
+                                ? 'border-amber-400 bg-amber-400/10 text-amber-500'
+                                : 'border-border text-muted-foreground hover:border-amber-400/50 hover:text-amber-500'"
+                            @click="priceRange = opt.value as typeof priceRange"
+                        >
+                            {{ opt.label }}
+                        </button>
+                    </div>
+
+                    <div class="hidden h-5 w-px bg-border sm:block" />
+
+                    <!-- Sort -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sort:</span>
+                        <select
+                            v-model="sortOrder"
+                            class="rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground focus:border-amber-400 focus:outline-none"
+                        >
+                            <option value="date-asc">Date: Soonest</option>
+                            <option value="date-desc">Date: Latest</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                        </select>
+                    </div>
+
+                    <!-- Clear all (only when filters are active) -->
+                    <button
+                        v-if="hasActiveFilters"
+                        type="button"
+                        class="flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-400"
+                        @click="clearFilters"
+                    >
+                        <X class="h-3.5 w-3.5" />
+                        Clear all
+                    </button>
+                </div>
+
+                <!-- Results count -->
+                <p class="text-sm text-muted-foreground">
+                    <span class="font-semibold text-foreground">{{ filteredEvents.length }}</span>
+                    {{ filteredEvents.length === 1 ? 'event' : 'events' }} found
+                    <span v-if="searchQuery"> for "<span class="text-amber-500">{{ searchQuery }}</span>"</span>
+                </p>
             </div>
 
             <!-- Grid -->
@@ -93,13 +235,26 @@ const testimonials = [
             <!-- Empty state -->
             <div
                 v-else
-                class="flex min-h-48 items-center justify-center rounded-2xl border border-border bg-card"
+                class="flex min-h-56 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-card"
             >
-                <p class="text-muted-foreground">No events found for this category yet. Check back soon.</p>
+                <Search class="h-10 w-10 text-muted-foreground/40" />
+                <div class="text-center">
+                    <p class="font-semibold text-foreground">No events found</p>
+                    <p class="mt-1 text-sm text-muted-foreground">
+                        Try adjusting your search or clearing the filters.
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    class="rounded-xl bg-amber-400 px-5 py-2 text-sm font-bold text-slate-900 hover:bg-amber-300"
+                    @click="clearFilters"
+                >
+                    Clear Filters
+                </button>
             </div>
 
-            <!-- Events Pagination -->
-            <div v-if="events.last_page > 1" class="mt-12 flex items-center justify-center gap-1.5">
+            <!-- Pagination (only when not filtering client-side) -->
+            <div v-if="events.last_page > 1 && !hasActiveFilters && activeFilter === 'all'" class="mt-12 flex items-center justify-center gap-1.5">
                 <template v-for="link in events.links" :key="link.label">
                     <Link
                         v-if="link.url"

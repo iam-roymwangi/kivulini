@@ -42,8 +42,6 @@ export interface BookingPayload {
     contact_name: string;
     contact_email: string;
     contact_phone: string;
-    emergency_contact_name: string;
-    emergency_contact_phone: string;
     quantity: number;
     responses: { event_question_id: number; answer: string }[];
     consent: { agreed: boolean; signer_name: string };

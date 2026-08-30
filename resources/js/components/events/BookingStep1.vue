@@ -14,8 +14,6 @@ const form = reactive({
     contact_name: props.initialData?.contact_name ?? '',
     contact_email: props.initialData?.contact_email ?? '',
     contact_phone: props.initialData?.contact_phone ?? '',
-    emergency_contact_name: props.initialData?.emergency_contact_name ?? '',
-    emergency_contact_phone: props.initialData?.emergency_contact_phone ?? '',
 });
 
 const errors = reactive<Record<string, string>>({});
@@ -27,8 +25,6 @@ function validate(): boolean {
     if (!form.contact_phone.trim()) { errors.contact_phone = 'Phone number is required.'; }
     if (!form.contact_email.trim()) { errors.contact_email = 'Email address is required.'; }
     else if (!emailRegex.test(form.contact_email)) { errors.contact_email = 'Enter a valid email address.'; }
-    if (!form.emergency_contact_name.trim()) { errors.emergency_contact_name = 'Emergency contact name is required.'; }
-    if (!form.emergency_contact_phone.trim()) { errors.emergency_contact_phone = 'Emergency contact phone is required.'; }
     return Object.keys(errors).length === 0;
 }
 
@@ -62,20 +58,6 @@ function submit() {
                 <label for="contact_email" class="form-label">Email Address <span class="text-amber-500">*</span></label>
                 <input id="contact_email" v-model="form.contact_email" type="email" autocomplete="email" class="form-input" :class="errors.contact_email ? 'border-red-500' : ''" placeholder="jane@example.com" />
                 <p v-if="errors.contact_email" class="form-error" role="alert">{{ errors.contact_email }}</p>
-            </div>
-
-            <div class="rounded-2xl border border-border bg-muted/20 p-4 space-y-4">
-                <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Emergency Contact</p>
-                <div>
-                    <label for="emergency_contact_name" class="form-label">Name <span class="text-amber-500">*</span></label>
-                    <input id="emergency_contact_name" v-model="form.emergency_contact_name" type="text" class="form-input" :class="errors.emergency_contact_name ? 'border-red-500' : ''" placeholder="John Doe" />
-                    <p v-if="errors.emergency_contact_name" class="form-error" role="alert">{{ errors.emergency_contact_name }}</p>
-                </div>
-                <div>
-                    <label for="emergency_contact_phone" class="form-label">Phone <span class="text-amber-500">*</span></label>
-                    <input id="emergency_contact_phone" v-model="form.emergency_contact_phone" type="tel" class="form-input" :class="errors.emergency_contact_phone ? 'border-red-500' : ''" placeholder="+254 700 000 001" />
-                    <p v-if="errors.emergency_contact_phone" class="form-error" role="alert">{{ errors.emergency_contact_phone }}</p>
-                </div>
             </div>
 
             <button type="submit" class="btn-primary w-full">Continue</button>

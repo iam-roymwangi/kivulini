@@ -40,7 +40,7 @@ class Booking extends Model
     {
         static::creating(function ($booking) {
             if (empty($booking->booking_reference)) {
-                $booking->booking_reference = 'BK-' . strtoupper(Str::random(8));
+                $booking->booking_reference = 'BK-'.strtoupper(Str::random(8));
             }
         });
     }

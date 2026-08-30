@@ -1,42 +1,60 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
-import { home } from '@/routes';
+import NavIsland from '@/components/events/NavIsland.vue';
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import type { User } from '@/types';
 
 defineProps<{
     title?: string;
     description?: string;
 }>();
+
+const page = usePage();
+const user = computed(() => (page.props.auth as { user: User | null } | null)?.user ?? null);
+
+const heroImages = [
+    '/assets/images/hero.jpg',
+    '/assets/images/event-3.jpg',
+    '/assets/images/event-4.jpg',
+];
+
+const heroImage = heroImages[Math.floor(Math.random() * heroImages.length)];
 </script>
 
 <template>
-    <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
-    >
-        <div class="w-full max-w-sm">
-            <div class="flex flex-col gap-8">
-                <div class="flex flex-col items-center gap-4">
-                    <Link
-                        :href="home()"
-                        class="flex flex-col items-center gap-2 font-medium"
-                    >
-                        <div
-                            class="mb-1 flex h-9 w-9 items-center justify-center rounded-md"
-                        >
-                            <AppLogoIcon
-                                class="size-9 fill-current text-[var(--foreground)] dark:text-white"
-                            />
-                        </div>
-                        <span class="sr-only">{{ title }}</span>
-                    </Link>
-                    <div class="space-y-2 text-center">
-                        <h1 class="text-xl font-medium">{{ title }}</h1>
-                        <p class="text-center text-sm text-muted-foreground">
-                            {{ description }}
+    <div class="min-h-svh bg-background">
+        <NavIsland :user="user" />
+
+        <div class="grid min-h-svh pt-20 lg:grid-cols-2 lg:pt-0">
+            <!-- Left panel — hero image + brand copy (desktop only) -->
+            <div class="relative hidden overflow-hidden lg:flex">
+                <img :src="heroImage" alt="Adventure" class="absolute inset-0 h-full w-full object-cover" />
+                <div class="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-slate-950/60 to-transparent" />
+                <div class="relative z-10 flex flex-col justify-end p-10 pb-16">
+                    <blockquote class="text-white">
+                        <p class="mb-4 text-3xl font-black leading-tight">
+                            The adventure<br />starts with<br />
+                            <span class="text-amber-400">one booking.</span>
                         </p>
-                    </div>
+                        <footer class="text-sm text-slate-400">
+                            Join thousands of explorers who trust Kivulini Adventures for their best weekends.
+                        </footer>
+                    </blockquote>
                 </div>
-                <slot />
+            </div>
+
+            <!-- Right panel — form -->
+            <div class="flex flex-col items-center justify-center bg-background px-6 py-12 md:px-12">
+                <div class="w-full max-w-sm space-y-8">
+                    <!-- Heading -->
+                    <div class="space-y-2 text-center lg:text-left">
+                        <h1 class="text-2xl font-black text-foreground">{{ title }}</h1>
+                        <p class="text-sm text-muted-foreground">{{ description }}</p>
+                    </div>
+
+                    <!-- Form slot -->
+                    <slot />
+                </div>
             </div>
         </div>
     </div>

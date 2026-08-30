@@ -31,8 +31,6 @@ function validPayload(array $overrides = []): array
         'contact_name' => 'Jane Doe',
         'contact_email' => 'jane@example.com',
         'contact_phone' => '+254700000001',
-        'emergency_contact_name' => 'John Doe',
-        'emergency_contact_phone' => '+254700000002',
         'quantity' => 1,
         'responses' => [],
         'consent' => [
@@ -61,7 +59,7 @@ test('store returns 422 when event is sold out', function () {
     $response = $this->postJson("/events/{$event->id}/bookings", validPayload());
 
     $response->assertStatus(422)
-        ->assertJson(['message' => 'No seats remaining for this event.']);
+        ->assertJson(['message' => 'No slots remaining for this event.']);
 });
 
 test('store returns 422 when requested quantity exceeds available slots', function () {
@@ -70,7 +68,7 @@ test('store returns 422 when requested quantity exceeds available slots', functi
     $response = $this->postJson("/events/{$event->id}/bookings", validPayload(['quantity' => 5]));
 
     $response->assertStatus(422)
-        ->assertJson(['message' => 'No seats remaining for this event.']);
+        ->assertJson(['message' => 'No slots remaining for this event.']);
 });
 
 test('store returns 422 validation error when required fields are missing', function () {
@@ -87,7 +85,7 @@ test('store returns 422 validation error when required fields are missing', func
 
 // --- downloadPass() ---
 
-test('downloadPass returns HTML file with correct content-disposition header', function () {
+test('downloadPass returns PDF file with correct content-disposition header', function () {
     $event = makeEvent();
 
     $booking = Booking::create([
@@ -95,8 +93,6 @@ test('downloadPass returns HTML file with correct content-disposition header', f
         'contact_name' => 'Jane Doe',
         'contact_email' => 'jane@example.com',
         'contact_phone' => '+254700000001',
-        'emergency_contact_name' => 'John Doe',
-        'emergency_contact_phone' => '+254700000002',
         'quantity' => 1,
         'total_price' => '1500.00',
         'payment_status' => 'paid',
@@ -105,11 +101,11 @@ test('downloadPass returns HTML file with correct content-disposition header', f
     $response = $this->get("/bookings/{$booking->id}/pass");
 
     $response->assertStatus(200)
-        ->assertHeader('Content-Type', 'text/html; charset=utf-8')
-        ->assertHeader('Content-Disposition', "attachment; filename=\"pass-{$booking->booking_reference}.html\"");
+        ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('Content-Disposition', "attachment; filename=pass-{$booking->booking_reference}.pdf");
 });
 
-test('downloadPass response contains required booking and event fields', function () {
+test('downloadPass view contains required booking and event fields', function () {
     $event = makeEvent();
 
     $booking = Booking::create([
@@ -117,18 +113,14 @@ test('downloadPass response contains required booking and event fields', functio
         'contact_name' => 'Jane Doe',
         'contact_email' => 'jane@example.com',
         'contact_phone' => '+254700000001',
-        'emergency_contact_name' => 'John Doe',
-        'emergency_contact_phone' => '+254700000002',
         'quantity' => 1,
         'total_price' => '1500.00',
         'payment_status' => 'paid',
     ]);
 
-    $response = $this->get("/bookings/{$booking->id}/pass");
+    $html = view('bookings.pass-pdf', ['booking' => $booking])->render();
 
-    $content = $response->getContent();
-
-    expect($content)
+    expect($html)
         ->toContain($booking->booking_reference)
         ->toContain($event->title)
         ->toContain($event->start_date->format('D, M j Y'))

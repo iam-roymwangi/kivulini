@@ -16,8 +16,8 @@ defineProps<{
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'Join Kivulini',
+        description: 'Create an account to start booking adventures',
     },
 });
 </script>
@@ -91,7 +91,7 @@ defineOptions({
 
             <Button
                 type="submit"
-                class="mt-2 w-full"
+                class="mt-2 w-full bg-amber-400 text-slate-900 hover:bg-amber-300 focus-visible:ring-amber-400"
                 tabindex="5"
                 :disabled="processing"
                 data-test="register-user-button"

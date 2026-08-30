@@ -7,6 +7,7 @@ use App\Exceptions\BookingCapacityException;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Event;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
@@ -18,10 +19,10 @@ class BookingController extends Controller
     public function store(StoreBookingRequest $request, Event $event): JsonResponse
     {
         try {
-            $booking = (new CreateBooking())->handle($event, $request->validated(), $request->ip());
+            $booking = (new CreateBooking)->handle($event, $request->validated(), $request->ip());
         } catch (BookingCapacityException) {
             return response()->json(
-                ['message' => 'No seats remaining for this event.'],
+                ['message' => 'No slots remaining for this event.'],
                 422
             );
         }
@@ -36,17 +37,14 @@ class BookingController extends Controller
     }
 
     /**
-     * Download the Digital Pass for a confirmed booking as a styled HTML page.
+     * Download the Digital Pass for a confirmed booking as a PDF.
      */
     public function downloadPass(Booking $booking): Response
     {
         $booking->loadMissing('event');
 
-        $html = view('bookings.pass', ['booking' => $booking])->render();
+        $pdf = Pdf::loadView('bookings.pass-pdf', ['booking' => $booking]);
 
-        return response($html, 200, [
-            'Content-Type' => 'text/html',
-            'Content-Disposition' => "attachment; filename=\"pass-{$booking->booking_reference}.html\"",
-        ]);
+        return $pdf->download("pass-{$booking->booking_reference}.pdf");
     }
 }

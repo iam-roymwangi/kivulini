@@ -27,8 +27,6 @@ class StoreBookingRequest extends FormRequest
             'contact_name' => ['required', 'string', 'max:255'],
             'contact_email' => ['required', 'email', 'max:255'],
             'contact_phone' => ['required', 'string', 'max:30'],
-            'emergency_contact_name' => ['required', 'string', 'max:255'],
-            'emergency_contact_phone' => ['required', 'string', 'max:30'],
             'quantity' => ['required', 'integer', 'min:1'],
             'responses' => ['array'],
             'responses.*.event_question_id' => ['required', 'integer', 'exists:event_questions,id'],

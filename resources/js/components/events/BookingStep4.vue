@@ -109,7 +109,7 @@ async function submit() {
                     <span>{{ event.location }}</span>
                 </div>
                 <div class="flex justify-between text-muted-foreground">
-                    <span>Seats</span>
+                    <span>Slots</span>
                     <span>{{ payload.quantity }}</span>
                 </div>
                 <div class="flex justify-between text-muted-foreground">
