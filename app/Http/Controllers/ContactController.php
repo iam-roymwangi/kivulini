@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreContactRequest;
 use App\Mail\ContactMail;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -25,13 +26,22 @@ class ContactController extends Controller
 
         $data = $request->validated();
 
-        Mail::to(config('mail.contact_address', config('mail.from.address')))
-            ->send(new ContactMail(
+        try {
+            $recipient = config('mail.contact_address')
+                ?: config('mail.from.address')
+                ?: 'info@kivulini.co.ke';
+
+            Mail::to($recipient)->send(new ContactMail(
                 senderName: $data['name'],
                 senderEmail: $data['email'],
                 contactSubject: $data['subject'] ?? '',
                 body: $data['message'],
             ));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send contact email: '.$e->getMessage(), [
+                'data' => $data,
+            ]);
+        }
 
         return response()->json(['message' => 'Message sent successfully.'], 200);
     }

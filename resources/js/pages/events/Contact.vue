@@ -35,31 +35,33 @@ async function submitForm() {
     try {
         const csrf = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
 
-        const res = await fetch(route('contact.store'), {
+        const res = await fetch('/contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrf,
+                'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify(form),
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
 
         if (res.ok) {
             submitted.value = true;
             Object.assign(form, { name: '', email: '', subject: '', message: '' });
-        } else if (res.status === 422 && data.errors) {
+        } else if (res.status === 422 && data?.errors) {
             // Laravel validation errors
             Object.keys(data.errors).forEach((key) => {
                 errors[key] = data.errors[key][0];
             });
         } else {
             failed.value = true;
-            failMessage.value = data.message ?? 'Something went wrong. Please try again.';
+            failMessage.value = data?.message ?? `Server error (${res.status}). Please try again.`;
         }
-    } catch {
+    } catch (err) {
+        console.error('Contact submission error:', err);
         failed.value = true;
         failMessage.value = 'Network error. Please check your connection and try again.';
     } finally {
