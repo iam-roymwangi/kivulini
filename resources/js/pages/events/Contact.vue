@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from '@lucide/vue';
+import { AlertCircle, CheckCircle2, Mail, MapPin, Phone, Send } from '@lucide/vue';
 
 const submitted = ref(false);
+const failed = ref(false);
 
 const form = useForm({
     name: '',
@@ -12,12 +13,34 @@ const form = useForm({
     message: '',
 });
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validate(): boolean {
+    form.clearErrors();
+    if (!form.name.trim()) { form.setError('name', 'Your name is required.'); }
+    if (!form.email.trim()) {
+        form.setError('email', 'Email address is required.');
+    } else if (!emailRegex.test(form.email)) {
+        form.setError('email', 'Please enter a valid email address.');
+    }
+    if (!form.message.trim()) { form.setError('message', 'Message cannot be empty.'); }
+    return !form.hasErrors;
+}
+
 function submitForm() {
+    if (!validate()) { return; }
+    failed.value = false;
+
     form.post(route('contact.store'), {
         preserveScroll: true,
         onSuccess: () => {
             submitted.value = true;
             form.reset();
+        },
+        onError: () => {
+            // Server-side validation errors are handled inline.
+            // A general failure banner shows for unexpected errors.
+            if (!form.hasErrors) { failed.value = true; }
         },
     });
 }
@@ -117,6 +140,15 @@ function submitForm() {
                         </div>
 
                         <form v-else @submit.prevent="submitForm" class="space-y-6">
+                            <!-- General error banner -->
+                            <div
+                                v-if="failed"
+                                class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400"
+                                role="alert"
+                            >
+                                <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+                                <span>Something went wrong. Please try again or email us directly at <strong>info@kivuliniadventures.com</strong>.</span>
+                            </div>
                             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
                                     <label for="name" class="block text-sm font-bold text-foreground">Your Name</label>
@@ -171,8 +203,8 @@ function submitForm() {
 
                             <button
                                 type="submit"
-                                :disabled="form.processing"
-                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-bold text-white transition-all hover:bg-amber-400 disabled:opacity-60 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300"
+                                :disabled="form.processing || submitted"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-bold text-white transition-all hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300"
                             >
                                 <Send class="h-4 w-4" />
                                 {{ form.processing ? 'Sending...' : 'Send Message' }}
