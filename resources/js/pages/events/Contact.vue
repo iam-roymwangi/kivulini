@@ -77,7 +77,7 @@ async function submitForm() {
         <meta property="og:title" content="Contact Kivulini Adventures" />
         <meta property="og:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" :href="$page.url" />
+        <link rel="canonical" href="https://kivuliniadventures.com/contact" />
     </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">
@@ -103,7 +103,7 @@ async function submitForm() {
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold uppercase tracking-wider text-muted-foreground">Email Us</h3>
-                                <p class="mt-1 font-bold text-foreground">info@kivulini.co.ke</p>
+                                <p class="mt-1 font-bold text-foreground">info@kivuliniadventures.com</p>
                             </div>
                         </div>
                     </div>

@@ -29,7 +29,7 @@ class ContactController extends Controller
         try {
             $recipient = config('mail.contact_address')
                 ?: config('mail.from.address')
-                ?: 'info@kivulini.co.ke';
+                ?: 'info@kivuliniadventures.com';
 
             Mail::to($recipient)->send(new ContactMail(
                 senderName: $data['name'],

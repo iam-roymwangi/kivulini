@@ -24,7 +24,7 @@ defineProps<{
         <meta property="og:title" content="Past Trips Photo Gallery – Kivulini Adventures" />
         <meta property="og:description" content="Browse photos from our past hikes, road trips, and vacations across Kenya." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" :href="$page.url" />
+        <link rel="canonical" href="https://kivuliniadventures.com/gallery" />
     </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">
