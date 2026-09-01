@@ -18,8 +18,8 @@ const categoryLinks = [
 ];
 
 const contactInfo = [
-    { label: 'info@kivulini.co.ke', value: 'mailto:info@kivulini.co.ke' },
-    { label: '+254 700 000 000', value: 'tel:+254700000000' },
+    { label: 'info@kivuliniadventures.com', value: 'mailto:info@kivuliniadventures.com' },
+    { label: '+254 725 038 004', value: 'tel:+254725038004' },
     { label: 'Nairobi, Kenya', value: '#' },
 ];
 </script>

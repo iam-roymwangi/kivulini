@@ -21,9 +21,8 @@ class EventController extends Controller
             ->with('media')
             ->paginate(3, ['*'], 'events_page');
 
-        $pastEventsMedia = EventMedia::whereHas('event', function ($query) {
-            $query->where('status', 'completed');
-        })
+        $pastEventsMedia = EventMedia::where('is_featured', true)
+            ->with('event')
             ->orderBy('sort_order')
             ->paginate(3, ['*'], 'gallery_page');
 
@@ -75,9 +74,8 @@ class EventController extends Controller
      */
     public function galleryPage(Request $request): Response
     {
-        $pastEventsMedia = EventMedia::whereHas('event', function ($query) {
-            $query->where('status', 'completed');
-        })
+        $pastEventsMedia = EventMedia::where('is_featured', true)
+            ->with('event')
             ->orderBy('sort_order')
             ->paginate(9, ['*'], 'page')->withQueryString();
 

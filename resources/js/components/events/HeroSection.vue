@@ -59,11 +59,11 @@ const current = computed(() => slides[currentIndex.value]);
             <div class="flex min-h-[9rem] flex-col items-center justify-center gap-3">
                 <Transition name="hero-text" mode="out-in">
                     <div :key="currentIndex">
-                        <h1 class="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
+                        <h1 class="max-w-4xl text-3xl font-black tracking-tight text-white sm:text-5xl lg:text-7xl">
                             {{ current.caption }}<br />
                             <span class="text-amber-400">{{ current.accent }}</span>
                         </h1>
-                        <p class="mx-auto mt-3 max-w-xl text-lg text-slate-300">{{ current.sub }}</p>
+                        <p class="mx-auto mt-3 max-w-xl text-md text-slate-300">{{ current.sub }}</p>
                     </div>
                 </Transition>
             </div>
@@ -72,13 +72,13 @@ const current = computed(() => slides[currentIndex.value]);
                 href="#events"
                 class="rounded-full bg-amber-400 px-8 py-4 text-base font-bold text-slate-900 shadow-lg transition-all hover:bg-amber-300 hover:shadow-amber-400/25 hover:shadow-xl active:scale-95"
             >
-                Explore Upcoming Trips
+                Explore Upcoming Events
             </a>
 
         </div>
 
         <!-- Prev / Next arrows -->
-        <button
+        <!-- <button
             type="button"
             class="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-slate-900/60 p-2.5 text-white backdrop-blur-sm transition hover:bg-slate-900/80 md:left-8"
             aria-label="Previous slide"
@@ -97,7 +97,7 @@ const current = computed(() => slides[currentIndex.value]);
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
-        </button>
+        </button> -->
 
         <!-- Dot indicators -->
         <div class="absolute bottom-20 left-1/2 z-20 flex -translate-x-1/2 gap-2">
