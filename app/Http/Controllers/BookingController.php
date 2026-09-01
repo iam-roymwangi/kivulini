@@ -10,6 +10,7 @@ use App\Models\Event;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -34,6 +35,35 @@ class BookingController extends Controller
             ],
             201
         );
+    }
+
+    /**
+     * Cancel an existing booking.
+     */
+    public function cancel(Booking $booking): JsonResponse
+    {
+        if ($booking->payment_status === 'cancelled') {
+            return response()->json([
+                'message' => 'Booking is already cancelled.',
+                'booking' => $booking,
+            ], 422);
+        }
+
+        DB::transaction(function () use ($booking): void {
+            if ($booking->payment_status === 'paid') {
+                Event::where('id', $booking->event_id)
+                    ->where('booked_slots', '>=', $booking->quantity)
+                    ->decrement('booked_slots', $booking->quantity);
+            }
+
+            $booking->payment_status = 'cancelled';
+            $booking->save();
+        });
+
+        return response()->json([
+            'message' => 'Booking cancelled successfully.',
+            'booking' => $booking->fresh(),
+        ]);
     }
 
     /**

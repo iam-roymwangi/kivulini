@@ -128,3 +128,66 @@ test('downloadPass view contains required booking and event fields', function ()
         ->toContain($booking->contact_name)
         ->toContain($booking->contact_email);
 });
+
+// --- cancel() ---
+
+test('cancel updates payment_status to cancelled and releases booked slots if paid', function () {
+    $event = makeEvent(['capacity' => 10, 'booked_slots' => 3]);
+
+    $booking = Booking::create([
+        'event_id' => $event->id,
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'quantity' => 2,
+        'total_price' => '3000.00',
+        'payment_status' => 'paid',
+    ]);
+
+    $response = $this->postJson("/bookings/{$booking->id}/cancel");
+
+    $response->assertStatus(200)
+        ->assertJson(['message' => 'Booking cancelled successfully.']);
+
+    expect($booking->fresh()->payment_status)->toBe('cancelled');
+    expect($event->fresh()->booked_slots)->toBe(1);
+});
+
+test('cancel updates pending booking payment_status to cancelled without changing slots', function () {
+    $event = makeEvent(['capacity' => 10, 'booked_slots' => 2]);
+
+    $booking = Booking::create([
+        'event_id' => $event->id,
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'quantity' => 2,
+        'total_price' => '3000.00',
+        'payment_status' => 'pending',
+    ]);
+
+    $response = $this->postJson("/bookings/{$booking->id}/cancel");
+
+    $response->assertStatus(200);
+    expect($booking->fresh()->payment_status)->toBe('cancelled');
+    expect($event->fresh()->booked_slots)->toBe(2);
+});
+
+test('cancel returns 422 if booking is already cancelled', function () {
+    $event = makeEvent();
+
+    $booking = Booking::create([
+        'event_id' => $event->id,
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'quantity' => 1,
+        'total_price' => '1500.00',
+        'payment_status' => 'cancelled',
+    ]);
+
+    $response = $this->postJson("/bookings/{$booking->id}/cancel");
+
+    $response->assertStatus(422)
+        ->assertJson(['message' => 'Booking is already cancelled.']);
+});

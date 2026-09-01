@@ -24,7 +24,11 @@ class StoreEventRequest extends FormRequest
             'description' => ['required', 'string'],
             'location' => ['required', 'string', 'max:255'],
             'pickup_location' => ['nullable', 'string', 'max:255'],
-            'start_date' => ['required', 'date', 'after_or_equal:today'],
+            'start_date' => array_values(array_filter([
+                'required',
+                'date',
+                $this->input('status') === 'completed' ? null : 'after_or_equal:today',
+            ])),
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'price' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],

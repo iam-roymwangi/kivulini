@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { X } from '@lucide/vue';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import BookingConfirmation from '@/components/events/BookingConfirmation.vue';
@@ -61,6 +61,22 @@ const bookingPayload = ref<Partial<BookingPayload>>({
     quantity: props.initialQuantity ?? 1,
     responses: [],
     consent: { agreed: false, signer_name: '' },
+});
+
+watch(
+    () => props.initialQuantity,
+    (newQty) => {
+        if (newQty && newQty > 0) {
+            bookingPayload.value.quantity = newQty;
+        }
+    },
+    { immediate: true },
+);
+
+watch(open, (isOpen) => {
+    if (isOpen && props.initialQuantity) {
+        bookingPayload.value.quantity = props.initialQuantity;
+    }
 });
 
 function goNext(data: Partial<BookingPayload>) {

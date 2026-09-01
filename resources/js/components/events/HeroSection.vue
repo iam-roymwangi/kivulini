@@ -8,8 +8,8 @@ const slides = [
     { src: '/assets/images/sgr_terminal.webp', caption: 'Life is Short.', accent: 'Make it Epic.', sub: 'Curated road trips and live events for the bold.' },
     { src: '/assets/images/sgr_terminal1.webp', caption: 'No Tourist Traps.', accent: 'Real Adventures.', sub: 'Handpicked locations, unforgettable crew.' },
     { src: '/assets/images/jg_hike.webp', caption: 'Your Weekend,', accent: 'Reimagined.', sub: 'From Naivasha to the coast — we handle everything.' },
-    { src: '/assets/images/event-4.jpg', caption: 'The Crew.', accent: 'The Experience.', sub: 'People who get it. Places that never disappoint.' },
-    { src: '/assets/images/event-5.jpg', caption: 'Stories Worth', accent: 'Telling.', sub: 'Book your seat and become part of the story.' },
+    { src: '/assets/images/lineup.webp', caption: 'The Crew.', accent: 'The Experience.', sub: 'People who get it. Places that never disappoint.' },
+    { src: '/assets/images/game.webp', caption: 'Stories Worth', accent: 'Telling.', sub: 'Book your seat and become part of the story.' },
 ];
 
 const currentIndex = ref(0);
@@ -34,24 +34,20 @@ const current = computed(() => slides[currentIndex.value]);
 </script>
 
 <template>
-    <section
-        class="relative w-full items-center justify-center overflow-hidden bg-slate-950"
-        style="min-height: 100dvh; display: flex;"
-        @mouseenter="stopAutoplay"
-        @mouseleave="startAutoplay"
-    >
+    <section class="relative w-full items-center justify-center overflow-hidden bg-slate-950"
+        style="min-height: 100dvh; display: flex;" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
         <!-- Slide backgrounds -->
         <div class="absolute inset-0" style="position: absolute; inset: 0;">
-            <div
-                v-for="(slide, i) in slides"
-                :key="slide.src"
+            <div v-for="(slide, i) in slides" :key="slide.src"
                 style="position: absolute; inset: 0; transition: opacity 1s;"
-                :style="{ opacity: i === currentIndex ? '1' : '0' }"
-            >
-                <img :src="slide.src" :alt="slide.caption" style="width: 100%; height: 100%; object-fit: cover; display: block;" :loading="i === 0 ? 'eager' : 'lazy'" />
+                :style="{ opacity: i === currentIndex ? '1' : '0' }">
+                <img :src="slide.src" :alt="slide.caption"
+                    style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                    :loading="i === 0 ? 'eager' : 'lazy'" />
             </div>
             <!-- Gradient -->
-            <div style="position: absolute; inset: 0; background: linear-gradient(to top, #020617 0%, rgba(2,6,23,0.55) 50%, rgba(2,6,23,0.15) 100%);" />
+            <div
+                style="position: absolute; inset: 0; background: linear-gradient(to top, #020617 0%, rgba(2,6,23,0.55) 50%, rgba(2,6,23,0.15) 100%);" />
         </div>
 
         <!-- Content -->
@@ -68,10 +64,8 @@ const current = computed(() => slides[currentIndex.value]);
                 </Transition>
             </div>
 
-            <a
-                href="#events"
-                class="rounded-full bg-amber-400 px-8 py-4 text-base font-bold text-slate-900 shadow-lg transition-all hover:bg-amber-300 hover:shadow-amber-400/25 hover:shadow-xl active:scale-95"
-            >
+            <a href="#events"
+                class="rounded-full bg-amber-400 px-8 py-4 text-base font-bold text-slate-900 shadow-lg transition-all hover:bg-amber-300 hover:shadow-amber-400/25 hover:shadow-xl active:scale-95">
                 Explore Upcoming Events
             </a>
 
@@ -101,15 +95,10 @@ const current = computed(() => slides[currentIndex.value]);
 
         <!-- Dot indicators -->
         <div class="absolute bottom-20 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-            <button
-                v-for="(_, i) in slides"
-                :key="i"
-                type="button"
+            <button v-for="(_, i) in slides" :key="i" type="button"
                 class="h-1.5 rounded-full transition-all duration-300"
                 :class="i === currentIndex ? 'w-8 bg-amber-400' : 'w-2 bg-white/40 hover:bg-white/70'"
-                :aria-label="`Go to slide ${i + 1}`"
-                @click="goTo(i)"
-            />
+                :aria-label="`Go to slide ${i + 1}`" @click="goTo(i)" />
         </div>
 
         <!-- Scroll hint -->
@@ -126,10 +115,12 @@ const current = computed(() => slides[currentIndex.value]);
 .hero-text-leave-active {
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
+
 .hero-text-enter-from {
     opacity: 0;
     transform: translateY(16px);
 }
+
 .hero-text-leave-to {
     opacity: 0;
     transform: translateY(-10px);

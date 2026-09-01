@@ -17,6 +17,7 @@ Route::get('/contact', [EventController::class, 'contactPage'])->name('contact')
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::post('/events/{event}/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 Route::get('/bookings/{booking}/pass', [BookingController::class, 'downloadPass'])->name('bookings.pass');
 
 use App\Http\Controllers\Admin\AdminGalleryController;

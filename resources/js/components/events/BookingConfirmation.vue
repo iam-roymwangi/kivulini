@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { PlatformEvent } from '@/types';
 
 const props = defineProps<{
@@ -19,35 +20,107 @@ const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE
     month: 'long',
     year: 'numeric',
 });
+
+const isCancelled = ref(false);
+const showConfirmCancel = ref(false);
+const cancelling = ref(false);
+const cancelError = ref('');
+
+async function handleCancelBooking() {
+    cancelling.value = true;
+    cancelError.value = '';
+
+    try {
+        const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
+        const csrf = csrfMeta?.content ?? '';
+
+        const res = await fetch(`/bookings/${props.bookingId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+        });
+
+        const json = await res.json();
+
+        if (res.ok) {
+            isCancelled.value = true;
+            showConfirmCancel.value = false;
+        } else {
+            cancelError.value = json.message ?? 'Failed to cancel booking. Please try again.';
+        }
+    } catch {
+        cancelError.value = 'Network error. Please check your connection.';
+    } finally {
+        cancelling.value = false;
+    }
+}
 </script>
 
 <template>
     <div class="flex flex-col items-center gap-6 px-1 pb-4 text-center">
-        <!-- Success icon -->
-        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-amber-400/10 ring-4 ring-amber-400/30">
-            <svg class="h-10 w-10 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <!-- Success or Cancelled icon -->
+        <div
+            class="flex h-20 w-20 items-center justify-center rounded-full ring-4"
+            :class="isCancelled
+                ? 'bg-red-500/10 ring-red-500/30'
+                : 'bg-amber-400/10 ring-amber-400/30'"
+        >
+            <svg
+                v-if="!isCancelled"
+                class="h-10 w-10 text-amber-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <svg
+                v-else
+                class="h-10 w-10 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </div>
 
         <div class="space-y-1">
-            <h2 class="text-2xl font-black text-slate-900 dark:text-white">You're In.</h2>
-            <p class="text-slate-500 dark:text-slate-400">Your seat is confirmed. Get ready.</p>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white">
+                {{ isCancelled ? 'Booking Cancelled' : "You're In." }}
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400">
+                {{ isCancelled ? 'Your booking has been successfully cancelled.' : 'Your seat is confirmed. Get ready.' }}
+            </p>
         </div>
 
         <!-- Booking reference -->
-        <div class="w-full rounded-2xl border border-border bg-slate-50 dark:border-slate-700 dark:bg-slate-900 p-5">
+        <div class="w-full rounded-2xl border border-border bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900">
             <p class="mb-1 text-xs font-semibold uppercase tracking-widest text-slate-500">Booking Reference</p>
-            <p class="text-2xl font-black tracking-widest text-amber-400">
+            <p
+                class="text-2xl font-black tracking-widest"
+                :class="isCancelled ? 'text-slate-400 line-through' : 'text-amber-400'"
+            >
                 {{ bookingReference }}
             </p>
+            <span
+                v-if="isCancelled"
+                class="mt-2 inline-block rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-400"
+            >
+                Cancelled
+            </span>
         </div>
 
         <!-- Event summary -->
         <div class="w-full space-y-2 text-sm">
             <div class="flex justify-between">
                 <span class="text-slate-500">Event</span>
-                <span class="font-semibold text-slate-900 dark:text-white text-right max-w-[60%]">{{ event.title }}</span>
+                <span class="max-w-[60%] text-right font-semibold text-slate-900 dark:text-white">{{ event.title }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="text-slate-500">Date</span>
@@ -59,9 +132,40 @@ const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE
             </div>
         </div>
 
+        <!-- Error display -->
+        <p v-if="cancelError" class="text-xs font-semibold text-red-500" role="alert">
+            {{ cancelError }}
+        </p>
+
+        <!-- Cancel Confirmation Prompt -->
+        <div v-if="showConfirmCancel && !isCancelled" class="w-full rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-3">
+            <p class="text-xs font-medium text-red-400">
+                Are you sure you want to cancel booking <strong>{{ bookingReference }}</strong>? This action will release your slot(s).
+            </p>
+            <div class="flex gap-2">
+                <button
+                    type="button"
+                    :disabled="cancelling"
+                    class="flex-1 rounded-lg bg-red-600 py-2 text-xs font-bold text-white hover:bg-red-500 disabled:opacity-50"
+                    @click="handleCancelBooking"
+                >
+                    {{ cancelling ? 'Cancelling...' : 'Yes, Cancel Booking' }}
+                </button>
+                <button
+                    type="button"
+                    :disabled="cancelling"
+                    class="flex-1 rounded-lg border border-border py-2 text-xs font-bold text-slate-400 hover:text-white disabled:opacity-50"
+                    @click="showConfirmCancel = false"
+                >
+                    Keep Booking
+                </button>
+            </div>
+        </div>
+
         <!-- Actions -->
         <div class="flex w-full flex-col gap-3">
             <a
+                v-if="!isCancelled"
                 :href="passUrl"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -72,6 +176,15 @@ const formattedDate = new Date(props.event.start_date).toLocaleDateString('en-KE
                 </svg>
                 Download Your Pass
             </a>
+
+            <button
+                v-if="!isCancelled && !showConfirmCancel"
+                type="button"
+                class="w-full rounded-xl border border-red-500/30 py-3 text-sm font-bold text-red-400 transition-colors hover:bg-red-500/10"
+                @click="showConfirmCancel = true"
+            >
+                Cancel Booking
+            </button>
 
             <button
                 type="button"
