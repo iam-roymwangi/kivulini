@@ -90,7 +90,15 @@ const filteredEvents = computed(() => {
 });
 
 const activeFilterLabel = computed(() => {
-    const map: Record<string, string> = { all: 'Events', event: 'Events', road_trip: 'Road Trips', vacation: 'Vacations' };
+    const map: Record<string, string> = {
+        all: 'Events',
+        cultural_heritage: 'Cultural & Heritage Tours',
+        wildlife_safari: 'Wildlife Safaris',
+        food_music: 'Food & Music',
+        road_trip: 'Road Trips',
+        hiking: 'Hiking',
+        vacation: 'Vacations',
+    };
     return map[activeFilter.value] ?? 'Events';
 });
 

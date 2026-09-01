@@ -140,9 +140,12 @@ const remainingMedia = computed(() =>
             <div>
                 <label class="form-label">Type *</label>
                 <select class="form-input" :value="form.type" @change="patch({ type: ($event.target as HTMLSelectElement).value })">
-                    <option value="event">Event</option>
-                    <option value="road_trip">Road Trip</option>
-                    <option value="vacation">Vacation</option>
+                    <option value="cultural_heritage">Cultural &amp; Heritage Tours</option>
+                    <option value="wildlife_safari">Wildlife Safaris</option>
+                    <option value="food_music">Food &amp; Music</option>
+                    <option value="road_trip">Road Trips</option>
+                    <option value="hiking">Hiking</option>
+                    <option value="vacation">Vacations</option>
                 </select>
             </div>
 

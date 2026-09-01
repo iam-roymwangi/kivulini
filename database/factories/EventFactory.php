@@ -22,7 +22,7 @@ class EventFactory extends Factory
         return [
             'title' => rtrim($title, '.'),
             'slug' => Str::slug($title).'-'.Str::random(4),
-            'type' => fake()->randomElement(['event', 'road_trip', 'event']),
+            'type' => fake()->randomElement(['cultural_heritage', 'wildlife_safari', 'food_music', 'road_trip', 'hiking', 'vacation']),
             'summary' => fake()->sentence(rand(12, 20)),
             'description' => collect(range(1, 4))->map(fn () => '<p>'.fake()->paragraph(rand(3, 6)).'</p>')->join("\n"),
             'location' => fake()->randomElement(['Nairobi', 'Mombasa', 'Nakuru', 'Naivasha', 'Diani', 'Kisumu', 'Malindi', 'Lake Nakuru']),
@@ -56,6 +56,11 @@ class EventFactory extends Factory
     public function roadTrip(): static
     {
         return $this->state(['type' => 'road_trip']);
+    }
+
+    public function hiking(): static
+    {
+        return $this->state(['type' => 'hiking']);
     }
 
     public function draft(): static

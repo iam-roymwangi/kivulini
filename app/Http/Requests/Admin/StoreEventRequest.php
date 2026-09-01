@@ -19,7 +19,7 @@ class StoreEventRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:event,road_trip,vacation'],
+            'type' => ['required', 'in:cultural_heritage,wildlife_safari,food_music,road_trip,hiking,vacation'],
             'summary' => ['required', 'string', 'max:500'],
             'description' => ['required', 'string'],
             'location' => ['required', 'string', 'max:255'],

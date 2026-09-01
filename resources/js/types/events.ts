@@ -20,7 +20,7 @@ export interface PlatformEvent {
     id: number;
     title: string;
     slug: string;
-    type: 'event' | 'road_trip' | 'vacation';
+    type: 'cultural_heritage' | 'wildlife_safari' | 'food_music' | 'road_trip' | 'hiking' | 'vacation';
     summary: string;
     description: string;
     location: string;

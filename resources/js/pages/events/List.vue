@@ -79,7 +79,13 @@ const filteredEvents = computed(() => {
 });
 
 const typeLabel = computed(() => ({
-    all: 'All Adventures', event: 'Events', road_trip: 'Road Trips', vacation: 'Vacations',
+    all: 'All Adventures',
+    cultural_heritage: 'Cultural & Heritage Tours',
+    wildlife_safari: 'Wildlife Safaris',
+    food_music: 'Food & Music',
+    road_trip: 'Road Trips',
+    hiking: 'Hiking',
+    vacation: 'Vacations',
 }[activeFilter.value] ?? 'Adventures'));
 </script>
 

@@ -17,8 +17,13 @@ const emit = defineEmits<{
 }>();
 
 const pills = [
-    { label: 'All Events', value: 'all', disabled: false },
-    { label: 'Road Trips', value: 'road_trip', disabled: false },
+    { label: 'All',                    value: 'all',               disabled: false },
+    { label: 'Cultural & Heritage',    value: 'cultural_heritage', disabled: false },
+    { label: 'Wildlife Safaris',       value: 'wildlife_safari',   disabled: false },
+    { label: 'Food & Music',           value: 'food_music',        disabled: false },
+    { label: 'Road Trips',             value: 'road_trip',         disabled: false },
+    { label: 'Hiking',                 value: 'hiking',            disabled: false },
+    { label: 'Vacations',              value: 'vacation',          disabled: false },
 ];
 
 function select(value: string, disabled: boolean) {

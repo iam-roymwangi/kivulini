@@ -11,7 +11,7 @@ function makeEvent(array $overrides = []): Event
     return Event::create(array_merge([
         'title' => 'Test Event',
         'slug' => 'test-event',
-        'type' => 'event',
+        'type' => 'hiking',
         'summary' => 'A test event summary.',
         'description' => 'Full description.',
         'location' => 'Nairobi, Kenya',
