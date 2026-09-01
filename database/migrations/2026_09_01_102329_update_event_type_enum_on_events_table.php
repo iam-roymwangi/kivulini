@@ -18,33 +18,33 @@ return new class extends Migration
         if (DB::getDriverName() === 'mysql') {
             $types = implode("','", self::NEW_TYPES);
             DB::statement("ALTER TABLE `events` MODIFY COLUMN `type` ENUM('{$types}') NOT NULL DEFAULT 'cultural_heritage'");
-        } else {
-            $this->recreateTableSqlite(self::NEW_TYPES, 'cultural_heritage', fn (string $t) => $t);
+        } elseif (DB::getDatabaseName() !== ':memory:') {
+            // File-based SQLite: recreate table to change the CHECK constraint
+            $this->recreateSqlite(self::NEW_TYPES, 'cultural_heritage');
         }
+        // In-memory SQLite (tests): table was just created with correct schema
+        // via RefreshDatabase, so no structural change is needed.
     }
 
     public function down(): void
     {
-        // Remap values that don't exist in the old set back to 'event'
-        DB::table('events')
-            ->whereNotIn('type', self::OLD_TYPES)
-            ->update(['type' => 'event']);
+        DB::table('events')->whereNotIn('type', self::OLD_TYPES)->update(['type' => 'event']);
 
         if (DB::getDriverName() === 'mysql') {
             $types = implode("','", self::OLD_TYPES);
             DB::statement("ALTER TABLE `events` MODIFY COLUMN `type` ENUM('{$types}') NOT NULL DEFAULT 'event'");
-        } else {
-            $this->recreateTableSqlite(self::OLD_TYPES, 'event', fn (string $t) => $t);
+        } elseif (DB::getDatabaseName() !== ':memory:') {
+            $this->recreateSqlite(self::OLD_TYPES, 'event');
         }
     }
 
     /**
      * SQLite doesn't support ALTER COLUMN, so we recreate the table.
+     * Only called for file-based SQLite (not :memory:).
      *
      * @param  string[]  $types
-     * @param  callable(string): string  $typeMapper
      */
-    private function recreateTableSqlite(array $types, string $default, callable $typeMapper): void
+    private function recreateSqlite(array $types, string $default): void
     {
         $check = implode("','", $types);
 

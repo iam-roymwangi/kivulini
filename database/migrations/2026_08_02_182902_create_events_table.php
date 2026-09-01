@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->enum('type', ['event', 'road_trip', 'vacation'])->default('event');
+            $table->enum('type', ['cultural_heritage', 'wildlife_safari', 'food_music', 'road_trip', 'hiking', 'vacation'])->default('cultural_heritage');
             $table->text('summary');
             $table->longText('description');
 
