@@ -1,0 +1,78 @@
+name: Continuous Integration and Deployment
+
+on:
+  push:
+    branches: "main"
+
+jobs:
+  laravel-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout Code
+      - uses: actions/checkout@v4
+
+      # 2. Setup PHP
+      - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: "8.2"
+
+      # 3. Install Backend Dependencies (Vendor)
+      - name: Install Composer Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      # 4. Setup Node & Build Frontend
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Build Frontend Assets
+        run: npm run build
+
+      # ---------------------------------------------------------
+      # DEPLOYMENT STEP 1: BACKEND (The Core App)
+      # Uploads everything to /cacumator/ EXCEPT the public folder
+      # ---------------------------------------------------------
+      - name: Deploy Backend to /kivulini
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /kivulini/
+          local-dir: ./
+          # We upload 'vendor' here so the app works.
+          # We exclude 'public' because that goes to public_html in the next step.
+          exclude: |
+            **/.git*
+            **/.github*
+            **/node_modules/**
+            **/vendor/**
+            **/tests/**
+            **/.env
+            **/public/** ./storage/*.key
+
+      # ---------------------------------------------------------
+      # DEPLOYMENT STEP 2: FRONTEND (Assets & Build)
+      # Uploads contents of 'public/' to /public_html/
+      # ---------------------------------------------------------
+      - name: Deploy Assets to /public_html
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/
+          local-dir: ./public/
+          # Exclude storage to protect your symlink.
+          exclude: |
+            index.php
+            .htaccess
+            storage/**
+            storage
+            hot
