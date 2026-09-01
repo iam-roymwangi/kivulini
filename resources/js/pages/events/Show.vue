@@ -28,6 +28,25 @@ function openBooking(qty: number) {
     <Head>
         <title>{{ eventData.title }}</title>
         <meta name="description" :content="eventData.summary" />
+        <meta name="keywords" :content="`${eventData.title}, ${eventData.location}, Kenya adventures, ${eventData.type?.replace('_', ' ')}`" />
+        <meta property="og:title" :content="`${eventData.title} – Kivulini Adventures`" />
+        <meta property="og:description" :content="eventData.summary" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" :content="$page.url" />
+        <meta
+            v-if="eventData.media?.[0]?.url"
+            property="og:image"
+            :content="eventData.media[0].url"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="`${eventData.title} – Kivulini Adventures`" />
+        <meta name="twitter:description" :content="eventData.summary" />
+        <meta
+            v-if="eventData.media?.[0]?.url"
+            name="twitter:image"
+            :content="eventData.media[0].url"
+        />
+        <link rel="canonical" :href="$page.url" />
     </Head>
 
     <div class="pt-24 pb-16">

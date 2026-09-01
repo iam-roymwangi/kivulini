@@ -103,7 +103,20 @@ const testimonials = [
 </script>
 
 <template>
-    <Head title="Explore Upcoming Trips" />
+    <Head>
+        <title>Explore Upcoming Trips & Adventures in Kenya</title>
+        <meta name="description" content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa with Kivulini Adventures." />
+        <meta name="keywords" content="Kenya adventures, hiking Kenya, road trips East Africa, group travel Kenya, Kivulini" />
+        <meta property="og:title" content="Kivulini Adventures – Explore Upcoming Trips" />
+        <meta property="og:description" content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" :content="$page.url" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Kivulini Adventures – Explore Upcoming Trips" />
+        <meta name="twitter:description" content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
+        <link rel="canonical" :href="$page.url" />
+        <meta name="google-site-verification" content="lLCsUFtkLMchpj1b-W6QPRnNaOYpTUDGStmmRcaRa6A" />
+    </Head>
 
     <!-- Hero -->
     <HeroSection v-model="activeFilter" />

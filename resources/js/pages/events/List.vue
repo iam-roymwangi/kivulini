@@ -84,7 +84,15 @@ const typeLabel = computed(() => ({
 </script>
 
 <template>
-    <Head title="Upcoming Trips & Events" />
+    <Head>
+        <title>Upcoming Trips & Events</title>
+        <meta name="description" content="Browse all upcoming hikes, road trips, and vacations in Kenya. Filter by category, price, and date to find your perfect adventure." />
+        <meta name="keywords" content="Kenya trips, upcoming events Kenya, hiking, road trips, group travel" />
+        <meta property="og:title" content="Upcoming Trips & Events – Kivulini Adventures" />
+        <meta property="og:description" content="Browse all upcoming hikes, road trips, and vacations in Kenya." />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" :href="$page.url" />
+    </Head>
 
     <div class="bg-background pb-24 pt-32 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

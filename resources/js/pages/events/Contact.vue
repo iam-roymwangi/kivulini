@@ -38,7 +38,14 @@ function submitForm() {
 </script>
 
 <template>
-    <Head title="Contact Us" />
+    <Head>
+        <title>Contact Us</title>
+        <meta name="description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
+        <meta property="og:title" content="Contact Kivulini Adventures" />
+        <meta property="og:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" :href="$page.url" />
+    </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

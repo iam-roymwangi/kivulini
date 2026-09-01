@@ -18,7 +18,14 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Past Trips Photo Gallery" />
+    <Head>
+        <title>Past Trips Photo Gallery</title>
+        <meta name="description" content="Browse photos from Kivulini Adventures' past hikes, road trips, and vacations across Kenya and East Africa." />
+        <meta property="og:title" content="Past Trips Photo Gallery – Kivulini Adventures" />
+        <meta property="og:description" content="Browse photos from our past hikes, road trips, and vacations across Kenya." />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" :href="$page.url" />
+    </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">
