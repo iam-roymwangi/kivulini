@@ -85,12 +85,8 @@ const navLinks = [
                 <template v-else>
                     <div class="hidden items-center gap-3 md:flex">
                         <Link href="/login"
-                            class="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
-                            Log In
-                        </Link>
-                        <Link href="/register"
                             class="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-400 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300">
-                            Sign Up
+                            Log In
                         </Link>
                     </div>
                 </template>
@@ -123,14 +119,9 @@ const navLinks = [
                                 <hr class="border-slate-700" />
                                 <template v-if="!user">
                                     <Link href="/login"
-                                        class="text-base font-medium text-slate-300 transition-colors hover:text-white"
-                                        @click="mobileMenuOpen = false">
-                                        Log In
-                                    </Link>
-                                    <Link href="/register"
                                         class="rounded-full bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
                                         @click="mobileMenuOpen = false">
-                                        Sign Up
+                                        Log In
                                     </Link>
                                 </template>
                             </nav>
