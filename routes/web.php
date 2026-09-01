@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,7 @@ Route::get('/events', [EventController::class, 'list'])->name('events.list');
 Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
 Route::get('/gallery', [EventController::class, 'galleryPage'])->name('events.gallery');
 Route::get('/contact', [EventController::class, 'contactPage'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::post('/events/{event}/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/bookings/{booking}/pass', [BookingController::class, 'downloadPass'])->name('bookings.pass');

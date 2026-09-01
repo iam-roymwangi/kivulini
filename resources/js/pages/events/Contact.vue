@@ -1,39 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { Mail, Phone, MapPin, Send, CheckCircle2 } from '@lucide/vue';
 
-const form = ref({
+const submitted = ref(false);
+
+const form = useForm({
     name: '',
     email: '',
     subject: '',
     message: '',
 });
 
-const submitting = ref(false);
-const submitted = ref(false);
-const errors = ref<Record<string, string>>({});
-
 function submitForm() {
-    errors.value = {};
-    if (!form.value.name.trim()) { errors.value.name = 'Name is required'; }
-    if (!form.value.email.trim()) {
-        errors.value.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
-        errors.value.email = 'Please enter a valid email address';
-    }
-    if (!form.value.message.trim()) { errors.value.message = 'Message is required'; }
-
-    if (Object.keys(errors.value).length > 0) { return; }
-
-    submitting.value = true;
-    
-    // Simulate API request
-    setTimeout(() => {
-        submitting.value = false;
-        submitted.value = true;
-        form.value = { name: '', email: '', subject: '', message: '' };
-    }, 1200);
+    form.post(route('contact.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            submitted.value = true;
+            form.reset();
+        },
+    });
 }
 </script>
 
@@ -140,9 +126,9 @@ function submitForm() {
                                         v-model="form.name"
                                         class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                                         placeholder="Jane Doe"
-                                        :class="{ 'border-red-500': errors.name }"
+                                        :class="{ 'border-red-500': form.errors.name }"
                                     />
-                                    <span v-if="errors.name" class="mt-1 block text-xs text-red-500">{{ errors.name }}</span>
+                                    <span v-if="form.errors.name" class="mt-1 block text-xs text-red-500">{{ form.errors.name }}</span>
                                 </div>
 
                                 <div>
@@ -153,9 +139,9 @@ function submitForm() {
                                         v-model="form.email"
                                         class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                                         placeholder="jane@example.com"
-                                        :class="{ 'border-red-500': errors.email }"
+                                        :class="{ 'border-red-500': form.errors.email }"
                                     />
-                                    <span v-if="errors.email" class="mt-1 block text-xs text-red-500">{{ errors.email }}</span>
+                                    <span v-if="form.errors.email" class="mt-1 block text-xs text-red-500">{{ form.errors.email }}</span>
                                 </div>
                             </div>
 
@@ -178,18 +164,18 @@ function submitForm() {
                                     v-model="form.message"
                                     class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                                     placeholder="Write your message here..."
-                                    :class="{ 'border-red-500': errors.message }"
+                                    :class="{ 'border-red-500': form.errors.message }"
                                 />
-                                <span v-if="errors.message" class="mt-1 block text-xs text-red-500">{{ errors.message }}</span>
+                                <span v-if="form.errors.message" class="mt-1 block text-xs text-red-500">{{ form.errors.message }}</span>
                             </div>
 
                             <button
                                 type="submit"
-                                :disabled="submitting"
+                                :disabled="form.processing"
                                 class="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-bold text-white transition-all hover:bg-amber-400 disabled:opacity-60 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300"
                             >
                                 <Send class="h-4 w-4" />
-                                {{ submitting ? 'Sending...' : 'Send Message' }}
+                                {{ form.processing ? 'Sending...' : 'Send Message' }}
                             </button>
                         </form>
                     </div>

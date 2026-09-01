@@ -115,4 +115,13 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Contact Form Recipient
+    |--------------------------------------------------------------------------
+    | The address that receives contact form submissions. Defaults to the
+    | "from" address if not set.
+    */
+    'contact_address' => env('MAIL_CONTACT_ADDRESS'),
+
 ];
