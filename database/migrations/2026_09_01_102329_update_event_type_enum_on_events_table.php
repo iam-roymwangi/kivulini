@@ -2,113 +2,91 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * SQLite doesn't support ALTER COLUMN so we recreate the table manually.
-     * Steps: rename original → create new with updated CHECK → copy data → drop old.
-     */
+    private const NEW_TYPES = ['cultural_heritage', 'wildlife_safari', 'food_music', 'road_trip', 'hiking', 'vacation'];
+
+    private const OLD_TYPES = ['event', 'road_trip', 'vacation'];
+
     public function up(): void
     {
-        DB::statement('PRAGMA foreign_keys = OFF');
+        // Remap old values before changing the constraint
+        DB::table('events')->where('type', 'event')->update(['type' => 'cultural_heritage']);
 
-        DB::statement('ALTER TABLE "events" RENAME TO "__old__events"');
-
-        DB::statement('
-            CREATE TABLE "events" (
-                "id"                    integer primary key autoincrement not null,
-                "title"                 varchar not null,
-                "slug"                  varchar not null,
-                "type"                  varchar check("type" in (\'cultural_heritage\',\'wildlife_safari\',\'food_music\',\'road_trip\',\'hiking\',\'vacation\')) not null default \'cultural_heritage\',
-                "summary"               text not null,
-                "description"           text not null,
-                "location"              varchar not null,
-                "pickup_location"       varchar,
-                "start_date"            datetime not null,
-                "end_date"              datetime not null,
-                "price"                 numeric not null,
-                "capacity"              integer not null,
-                "booked_slots"          integer not null default \'0\',
-                "status"                varchar check("status" in (\'draft\',\'published\',\'completed\',\'cancelled\')) not null default \'draft\',
-                "liability_waiver_text" text,
-                "created_at"            datetime,
-                "updated_at"            datetime,
-                "deleted_at"            datetime
-            )
-        ');
-
-        // Copy rows, remapping old → new type values
-        DB::statement("
-            INSERT INTO \"events\"
-            SELECT
-                \"id\", \"title\", \"slug\",
-                CASE \"type\"
-                    WHEN 'event'     THEN 'cultural_heritage'
-                    WHEN 'road_trip' THEN 'road_trip'
-                    WHEN 'vacation'  THEN 'vacation'
-                    ELSE 'cultural_heritage'
-                END,
-                \"summary\", \"description\", \"location\", \"pickup_location\",
-                \"start_date\", \"end_date\", \"price\", \"capacity\", \"booked_slots\",
-                \"status\", \"liability_waiver_text\", \"created_at\", \"updated_at\", \"deleted_at\"
-            FROM \"__old__events\"
-        ");
-
-        DB::statement('CREATE UNIQUE INDEX IF NOT EXISTS "events_slug_unique" ON "events" ("slug")');
-
-        DB::statement('DROP TABLE "__old__events"');
-
-        DB::statement('PRAGMA foreign_keys = ON');
+        if (DB::getDriverName() === 'mysql') {
+            $types = implode("','", self::NEW_TYPES);
+            DB::statement("ALTER TABLE `events` MODIFY COLUMN `type` ENUM('{$types}') NOT NULL DEFAULT 'cultural_heritage'");
+        } else {
+            $this->recreateTableSqlite(self::NEW_TYPES, 'cultural_heritage', fn (string $t) => $t);
+        }
     }
 
     public function down(): void
     {
-        DB::statement('PRAGMA foreign_keys = OFF');
+        // Remap values that don't exist in the old set back to 'event'
+        DB::table('events')
+            ->whereNotIn('type', self::OLD_TYPES)
+            ->update(['type' => 'event']);
+
+        if (DB::getDriverName() === 'mysql') {
+            $types = implode("','", self::OLD_TYPES);
+            DB::statement("ALTER TABLE `events` MODIFY COLUMN `type` ENUM('{$types}') NOT NULL DEFAULT 'event'");
+        } else {
+            $this->recreateTableSqlite(self::OLD_TYPES, 'event', fn (string $t) => $t);
+        }
+    }
+
+    /**
+     * SQLite doesn't support ALTER COLUMN, so we recreate the table.
+     *
+     * @param  string[]  $types
+     * @param  callable(string): string  $typeMapper
+     */
+    private function recreateTableSqlite(array $types, string $default, callable $typeMapper): void
+    {
+        $check = implode("','", $types);
+
+        Schema::disableForeignKeyConstraints();
 
         DB::statement('ALTER TABLE "events" RENAME TO "__old__events"');
-        DB::statement('
-            CREATE TABLE "events" (
-                "id"                    integer primary key autoincrement not null,
-                "title"                 varchar not null,
-                "slug"                  varchar not null,
-                "type"                  varchar check("type" in (\'event\',\'road_trip\',\'vacation\')) not null default \'event\',
-                "summary"               text not null,
-                "description"           text not null,
-                "location"              varchar not null,
-                "pickup_location"       varchar,
-                "start_date"            datetime not null,
-                "end_date"              datetime not null,
-                "price"                 numeric not null,
-                "capacity"              integer not null,
-                "booked_slots"          integer not null default \'0\',
-                "status"                varchar check("status" in (\'draft\',\'published\',\'completed\',\'cancelled\')) not null default \'draft\',
-                "liability_waiver_text" text,
-                "created_at"            datetime,
-                "updated_at"            datetime,
-                "deleted_at"            datetime
-            )
-        ');
 
         DB::statement("
-            INSERT INTO \"events\"
-            SELECT
-                \"id\", \"title\", \"slug\",
-                CASE \"type\"
-                    WHEN 'road_trip' THEN 'road_trip'
-                    WHEN 'vacation'  THEN 'vacation'
-                    ELSE 'event'
-                END,
-                \"summary\", \"description\", \"location\", \"pickup_location\",
-                \"start_date\", \"end_date\", \"price\", \"capacity\", \"booked_slots\",
-                \"status\", \"liability_waiver_text\", \"created_at\", \"updated_at\", \"deleted_at\"
-            FROM \"__old__events\"
+            CREATE TABLE \"events\" (
+                \"id\"                    integer primary key autoincrement not null,
+                \"title\"                 varchar not null,
+                \"slug\"                  varchar not null,
+                \"type\"                  varchar check(\"type\" in ('{$check}')) not null default '{$default}',
+                \"summary\"               text not null,
+                \"description\"           text not null,
+                \"location\"              varchar not null,
+                \"pickup_location\"       varchar,
+                \"start_date\"            datetime not null,
+                \"end_date\"              datetime not null,
+                \"price\"                 numeric not null,
+                \"capacity\"              integer not null,
+                \"booked_slots\"          integer not null default '0',
+                \"status\"                varchar check(\"status\" in ('draft','published','completed','cancelled')) not null default 'draft',
+                \"liability_waiver_text\" text,
+                \"created_at\"            datetime,
+                \"updated_at\"            datetime,
+                \"deleted_at\"            datetime
+            )
         ");
+
+        DB::statement('
+            INSERT INTO "events"
+            SELECT "id","title","slug","type","summary","description","location","pickup_location",
+                   "start_date","end_date","price","capacity","booked_slots","status",
+                   "liability_waiver_text","created_at","updated_at","deleted_at"
+            FROM "__old__events"
+        ');
 
         DB::statement('CREATE UNIQUE INDEX IF NOT EXISTS "events_slug_unique" ON "events" ("slug")');
 
         DB::statement('DROP TABLE "__old__events"');
 
-        DB::statement('PRAGMA foreign_keys = ON');
+        Schema::enableForeignKeyConstraints();
     }
 };
