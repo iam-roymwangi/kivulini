@@ -115,7 +115,6 @@ const testimonials = [
         <meta name="twitter:title" content="Kivulini Adventures – Explore Upcoming Trips" />
         <meta name="twitter:description" content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
         <link rel="canonical" :href="$page.url" />
-        <meta name="google-site-verification" content="lLCsUFtkLMchpj1b-W6QPRnNaOYpTUDGStmmRcaRa6A" />
     </Head>
 
     <!-- Hero -->
