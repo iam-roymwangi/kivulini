@@ -7,7 +7,7 @@ const activeFilter = defineModel<string>({ default: 'all' });
 const slides = [
     { src: '/assets/images/sgr_terminal.webp', caption: 'Life is Short.', accent: 'Make it Epic.', sub: 'Curated road trips and live events for the bold.' },
     { src: '/assets/images/sgr_terminal1.webp', caption: 'No Tourist Traps.', accent: 'Real Adventures.', sub: 'Handpicked locations, unforgettable crew.' },
-    { src: '/assets/images/event-3.jpg', caption: 'Your Weekend,', accent: 'Reimagined.', sub: 'From Naivasha to the coast — we handle everything.' },
+    { src: '/assets/images/jg_hike.webp', caption: 'Your Weekend,', accent: 'Reimagined.', sub: 'From Naivasha to the coast — we handle everything.' },
     { src: '/assets/images/event-4.jpg', caption: 'The Crew.', accent: 'The Experience.', sub: 'People who get it. Places that never disappoint.' },
     { src: '/assets/images/event-5.jpg', caption: 'Stories Worth', accent: 'Telling.', sub: 'Book your seat and become part of the story.' },
 ];
