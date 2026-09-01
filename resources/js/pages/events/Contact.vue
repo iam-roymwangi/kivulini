@@ -1,48 +1,70 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ref, reactive } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import { AlertCircle, CheckCircle2, Mail, MapPin, Phone, Send } from '@lucide/vue';
 
 const submitted = ref(false);
+const processing = ref(false);
 const failed = ref(false);
+const failMessage = ref('');
 
-const form = useForm({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-});
+const form = reactive({ name: '', email: '', subject: '', message: '' });
+const errors = reactive<Record<string, string>>({});
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validate(): boolean {
-    form.clearErrors();
-    if (!form.name.trim()) { form.setError('name', 'Your name is required.'); }
+    Object.keys(errors).forEach((k) => delete errors[k]);
+    if (!form.name.trim()) { errors.name = 'Your name is required.'; }
     if (!form.email.trim()) {
-        form.setError('email', 'Email address is required.');
+        errors.email = 'Email address is required.';
     } else if (!emailRegex.test(form.email)) {
-        form.setError('email', 'Please enter a valid email address.');
+        errors.email = 'Please enter a valid email address.';
     }
-    if (!form.message.trim()) { form.setError('message', 'Message cannot be empty.'); }
-    return !form.hasErrors;
+    if (!form.message.trim()) { errors.message = 'Message cannot be empty.'; }
+    return Object.keys(errors).length === 0;
 }
 
-function submitForm() {
+async function submitForm() {
     if (!validate()) { return; }
-    failed.value = false;
 
-    form.post(route('contact.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
+    processing.value = true;
+    failed.value = false;
+    failMessage.value = '';
+
+    try {
+        const csrf = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+
+        const res = await fetch(route('contact.store'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+            body: JSON.stringify(form),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
             submitted.value = true;
-            form.reset();
-        },
-        onError: () => {
-            // Server-side validation errors are handled inline.
-            // A general failure banner shows for unexpected errors.
-            if (!form.hasErrors) { failed.value = true; }
-        },
-    });
+            Object.assign(form, { name: '', email: '', subject: '', message: '' });
+        } else if (res.status === 422 && data.errors) {
+            // Laravel validation errors
+            Object.keys(data.errors).forEach((key) => {
+                errors[key] = data.errors[key][0];
+            });
+        } else {
+            failed.value = true;
+            failMessage.value = data.message ?? 'Something went wrong. Please try again.';
+        }
+    } catch {
+        failed.value = true;
+        failMessage.value = 'Network error. Please check your connection and try again.';
+    } finally {
+        processing.value = false;
+    }
 }
 </script>
 
@@ -147,7 +169,7 @@ function submitForm() {
                                 role="alert"
                             >
                                 <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
-                                <span>Something went wrong. Please try again or email us directly at <strong>info@kivuliniadventures.com</strong>.</span>
+                                <span>{{ failMessage }}</span>
                             </div>
                             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
@@ -158,9 +180,9 @@ function submitForm() {
                                         v-model="form.name"
                                         class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                                         placeholder="Jane Doe"
-                                        :class="{ 'border-red-500': form.errors.name }"
+                                        :class="{ 'border-red-500': errors.name }"
                                     />
-                                    <span v-if="form.errors.name" class="mt-1 block text-xs text-red-500">{{ form.errors.name }}</span>
+                                    <span v-if="errors.name" class="mt-1 block text-xs text-red-500">{{ errors.name }}</span>
                                 </div>
 
                                 <div>
@@ -171,9 +193,9 @@ function submitForm() {
                                         v-model="form.email"
                                         class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                                         placeholder="jane@example.com"
-                                        :class="{ 'border-red-500': form.errors.email }"
+                                        :class="{ 'border-red-500': errors.email }"
                                     />
-                                    <span v-if="form.errors.email" class="mt-1 block text-xs text-red-500">{{ form.errors.email }}</span>
+                                    <span v-if="errors.email" class="mt-1 block text-xs text-red-500">{{ errors.email }}</span>
                                 </div>
                             </div>
 
@@ -196,18 +218,18 @@ function submitForm() {
                                     v-model="form.message"
                                     class="mt-2 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                                     placeholder="Write your message here..."
-                                    :class="{ 'border-red-500': form.errors.message }"
+                                    :class="{ 'border-red-500': errors.message }"
                                 />
-                                <span v-if="form.errors.message" class="mt-1 block text-xs text-red-500">{{ form.errors.message }}</span>
+                                <span v-if="errors.message" class="mt-1 block text-xs text-red-500">{{ errors.message }}</span>
                             </div>
 
                             <button
                                 type="submit"
-                                :disabled="form.processing || submitted"
+                                :disabled="processing"
                                 class="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-bold text-white transition-all hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300"
                             >
                                 <Send class="h-4 w-4" />
-                                {{ form.processing ? 'Sending...' : 'Send Message' }}
+                                {{ processing ? 'Sending...' : 'Send Message' }}
                             </button>
                         </form>
                     </div>

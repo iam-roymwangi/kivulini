@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
-import { 
-    Upload, 
-    Trash2, 
-    Eye, 
-    Globe, 
-    EyeOff, 
+import {
+    Upload,
+    Trash2,
+    Eye,
+    Globe,
+    EyeOff,
     Plus,
     X,
     Image as ImageIcon,
     Calendar,
-    FolderPlus
+    FolderPlus,
+    Loader2,
 } from '@lucide/vue';
 
 interface EventOption {
@@ -68,6 +69,63 @@ const uploadForm = useForm({
 const fileInput = ref<HTMLInputElement | null>(null);
 const filePreviews = ref<string[]>([]);
 const dragActive = ref(false);
+const converting = ref(false);
+
+// ── WebP compression ─────────────────────────────────────────────────────────
+
+/**
+ * Convert any image File to a compressed WebP File using a canvas.
+ * Max dimension: 1920px. Quality: 0.82.
+ */
+function compressToWebp(file: File): Promise<File> {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+
+            const MAX = 1920;
+            let { width, height } = img;
+
+            if (width > MAX || height > MAX) {
+                if (width > height) {
+                    height = Math.round((height * MAX) / width);
+                    width = MAX;
+                } else {
+                    width = Math.round((width * MAX) / height);
+                    height = MAX;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) { resolve(file); return; }
+                    const webpName = file.name.replace(/\.[^.]+$/, '') + '.webp';
+                    resolve(new File([blob], webpName, { type: 'image/webp' }));
+                },
+                'image/webp',
+                0.82,
+            );
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            resolve(file); // fall back to original
+        };
+
+        img.src = objectUrl;
+    });
+}
+
+// ── File handling ─────────────────────────────────────────────────────────────
 
 function triggerFileInput() {
     fileInput.value?.click();
@@ -75,9 +133,9 @@ function triggerFileInput() {
 
 function handleFileChange(e: Event) {
     const files = (e.target as HTMLInputElement).files;
-    if (files) {
-        addFiles(Array.from(files));
-    }
+    if (files) { addFiles(Array.from(files)); }
+    // Reset so the same files can be re-selected if cleared
+    (e.target as HTMLInputElement).value = '';
 }
 
 function handleDragOver(e: DragEvent) {
@@ -94,29 +152,37 @@ function handleDrop(e: DragEvent) {
     e.preventDefault();
     dragActive.value = false;
     const files = e.dataTransfer?.files;
-    if (files) {
-        addFiles(Array.from(files));
-    }
+    if (files) { addFiles(Array.from(files)); }
 }
 
-function addFiles(files: File[]) {
-    const validImages = files.filter(f => f.type.startsWith('image/'));
-    uploadForm.images.push(...validImages);
-    
-    validImages.forEach(file => {
+async function addFiles(files: File[]) {
+    const validImages = files.filter((f) => f.type.startsWith('image/'));
+    if (validImages.length === 0) { return; }
+
+    converting.value = true;
+
+    const converted = await Promise.all(validImages.map(compressToWebp));
+
+    converted.forEach((file) => {
+        uploadForm.images.push(file);
         const reader = new FileReader();
         reader.onload = (e) => {
-            if (e.target?.result) {
-                filePreviews.value.push(e.target.result as string);
-            }
+            if (e.target?.result) { filePreviews.value.push(e.target.result as string); }
         };
         reader.readAsDataURL(file);
     });
+
+    converting.value = false;
 }
 
 function removePreview(index: number) {
     uploadForm.images.splice(index, 1);
     filePreviews.value.splice(index, 1);
+}
+
+function clearAll() {
+    uploadForm.images = [];
+    filePreviews.value = [];
 }
 
 function uploadImages() {
@@ -150,8 +216,8 @@ function toggleFeatured(id: number) {
 
 const sortedEvents = computed(() => {
     return [...props.events].sort((a, b) => {
-        if (a.status === 'completed' && b.status !== 'completed') return -1;
-        if (a.status !== 'completed' && b.status === 'completed') return 1;
+        if (a.status === 'completed' && b.status !== 'completed') { return -1; }
+        if (a.status !== 'completed' && b.status === 'completed') { return 1; }
         return a.title.localeCompare(b.title);
     });
 });
@@ -210,15 +276,18 @@ const sortedEvents = computed(() => {
 
                     <!-- Drag & Drop Zone -->
                     <div class="md:col-span-2">
-                        <div 
-                            class="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border p-8 text-center transition-colors cursor-pointer"
-                            :class="dragActive ? 'border-amber-400 bg-amber-500/5' : 'hover:border-amber-400/50'"
-                            @click="triggerFileInput"
+                        <div
+                            class="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border p-8 text-center transition-colors"
+                            :class="[
+                                dragActive ? 'border-amber-400 bg-amber-500/5' : 'hover:border-amber-400/50',
+                                converting ? 'cursor-wait' : 'cursor-pointer',
+                            ]"
+                            @click="!converting && triggerFileInput()"
                             @dragover="handleDragOver"
                             @dragleave="handleDragLeave"
                             @drop="handleDrop"
                         >
-                            <input 
+                            <input
                                 ref="fileInput"
                                 type="file"
                                 multiple
@@ -227,13 +296,15 @@ const sortedEvents = computed(() => {
                                 @change="handleFileChange"
                             />
                             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
-                                <Upload class="h-6 w-6" />
+                                <Loader2 v-if="converting" class="h-6 w-6 animate-spin text-amber-500" />
+                                <Upload v-else class="h-6 w-6" />
                             </div>
                             <p class="text-sm font-semibold text-foreground">
-                                Drag & drop images here, or <span class="text-amber-500 underline">browse</span>
+                                <span v-if="converting">Converting to WebP…</span>
+                                <template v-else>Drag & drop images here, or <span class="text-amber-500 underline">browse</span></template>
                             </p>
                             <p class="text-xs text-muted-foreground mt-1">
-                                Supports PNG, JPG, GIF, WebP up to 10MB per file.
+                                Images are compressed and converted to WebP in your browser before upload.
                             </p>
                         </div>
                     </div>
@@ -245,7 +316,7 @@ const sortedEvents = computed(() => {
                         <h3 class="text-sm font-semibold text-foreground">Selected Images ({{ uploadForm.images.length }})</h3>
                         <button 
                             type="button" 
-                            @click="filePreviews = []; uploadForm.images = []" 
+                            @click="clearAll()" 
                             class="text-xs text-red-500 hover:underline"
                         >
                             Clear All
@@ -274,10 +345,14 @@ const sortedEvents = computed(() => {
                     <button 
                         v-if="uploadForm.images.length > 0"
                         type="submit"
-                        :disabled="uploadForm.processing"
+                        :disabled="uploadForm.processing || converting"
                         class="rounded-xl bg-amber-400 px-6 py-2.5 text-sm font-bold text-slate-900 hover:bg-amber-300 disabled:opacity-60 transition-all shadow-md shadow-amber-400/10"
                     >
-                        {{ uploadForm.processing ? `Uploading & Compiling (${uploadForm.progress ? uploadForm.progress.percentage + '%' : 'Processing'})...` : 'Upload Images' }}
+                        <span v-if="converting">Converting images…</span>
+                        <span v-else-if="uploadForm.processing">
+                            Uploading{{ uploadForm.progress ? ` ${uploadForm.progress.percentage}%` : '…' }}
+                        </span>
+                        <span v-else>Upload {{ uploadForm.images.length }} Image{{ uploadForm.images.length !== 1 ? 's' : '' }}</span>
                     </button>
                 </div>
             </form>
