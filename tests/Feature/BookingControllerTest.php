@@ -43,14 +43,16 @@ function validPayload(array $overrides = []): array
 // --- store() ---
 
 test('store creates booking and returns 201 with booking reference', function () {
-    $event = makeEvent();
+    $event = makeEvent(['capacity' => 10, 'booked_slots' => 0]);
 
-    $response = $this->postJson("/events/{$event->id}/bookings", validPayload());
+    $response = $this->postJson("/events/{$event->id}/bookings", validPayload(['quantity' => 3]));
 
     $response->assertStatus(201)
         ->assertJsonStructure(['booking_reference', 'booking_id']);
 
     $this->assertDatabaseHas('bookings', ['contact_email' => 'jane@example.com']);
+    expect($event->fresh()->booked_slots)->toBe(3);
+    expect($event->fresh()->available_slots)->toBe(7);
 });
 
 test('store returns 422 when event is sold out', function () {

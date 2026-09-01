@@ -74,10 +74,11 @@ class EventController extends Controller
      */
     public function galleryPage(Request $request): Response
     {
-        $pastEventsMedia = EventMedia::where('is_featured', true)
-            ->with('event')
+        $pastEventsMedia = EventMedia::with('event')
+            ->orderByDesc('is_featured')
             ->orderBy('sort_order')
-            ->paginate(9, ['*'], 'page')->withQueryString();
+            ->orderByDesc('id')
+            ->paginate(12, ['*'], 'page')->withQueryString();
 
         return Inertia::render('events/Gallery', [
             'pastEventsMedia' => EventMediaResource::collection($pastEventsMedia),

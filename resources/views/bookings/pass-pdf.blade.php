@@ -4,95 +4,136 @@
     <meta charset="utf-8">
     <title>Digital Pass — {{ $booking->booking_reference }}</title>
     <style>
+        @page {
+            margin: 20px;
+        }
+
         body {
-            background-color: #0f172a;
+            background-color: #0b0f19;
             color: #f1f5f9;
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'DejaVu Sans', Arial, sans-serif;
             margin: 0;
-            padding: 40px 0;
+            padding: 20px 0;
             text-align: center;
         }
 
-        .pass-container {
-            width: 450px;
+        .ticket-wrapper {
+            width: 480px;
             margin: 0 auto;
-            background-color: #1e293b;
-            border: 2px solid #fbbf24;
-            border-radius: 20px;
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 16px;
             overflow: hidden;
             text-align: left;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
-        .pass-header {
-            background-color: #d97706;
-            padding: 30px;
-            color: #ffffff;
-            border-bottom: 2px solid #fbbf24;
+        .ticket-header {
+            background: #1e293b;
+            padding: 24px 28px;
+            border-bottom: 2px solid #f59e0b;
         }
 
-        .pass-label {
-            font-size: 10px;
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-logo-cell {
+            width: 60px;
+            vertical-align: middle;
+        }
+
+        .company-logo {
+            width: 48px;
+            height: 48px;
+        }
+
+        .header-text-cell {
+            vertical-align: middle;
+            padding-left: 12px;
+        }
+
+        .company-name {
+            font-size: 16px;
             font-weight: bold;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 5px;
+            color: #f59e0b;
         }
 
-        .pass-title {
-            font-size: 24px;
+        .ticket-subtitle {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .ticket-body {
+            padding: 28px;
+        }
+
+        .status-badge-container {
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background-color: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .event-title {
+            font-size: 22px;
             font-weight: bold;
             color: #ffffff;
-            line-height: 1.2;
-        }
-
-        .pass-body {
-            padding: 30px;
-        }
-
-        .badge-container {
-            text-align: center;
+            line-height: 1.3;
+            margin-top: 10px;
             margin-bottom: 20px;
         }
 
-        .badge {
-            display: inline-block;
-            background-color: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.4);
-            color: #fbbf24;
-            border-radius: 9999px;
-            padding: 5px 15px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .pass-reference {
+        .ref-box {
+            background-color: #1f2937;
+            border: 1px dashed #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
             text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px dashed rgba(251, 191, 36, 0.3);
+            margin-bottom: 24px;
         }
 
         .ref-label {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 5px;
+            color: #9ca3af;
+            margin-bottom: 4px;
         }
 
         .ref-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
-            letter-spacing: 1px;
-            color: #fbbf24;
+            letter-spacing: 3px;
+            color: #f59e0b;
         }
 
-        .pass-field {
-            margin-bottom: 18px;
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .details-table td {
+            padding: 8px 0;
+            vertical-align: top;
         }
 
         .field-label {
@@ -100,81 +141,123 @@
             font-weight: bold;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: #64748b;
+            color: #6b7280;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .field-value {
-            font-size: 14px;
-            color: #e2e8f0;
-            line-height: 1.4;
+            font-size: 13px;
+            font-weight: 500;
+            color: #e5e7eb;
         }
 
-        .pass-divider {
+        .divider {
             height: 1px;
-            background-color: rgba(251, 191, 36, 0.15);
-            margin: 20px 0;
+            background-color: #374151;
+            margin: 16px 0;
         }
 
-        .pass-footer {
-            padding: 20px;
+        .ticket-footer {
+            padding: 16px 24px;
             background-color: #0f172a;
-            border-top: 1px dashed rgba(251, 191, 36, 0.2);
+            border-top: 1px solid #1f2937;
             text-align: center;
-            font-size: 10px;
-            color: #475569;
+            font-size: 9px;
+            color: #6b7280;
             letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
-    <div class="pass-container">
-        <div class="pass-header">
-            <div class="pass-label">Digital Pass</div>
-            <div class="pass-title">{{ $booking->event->title }}</div>
+    @php
+        $logoPath = public_path('assets/images/kivulini_logo.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+    @endphp
+
+    <div class="ticket-wrapper">
+        <!-- Header -->
+        <div class="ticket-header">
+            <table class="header-table">
+                <tr>
+                    @if($logoBase64)
+                    <td class="header-logo-cell">
+                        <img src="{{ $logoBase64 }}" alt="Kivulini" class="company-logo">
+                    </td>
+                    @endif
+                    <td class="header-text-cell">
+                        <div class="company-name">Kivulini Adventures</div>
+                        <div class="ticket-subtitle">Official Event Pass</div>
+                    </td>
+                    <td class="status-badge-container">
+                        <span class="status-badge">✓ {{ strtoupper($booking->payment_status === 'paid' ? 'Confirmed' : $booking->payment_status) }}</span>
+                    </td>
+                </tr>
+            </table>
         </div>
 
-        <div class="pass-body">
-            <div class="badge-container">
-                <span class="badge">✓ Confirmed</span>
-            </div>
+        <!-- Body -->
+        <div class="ticket-body">
+            <!-- Event Title -->
+            <div class="event-title">{{ $booking->event->title }}</div>
 
-            <div class="pass-reference">
+            <!-- Booking Reference Box -->
+            <div class="ref-box">
                 <div class="ref-label">Booking Reference</div>
                 <div class="ref-value">{{ $booking->booking_reference }}</div>
             </div>
 
-            <div class="pass-field">
-                <span class="field-label">Event</span>
-                <span class="field-value">{{ $booking->event->title }}</span>
-            </div>
+            <!-- Details -->
+            <table class="details-table">
+                <tr>
+                    <td style="width: 50%;">
+                        <span class="field-label">Date & Time</span>
+                        <span class="field-value">{{ $booking->event->start_date->format('D, M j Y @ g:i A') }}</span>
+                    </td>
+                    <td style="width: 50%;">
+                        <span class="field-label">Location</span>
+                        <span class="field-value">{{ $booking->event->location }}</span>
+                    </td>
+                </tr>
+                @if($booking->event->pickup_location)
+                <tr>
+                    <td colspan="2">
+                        <span class="field-label">Pickup Point</span>
+                        <span class="field-value">{{ $booking->event->pickup_location }}</span>
+                    </td>
+                </tr>
+                @endif
+            </table>
 
-            <div class="pass-field">
-                <span class="field-label">Date</span>
-                <span class="field-value">{{ $booking->event->start_date->format('D, M j Y') }}</span>
-            </div>
+            <div class="divider"></div>
 
-            <div class="pass-field">
-                <span class="field-label">Location</span>
-                <span class="field-value">{{ $booking->event->location }}</span>
-            </div>
-
-            <div class="pass-divider"></div>
-
-            <div class="pass-field">
-                <span class="field-label">Attendee</span>
-                <span class="field-value">{{ $booking->contact_name }}</span>
-            </div>
-
-            <div class="pass-field">
-                <span class="field-label">Email</span>
-                <span class="field-value">{{ $booking->contact_email }}</span>
-            </div>
+            <table class="details-table">
+                <tr>
+                    <td style="width: 50%;">
+                        <span class="field-label">Attendee</span>
+                        <span class="field-value">{{ $booking->contact_name }}</span>
+                    </td>
+                    <td style="width: 50%;">
+                        <span class="field-label">Reserved Slots</span>
+                        <span class="field-value">{{ $booking->quantity }} {{ Str::plural('Ticket', $booking->quantity) }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%;">
+                        <span class="field-label">Email</span>
+                        <span class="field-value">{{ $booking->contact_email }}</span>
+                    </td>
+                    <td style="width: 50%;">
+                        <span class="field-label">Phone</span>
+                        <span class="field-value">{{ $booking->contact_phone }}</span>
+                    </td>
+                </tr>
+            </table>
         </div>
 
-        <div class="pass-footer">
-            Present this pass at the event entrance &bull; Non-transferable
+        <!-- Footer -->
+        <div class="ticket-footer">
+            Present this pass at entry &bull; Non-transferable &bull; Kivulini Adventures
         </div>
     </div>
 </body>

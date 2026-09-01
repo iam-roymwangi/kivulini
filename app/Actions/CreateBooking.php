@@ -36,8 +36,12 @@ class CreateBooking
                 'contact_phone' => $data['contact_phone'],
                 'quantity' => $data['quantity'],
                 'total_price' => $event->price * $data['quantity'],
-                'payment_status' => 'pending',
+                'payment_status' => 'paid',
             ]);
+
+            Event::where('id', $event->id)
+                ->lockForUpdate()
+                ->increment('booked_slots', $data['quantity']);
 
             foreach ($data['responses'] ?? [] as $response) {
                 $booking->responses()->create([
