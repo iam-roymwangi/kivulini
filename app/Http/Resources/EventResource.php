@@ -2,8 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class EventResource extends JsonResource
 {
@@ -14,7 +16,7 @@ class EventResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var \App\Models\Event $this */
+        /** @var Event $this */
         $featuredMedia = $this->whenLoaded('media', function () {
             return $this->media->firstWhere('is_featured', true);
         });
@@ -37,7 +39,7 @@ class EventResource extends JsonResource
             'status' => $this->status,
             'liability_waiver_text' => $this->liability_waiver_text,
             'cover_image_url' => $featuredMedia
-                ? \Illuminate\Support\Facades\Storage::url($featuredMedia->file_path)
+                ? Storage::url($featuredMedia->file_path)
                 : null,
             'media' => EventMediaResource::collection($this->whenLoaded('media')),
             'questions' => EventQuestionResource::collection($this->whenLoaded('questions')),

@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import MasonryGallery from '@/components/events/MasonryGallery.vue';
-import type { EventMedia } from '@/types';
-
-interface Paginator<T> {
-    data: T[];
-    current_page: number;
-    last_page: number;
-    total: number;
-    per_page: number;
-    links: { url: string | null; label: string; active: boolean }[];
-}
+import ModernPagination from '@/components/events/ModernPagination.vue';
+import type { EventMedia } from '@/types/events';
+import type { Paginator } from '@/types/ui';
 
 defineProps<{
     pastEventsMedia: Paginator<EventMedia>;
@@ -40,28 +33,12 @@ defineProps<{
                 </p>
             </div>
 
-            <!-- Masonry Gallery -->
-            <div v-if="pastEventsMedia.data.length > 0">
+            <!-- Masonry Gallery & Pagination -->
+            <div v-if="pastEventsMedia.data && pastEventsMedia.data.length > 0">
                 <MasonryGallery :items="pastEventsMedia.data" />
 
-                <!-- Pagination -->
-                <div v-if="pastEventsMedia.last_page > 1" class="mt-16 flex items-center justify-center gap-1.5">
-                    <template v-for="link in pastEventsMedia.links" :key="link.label">
-                        <Link
-                            v-if="link.url"
-                            :href="link.url"
-                            class="rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold transition-all hover:border-amber-400 hover:text-amber-500"
-                            :class="link.active ? 'border-amber-400 bg-amber-400/10 text-amber-500 font-bold' : 'text-muted-foreground'"
-                            preserve-scroll
-                            v-html="link.label"
-                        />
-                        <span
-                            v-else
-                            class="cursor-default rounded-xl border border-border/40 bg-card/40 px-4 py-2 text-sm text-muted-foreground/45"
-                            v-html="link.label"
-                        />
-                    </template>
-                </div>
+                <!-- Modern Pagination -->
+                <ModernPagination :pagination="pastEventsMedia" item-name="pictures" />
             </div>
 
             <!-- Empty state -->

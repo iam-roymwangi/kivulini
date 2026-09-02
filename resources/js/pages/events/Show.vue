@@ -25,27 +25,21 @@ function openBooking(qty: number) {
 </script>
 
 <template>
+
     <Head>
         <title>{{ eventData.title }}</title>
         <meta name="description" :content="eventData.summary" />
-        <meta name="keywords" :content="`${eventData.title}, ${eventData.location}, Kenya adventures, ${eventData.type?.replace('_', ' ')}`" />
+        <meta name="keywords"
+            :content="`${eventData.title}, ${eventData.location}, Kenya adventures, ${eventData.type?.replace('_', ' ')}`" />
         <meta property="og:title" :content="`${eventData.title} – Kivulini Adventures`" />
         <meta property="og:description" :content="eventData.summary" />
         <meta property="og:type" content="website" />
         <meta property="og:url" :content="$page.url" />
-        <meta
-            v-if="eventData.media?.[0]?.url"
-            property="og:image"
-            :content="eventData.media[0].url"
-        />
+        <meta v-if="eventData.media?.[0]?.url" property="og:image" :content="eventData.media[0].url" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" :content="`${eventData.title} – Kivulini Adventures`" />
         <meta name="twitter:description" :content="eventData.summary" />
-        <meta
-            v-if="eventData.media?.[0]?.url"
-            name="twitter:image"
-            :content="eventData.media[0].url"
-        />
+        <meta v-if="eventData.media?.[0]?.url" name="twitter:image" :content="eventData.media[0].url" />
         <link rel="canonical" :href="$page.url" />
     </Head>
 
@@ -71,13 +65,18 @@ function openBooking(qty: number) {
                     </div>
 
                     <!-- Pickup location -->
-                    <div v-if="eventData.pickup_location" class="flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
-                        <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <div v-if="eventData.pickup_location"
+                        class="flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
+                        <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-amber-400">Pickup Location</p>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-amber-400">Pickup Location
+                            </p>
                             <p class="mt-1 text-slate-700 dark:text-slate-200">{{ eventData.pickup_location }}</p>
                         </div>
                     </div>
@@ -86,7 +85,8 @@ function openBooking(qty: number) {
                     <div>
                         <h2 class="mb-4 text-xl font-bold text-foreground">About this Trip</h2>
                         <!-- eslint-disable-next-line vue/no-v-html -->
-                        <div class="prose max-w-none text-slate-700 dark:prose-invert dark:text-slate-300" v-html="eventData.description" />
+                        <div class="prose max-w-none text-slate-700 dark:prose-invert dark:text-slate-300"
+                            v-html="eventData.description" />
                     </div>
 
                     <!-- Trip timeline placeholder (itinerary) -->
@@ -94,16 +94,25 @@ function openBooking(qty: number) {
                         <h2 class="mb-6 text-xl font-bold text-foreground">Itinerary</h2>
                         <ol class="relative border-l border-border dark:border-slate-700 pl-6 space-y-8">
                             <li>
-                                <div class="absolute -left-2 mt-1.5 h-4 w-4 rounded-full border-2 border-amber-400 bg-background" />
+                                <div
+                                    class="absolute -left-2 mt-1.5 h-4 w-4 rounded-full border-2 border-amber-400 bg-background" />
                                 <p class="text-xs font-semibold uppercase tracking-widest text-amber-400">
-                                    {{ new Date(eventData.start_date).toLocaleDateString('en-KE', { weekday: 'long', day: 'numeric', month: 'long' }) }}
+                                    {{ new Date(eventData.start_date).toLocaleDateString('en-KE', {
+                                        weekday: 'long',
+                                        day: 'numeric', month: 'long'
+                                    }) }}
                                 </p>
-                                <p class="mt-1 text-muted-foreground">{{ eventData.pickup_location ? `Departure from ${eventData.pickup_location}` : `Trip starts at ${eventData.location}` }}</p>
+                                <p class="mt-1 text-muted-foreground">{{ eventData.pickup_location ? `Departure from
+                                    ${eventData.pickup_location}` : `Trip starts at ${eventData.location}` }}</p>
                             </li>
                             <li>
-                                <div class="absolute -left-2 mt-1.5 h-4 w-4 rounded-full border-2 border-slate-400 dark:border-slate-600 bg-background" />
+                                <div
+                                    class="absolute -left-2 mt-1.5 h-4 w-4 rounded-full border-2 border-slate-400 dark:border-slate-600 bg-background" />
                                 <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                                    {{ new Date(eventData.end_date).toLocaleDateString('en-KE', { weekday: 'long', day: 'numeric', month: 'long' }) }}
+                                    {{ new Date(eventData.end_date).toLocaleDateString('en-KE', {
+                                        weekday: 'long', day:
+                                            'numeric', month: 'long'
+                                    }) }}
                                 </p>
                                 <p class="mt-1 text-muted-foreground">Return to {{ eventData.location }}</p>
                             </li>
@@ -123,28 +132,24 @@ function openBooking(qty: number) {
 
                     <!-- Reviews placeholder -->
                     <div>
-                        <h2 class="mb-4 text-xl font-bold text-foreground">Traveller Reviews</h2>
-                        <div class="rounded-xl border border-border bg-card dark:border-slate-800 dark:bg-slate-900/50 p-6 text-center">
-                            <p class="text-muted-foreground">Reviews coming soon. Be the first to book and share your experience.</p>
+                        <h2 class="mb-4 text-xl font-bold text-foreground">Reviews</h2>
+                        <div
+                            class="rounded-xl border border-border bg-card dark:border-slate-800 dark:bg-slate-900/50 p-6 text-center">
+                            <p class="text-muted-foreground">Reviews coming soon. Be the first to book and share your
+                                experience.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right column: sticky booking box -->
                 <div class="w-full lg:sticky lg:top-28 lg:w-80 xl:w-96">
-                    <BookingBox
-                        :event="{ ...eventData, available_slots: availableSlots }"
-                        @open-booking="openBooking"
-                    />
+                    <BookingBox :event="{ ...eventData, available_slots: availableSlots }"
+                        @open-booking="openBooking" />
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Booking drawer -->
-    <BookingDrawer
-        v-model:open="showBooking"
-        :event="eventData"
-        :initial-quantity="bookingQuantity"
-    />
+    <BookingDrawer v-model:open="showBooking" :event="eventData" :initial-quantity="bookingQuantity" />
 </template>

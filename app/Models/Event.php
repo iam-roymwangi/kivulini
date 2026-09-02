@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,10 +42,10 @@ class Event extends Model
      */
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<Event>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<Event>
+     * @param  Builder<Event>  $query
+     * @return Builder<Event>
      */
-    public function scopePublished(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published');
     }

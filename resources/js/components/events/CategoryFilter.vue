@@ -16,7 +16,14 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
 }>();
 
-const pills = [
+interface PillItem {
+    label: string;
+    value: string;
+    disabled: boolean;
+    suffix?: string;
+}
+
+const pills: PillItem[] = [
     { label: 'All',                    value: 'all',               disabled: false },
     { label: 'Cultural & Heritage',    value: 'cultural_heritage', disabled: false },
     { label: 'Wildlife Safaris',       value: 'wildlife_safari',   disabled: false },

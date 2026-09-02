@@ -78,7 +78,7 @@ class EventController extends Controller
             ->orderByDesc('is_featured')
             ->orderBy('sort_order')
             ->orderByDesc('id')
-            ->paginate(12, ['*'], 'page')->withQueryString();
+            ->paginate(15, ['*'], 'page')->withQueryString();
 
         return Inertia::render('events/Gallery', [
             'pastEventsMedia' => EventMediaResource::collection($pastEventsMedia),

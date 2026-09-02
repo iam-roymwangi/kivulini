@@ -5,6 +5,11 @@ export interface EventMedia {
     is_featured: boolean;
     sort_order: number;
     url: string;
+    event?: {
+        id: number;
+        title: string;
+        slug: string;
+    } | null;
 }
 
 export interface EventQuestion {
