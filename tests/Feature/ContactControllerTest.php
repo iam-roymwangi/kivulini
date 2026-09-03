@@ -27,6 +27,19 @@ test('contact form sends email and returns 200', function () {
     });
 });
 
+test('contact mail renders the submitted subject', function () {
+    $html = (new ContactMail(
+        senderName: 'Jane Doe',
+        senderEmail: 'jane@example.com',
+        contactSubject: 'Trip inquiry',
+        body: 'I would like to know more about the Mt. Kenya hike.',
+    ))->render();
+
+    expect($html)
+        ->toContain('Trip inquiry')
+        ->toContain('New Message from Jane Doe');
+});
+
 test('contact form returns 422 when required fields are missing', function () {
     $response = $this->postJson(route('contact.store'), [
         'email' => 'not-an-email',

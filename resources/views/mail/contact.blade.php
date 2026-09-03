@@ -26,10 +26,10 @@
             <div class="value">{{ $senderName }} &lt;{{ $senderEmail }}&gt;</div>
         </div>
 
-        @if($subject)
+        @if($contactSubject)
         <div class="field">
             <div class="label">Subject</div>
-            <div class="value">{{ $subject }}</div>
+            <div class="value">{{ $contactSubject }}</div>
         </div>
         @endif
 
