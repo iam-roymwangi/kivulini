@@ -97,7 +97,6 @@ const typeLabel = computed(() => ({
         <meta property="og:title" content="Upcoming Trips & Events – Kivulini Adventures" />
         <meta property="og:description" content="Browse all upcoming hikes, road trips, and vacations in Kenya." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" :href="$page.url" />
     </Head>
 
     <div class="bg-background pb-24 pt-32 transition-colors">

@@ -37,7 +37,10 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'name' => config('app.name'),
+            'name' => env('APP_NAME', 'Laravel'),
+            'seo' => [
+                'canonicalUrl' => $request->url(),
+            ],
             'auth' => [
                 'user' => $request->user(),
             ],

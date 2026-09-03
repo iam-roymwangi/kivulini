@@ -40,7 +40,6 @@ function openBooking(qty: number) {
         <meta name="twitter:title" :content="`${eventData.title} – Kivulini Adventures`" />
         <meta name="twitter:description" :content="eventData.summary" />
         <meta v-if="eventData.media?.[0]?.url" name="twitter:image" :content="eventData.media[0].url" />
-        <link rel="canonical" :href="$page.url" />
     </Head>
 
     <div class="pt-24 pb-16">

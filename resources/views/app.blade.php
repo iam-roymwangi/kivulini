@@ -36,12 +36,16 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         <meta name="google-site-verification" content="lLCsUFtkLMchpj1b-W6QPRnNaOYpTUDGStmmRcaRa6A" />
+        @php($canonicalUrl = rtrim(url()->current(), '/'))
+        <meta name="robots" content="index,follow" />
+        <link rel="canonical" href="{{ $canonicalUrl }}" />
+        <meta property="og:url" content="{{ $canonicalUrl }}" />
 
         @fonts
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>{{ env('APP_NAME', 'Laravel') }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

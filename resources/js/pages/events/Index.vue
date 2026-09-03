@@ -122,12 +122,10 @@ const testimonials = [
         <meta property="og:description"
             content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Kivulini Adventures – Explore Upcoming Trips" />
         <meta name="twitter:description"
             content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
-        <link rel="canonical" href="https://kivuliniadventures.com/" />
     </Head>
 
     <!-- Hero -->

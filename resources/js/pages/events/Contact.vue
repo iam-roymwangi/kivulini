@@ -77,7 +77,6 @@ async function submitForm() {
         <meta property="og:title" content="Contact Kivulini Adventures" />
         <meta property="og:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://kivuliniadventures.com/contact" />
     </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">
