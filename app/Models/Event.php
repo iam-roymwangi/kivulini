@@ -47,7 +47,7 @@ class Event extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', 'published');
+        return $query->whereRaw('status = ?', ['published']);
     }
 
     /**

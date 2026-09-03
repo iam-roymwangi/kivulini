@@ -7,6 +7,7 @@ use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\EventMedia;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +22,7 @@ class EventController extends Controller
             ->with('media')
             ->paginate(3, ['*'], 'events_page');
 
-        $pastEventsMedia = EventMedia::where('is_featured', true)
+        $pastEventsMedia = EventMedia::query()->whereRaw('is_featured = ?', [true], 'and')
             ->with('event')
             ->orderBy('sort_order')
             ->paginate(3, ['*'], 'gallery_page');
@@ -29,6 +30,29 @@ class EventController extends Controller
         return Inertia::render('events/Index', [
             'events' => EventResource::collection($events),
             'pastEventsMedia' => EventMediaResource::collection($pastEventsMedia),
+        ]);
+    }
+
+    /**
+     * Display the homepage landing page.
+     */
+    public function home(): HttpResponse
+    {
+        $featuredEvents = Event::published()
+            ->with('media')
+            ->orderBy('start_date')
+            ->limit(6)
+            ->get();
+
+        $featuredGallery = EventMedia::query()->whereRaw('is_featured = ?', [true], 'and')
+            ->with('event')
+            ->orderBy('sort_order')
+            ->limit(6)
+            ->get();
+
+        return response()->view('home', [
+            'featuredEvents' => $featuredEvents,
+            'featuredGallery' => $featuredGallery,
         ]);
     }
 
@@ -56,7 +80,7 @@ class EventController extends Controller
      */
     public function show(string $slug): Response
     {
-        $event = Event::where('slug', $slug)
+        $event = Event::query()->whereRaw('slug = ?', [$slug], 'and')
             ->with([
                 'media',
                 'questions' => fn ($query) => $query->orderBy('sort_order'),

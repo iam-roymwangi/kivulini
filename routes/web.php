@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-Route::get('/', [EventController::class, 'index'])->name('home');
+Route::get('/', [EventController::class, 'home'])->name('home');
 Route::get('/events', [EventController::class, 'list'])->name('events.list');
 Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
 Route::get('/gallery', [EventController::class, 'galleryPage'])->name('events.gallery');

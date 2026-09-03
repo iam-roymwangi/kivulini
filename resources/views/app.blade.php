@@ -45,7 +45,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ env('APP_NAME', 'Laravel') }}</title>
+            <title>Kivulini Adventures</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
