@@ -81,16 +81,6 @@ const navLinks = [
                     </DropdownMenu>
                 </template>
 
-                <!-- Auth: guest (desktop) -->
-                <template v-else>
-                    <div class="hidden items-center gap-3 md:flex">
-                        <Link href="/login"
-                            class="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-400 dark:bg-amber-400 dark:text-slate-900 dark:hover:bg-amber-300">
-                            Log In
-                        </Link>
-                    </div>
-                </template>
-
                 <!-- Theme toggle -->
                 <Button variant="ghost" size="icon"
                     class="h-9 w-9 text-slate-600 hover:text-amber-500 dark:text-slate-300 dark:hover:text-amber-400"
@@ -116,14 +106,6 @@ const navLinks = [
                                     @click="mobileMenuOpen = false">
                                     {{ link.title }}
                                 </Link>
-                                <hr class="border-slate-700" />
-                                <template v-if="!user">
-                                    <Link href="/login"
-                                        class="rounded-full bg-amber-400 px-4 py-2 text-center text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-300"
-                                        @click="mobileMenuOpen = false">
-                                        Log In
-                                    </Link>
-                                </template>
                             </nav>
                         </SheetContent>
                     </Sheet>

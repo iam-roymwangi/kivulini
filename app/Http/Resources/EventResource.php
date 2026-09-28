@@ -18,7 +18,7 @@ class EventResource extends JsonResource
     {
         /** @var Event $this */
         $featuredMedia = $this->whenLoaded('media', function () {
-            return $this->media->firstWhere('is_featured', true);
+            return $this->media->firstWhere('is_featured', true) ?? $this->media->first();
         });
 
         return [

@@ -17,18 +17,23 @@ class EventController extends Controller
      */
     public function index(): Response
     {
-        $events = Event::published()
+        $featuredEvents = Event::published()
             ->with('media')
-            ->paginate(3, ['*'], 'events_page');
+            ->orderBy('start_date')
+            ->limit(3)
+            ->get();
 
-        $pastEventsMedia = EventMedia::query()->whereRaw('is_featured = ?', [true], 'and')
+        $featuredGallery = EventMedia::query()
             ->with('event')
-            ->orderBy('sort_order')
-            ->paginate(3, ['*'], 'gallery_page');
+            ->where('type', 'image')
+            ->whereHas('event', fn ($query) => $query->where('status', 'completed'))
+            ->latest()
+            ->limit(8)
+            ->get();
 
-        return Inertia::render('events/Index', [
-            'events' => EventResource::collection($events),
-            'pastEventsMedia' => EventMediaResource::collection($pastEventsMedia),
+        return Inertia::render('events/Home', [
+            'featuredEvents' => EventResource::collection($featuredEvents),
+            'featuredGallery' => EventMediaResource::collection($featuredGallery),
         ]);
     }
 

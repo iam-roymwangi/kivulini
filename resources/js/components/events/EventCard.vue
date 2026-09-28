@@ -5,9 +5,12 @@ import { CalendarDays, MapPin } from '@lucide/vue';
 import { show as showEvent } from '@/routes/events';
 import type { PlatformEvent } from '@/types';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     event: PlatformEvent;
-}>();
+    variant?: 'default' | 'overlay';
+}>(), {
+    variant: 'default',
+});
 
 const isSoldOut = computed(() => props.event.available_slots === 0);
 
@@ -29,7 +32,87 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
 </script>
 
 <template>
-    <article class="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <article
+        v-if="variant === 'overlay'"
+        class="group relative min-h-[28rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10"
+    >
+        <img
+            v-if="event.cover_image_url"
+            :src="event.cover_image_url"
+            :alt="event.title"
+            class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+        />
+        <div
+            v-else
+            class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950"
+        >
+            <span class="text-7xl font-black text-slate-700">{{ event.title[0] }}</span>
+        </div>
+
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/15" />
+        <div class="absolute inset-0 bg-slate-950/15 transition-colors duration-300 group-hover:bg-slate-950/5" />
+
+        <div class="relative flex min-h-[28rem] flex-col justify-between p-5">
+            <div class="flex items-start justify-between gap-3">
+                <span class="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-slate-950 shadow">
+                    {{ formattedPrice }}
+                </span>
+                <span
+                    v-if="isSoldOut"
+                    class="rounded-full border border-red-400 bg-red-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-200 backdrop-blur-sm"
+                >
+                    Sold Out
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                <Link :href="eventUrl" class="block">
+                    <h3 class="line-clamp-2 text-2xl font-black leading-tight text-white">
+                        {{ event.title }}
+                    </h3>
+                </Link>
+
+                <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-200">
+                    <span class="flex items-center gap-1.5">
+                        <MapPin class="h-4 w-4 text-amber-400" aria-hidden="true" />
+                        {{ event.location }}
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <CalendarDays class="h-4 w-4 text-amber-400" aria-hidden="true" />
+                        {{ formattedDate }}
+                    </span>
+                </div>
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p v-if="!isSoldOut" class="text-sm font-semibold text-slate-300">
+                        {{ event.available_slots }} seat{{ event.available_slots === 1 ? '' : 's' }} left
+                    </p>
+                    <p v-else class="text-sm font-semibold text-slate-300">
+                        Fully booked
+                    </p>
+
+                    <Link
+                        v-if="!isSoldOut"
+                        :href="eventUrl"
+                        class="inline-flex items-center justify-center rounded-full bg-amber-400 px-5 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-slate-950/20 transition hover:bg-amber-300 active:scale-95"
+                    >
+                        Book Seat
+                    </Link>
+                    <button
+                        v-else
+                        type="button"
+                        disabled
+                        class="inline-flex cursor-not-allowed items-center justify-center rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold text-white/60"
+                    >
+                        Book Seat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <article v-else class="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
         <!-- Main clickable area -->
         <Link :href="eventUrl" class="flex flex-1 flex-col">
             <!-- Cover image -->
@@ -38,7 +121,7 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
                     v-if="event.cover_image_url"
                     :src="event.cover_image_url"
                     :alt="event.title"
-                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    class="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                 />
                 <div

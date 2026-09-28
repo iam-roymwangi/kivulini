@@ -22,6 +22,11 @@ class EventMediaResource extends JsonResource
             'is_featured' => $this->is_featured,
             'sort_order' => $this->sort_order,
             'url' => Storage::url($this->file_path),
+            'event' => $this->whenLoaded('event', fn () => [
+                'id' => $this->event->id,
+                'title' => $this->event->title,
+                'slug' => $this->event->slug,
+            ]),
         ];
     }
 }
