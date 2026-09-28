@@ -34,7 +34,7 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
 <template>
     <article
         v-if="variant === 'overlay'"
-        class="group relative min-h-[28rem] overflow-hidden rounded-2xl bg-slate-900 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10"
+        class="group relative aspect-[1024/1536] overflow-hidden rounded-2xl bg-slate-900 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10"
     >
         <img
             v-if="event.cover_image_url"
@@ -53,7 +53,7 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/15" />
         <div class="absolute inset-0 bg-slate-950/15 transition-colors duration-300 group-hover:bg-slate-950/5" />
 
-        <div class="relative flex min-h-[28rem] flex-col justify-between p-5">
+        <div class="relative flex h-full flex-col justify-between p-5">
             <div class="flex items-start justify-between gap-3">
                 <span class="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-slate-950 shadow">
                     {{ formattedPrice }}
