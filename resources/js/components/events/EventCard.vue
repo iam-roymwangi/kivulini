@@ -7,7 +7,7 @@ import type { PlatformEvent } from '@/types';
 
 const props = withDefaults(defineProps<{
     event: PlatformEvent;
-    variant?: 'default' | 'overlay';
+    variant?: 'default' | 'overlay' | 'past';
 }>(), {
     variant: 'default',
 });
@@ -32,6 +32,7 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
 </script>
 
 <template>
+    <!-- ── Overlay variant (upcoming featured) ───────────────────────── -->
     <article
         v-if="variant === 'overlay'"
         class="group relative aspect-[1024/1536] overflow-hidden rounded-2xl bg-slate-900 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10"
@@ -88,9 +89,7 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
                     <p v-if="!isSoldOut" class="text-sm font-semibold text-slate-300">
                         {{ event.available_slots }} seat{{ event.available_slots === 1 ? '' : 's' }} left
                     </p>
-                    <p v-else class="text-sm font-semibold text-slate-300">
-                        Fully booked
-                    </p>
+                    <p v-else class="text-sm font-semibold text-slate-300">Fully booked</p>
 
                     <Link
                         v-if="!isSoldOut"
@@ -112,10 +111,65 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
         </div>
     </article>
 
-    <article v-else class="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-        <!-- Main clickable area -->
+    <!-- ── Past variant (completed events — no booking) ──────────────── -->
+    <article
+        v-else-if="variant === 'past'"
+        class="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/30 hover:shadow-lg"
+    >
         <Link :href="eventUrl" class="flex flex-1 flex-col">
-            <!-- Cover image -->
+            <div class="relative aspect-[4/3] overflow-hidden bg-slate-800">
+                <img
+                    v-if="event.cover_image_url"
+                    :src="event.cover_image_url"
+                    :alt="event.title"
+                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                />
+                <div
+                    v-else
+                    class="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800 to-slate-700"
+                >
+                    <span class="text-4xl font-black text-slate-600">{{ event.title[0] }}</span>
+                </div>
+
+                <!-- Completed badge -->
+                <div class="absolute left-3 top-3">
+                    <span class="rounded-full border border-slate-500/40 bg-slate-900/70 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-slate-300 backdrop-blur-sm">
+                        Completed
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex flex-1 flex-col gap-2 p-4">
+                <h3 class="line-clamp-2 text-base font-bold leading-snug text-card-foreground">
+                    {{ event.title }}
+                </h3>
+                <div class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    <span class="flex items-center gap-1">
+                        <MapPin class="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
+                        {{ event.location }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <CalendarDays class="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
+                        {{ formattedDate }}
+                    </span>
+                </div>
+            </div>
+        </Link>
+
+        <div class="p-4 pt-0">
+            <Link
+                :href="eventUrl"
+                class="block w-full rounded-xl border border-border py-2.5 text-center text-sm font-bold text-foreground transition-colors hover:border-amber-400 hover:text-amber-500"
+            >
+                View Trip
+            </Link>
+        </div>
+    </article>
+
+    <!-- ── Default variant (standard card with booking) ─────────────── -->
+    <article v-else class="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <Link :href="eventUrl" class="flex flex-1 flex-col">
             <div class="relative aspect-[4/3] overflow-hidden bg-slate-800">
                 <img
                     v-if="event.cover_image_url"
@@ -131,14 +185,12 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
                     <span class="text-4xl font-black text-slate-600">{{ event.title[0] }}</span>
                 </div>
 
-                <!-- Price badge -->
                 <div class="absolute left-3 top-3">
                     <span class="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-slate-900 shadow">
                         {{ formattedPrice }}
                     </span>
                 </div>
 
-                <!-- Sold out overlay -->
                 <div
                     v-if="isSoldOut"
                     class="absolute inset-0 flex items-center justify-center bg-slate-950/70"
@@ -149,13 +201,10 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
                 </div>
             </div>
 
-            <!-- Card body -->
             <div class="flex flex-1 flex-col gap-3 p-4">
                 <h3 class="line-clamp-2 text-base font-bold leading-snug text-card-foreground">
                     {{ event.title }}
                 </h3>
-
-                <!-- Meta row -->
                 <div class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                     <span class="flex items-center gap-1">
                         <MapPin class="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
@@ -166,15 +215,12 @@ const eventUrl = computed(() => showEvent.url(props.event.slug));
                         {{ formattedDate }}
                     </span>
                 </div>
-
-                <!-- Seat counter -->
                 <p v-if="!isSoldOut" class="text-xs text-muted-foreground">
                     {{ event.available_slots }} seat{{ event.available_slots === 1 ? '' : 's' }} left
                 </p>
             </div>
         </Link>
 
-        <!-- CTA (outside the Link to avoid nested interactive elements) -->
         <div class="p-4 pt-0">
             <Link
                 v-if="!isSoldOut"

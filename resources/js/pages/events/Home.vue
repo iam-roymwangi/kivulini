@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { GalleryHorizontal, HeartHandshake, MapPinned, Sparkles } from '@lucide/vue';
+import { GalleryHorizontal, MapPin, Users, Star, Flag } from '@lucide/vue';
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
 import MasonryGallery from '@/components/events/MasonryGallery.vue';
@@ -45,25 +45,15 @@ defineProps<{
     featuredMerchandise: PreviewCollection<MerchandiseItem>;
     pastEvents: ResourcePaginator<PlatformEvent>;
     reviews: Paginator<EventReview>;
+    stats: {
+        trips_completed: number;
+        adventurers: number;
+        destinations: number;
+        reviews: number;
+    };
 }>();
 
-const highlights = [
-    {
-        icon: Sparkles,
-        title: 'Curated adventures',
-        description: 'Handpicked road trips, hikes, and weekend escapes designed for memorable group travel.',
-    },
-    {
-        icon: MapPinned,
-        title: 'Kenya-first itineraries',
-        description: 'Trips centered on scenic routes, local culture, and destinations people actually want to revisit.',
-    },
-    {
-        icon: HeartHandshake,
-        title: 'Community-focused',
-        description: 'Travel with a friendly crew, thoughtful coordination, and a booking flow built for comfort.',
-    },
-];
+
 </script>
 
 <template>
@@ -88,18 +78,53 @@ const highlights = [
     <main class="bg-background text-foreground transition-colors">
         <HeroSection />
 
-        <!-- Highlights -->
-        <section class="mx-auto max-w-7xl px-4 py-16 md:px-8 lg:px-12 lg:py-20">
-            <div class="grid gap-6 md:grid-cols-3">
-                <article
-                    v-for="item in highlights"
-                    :key="item.title"
-                    class="rounded-2xl border border-border bg-card p-6 shadow-xs"
-                >
-                    <component :is="item.icon" class="h-8 w-8 text-amber-500" />
-                    <h2 class="mt-4 text-xl font-bold">{{ item.title }}</h2>
-                    <p class="mt-2 text-sm leading-7 text-muted-foreground">{{ item.description }}</p>
-                </article>
+        <!-- Stats -->
+        <section class="border-b border-border bg-card px-4 py-14 transition-colors md:px-8 lg:px-12">
+            <div class="mx-auto max-w-7xl">
+                <dl class="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
+                    <!-- Trips completed -->
+                    <div class="flex flex-col bg-card px-6 py-10 sm:px-10">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-400/10">
+                            <Flag class="h-5 w-5 text-amber-500" aria-hidden="true" />
+                        </div>
+                        <dt class="mt-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Events completed</dt>
+                        <dd class="mt-2 text-5xl font-black tabular-nums text-foreground">{{ stats.trips_completed }}</dd>
+                        <p class="mt-2 text-xs text-muted-foreground">Adventures successfully run across Kenya</p>
+                    </div>
+
+                    <!-- Adventurers -->
+                    <div class="flex flex-col bg-card px-6 py-10 sm:px-10">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-400/10">
+                            <Users class="h-5 w-5 text-sky-500" aria-hidden="true" />
+                        </div>
+                        <dt class="mt-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Adventurers</dt>
+                        <dd class="mt-2 flex items-baseline gap-1">
+                            <span class="text-5xl font-black tabular-nums text-foreground">{{ stats.adventurers.toLocaleString() }}</span>
+                            <span class="text-lg font-black text-sky-500">+</span>
+                        </dd>
+                        <p class="mt-2 text-xs text-muted-foreground">Seats booked across all our trips</p>
+                    </div>
+
+                    <!-- Destinations -->
+                    <div class="flex flex-col bg-card px-6 py-10 sm:px-10">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/10">
+                            <MapPin class="h-5 w-5 text-emerald-500" aria-hidden="true" />
+                        </div>
+                        <dt class="mt-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Destinations</dt>
+                        <dd class="mt-2 text-5xl font-black tabular-nums text-foreground">{{ stats.destinations }}</dd>
+                        <p class="mt-2 text-xs text-muted-foreground">Unique locations explored across the country</p>
+                    </div>
+
+                    <!-- Reviews -->
+                    <div class="flex flex-col bg-card px-6 py-10 sm:px-10">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-400/10">
+                            <Star class="h-5 w-5 text-violet-500" aria-hidden="true" />
+                        </div>
+                        <dt class="mt-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Reviews</dt>
+                        <dd class="mt-2 text-5xl font-black tabular-nums text-foreground">{{ stats.reviews }}</dd>
+                        <p class="mt-2 text-xs text-muted-foreground">Verified reviews from our community</p>
+                    </div>
+                </dl>
             </div>
         </section>
 
@@ -139,7 +164,7 @@ const highlights = [
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    <EventCard v-for="event in pastEvents.data" :key="event.id" :event="event" />
+                    <EventCard v-for="event in pastEvents.data" :key="event.id" :event="event" variant="past" />
                 </div>
 
                 <!-- Pagination -->

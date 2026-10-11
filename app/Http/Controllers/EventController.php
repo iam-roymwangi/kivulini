@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\EventMediaResource;
 use App\Http\Resources\EventResource;
 use App\Http\Resources\MerchandiseResource;
+use App\Models\Booking;
 use App\Models\Event;
 use App\Models\EventMedia;
 use App\Models\Merchandise;
@@ -52,11 +53,19 @@ class EventController extends Controller
             ->paginate(6, ['*'], 'reviews_page')
             ->withQueryString();
 
+        $stats = [
+            'trips_completed' => Event::where('status', 'completed')->count(),
+            'adventurers' => Booking::sum('quantity'),
+            'destinations' => Event::distinct()->count('location'),
+            'reviews' => Review::where('is_approved', true)->count(),
+        ];
+
         return Inertia::render('events/Home', [
             'featuredEvents' => EventResource::collection($featuredEvents),
             'featuredGallery' => EventMediaResource::collection($featuredGallery),
             'featuredMerchandise' => MerchandiseResource::collection($featuredMerchandise),
             'pastEvents' => EventResource::collection($pastEvents),
+            'stats' => $stats,
             'reviews' => $reviews->through(fn (Review $review) => [
                 'id' => $review->id,
                 'reviewer_name' => $review->reviewer_name,
