@@ -12,6 +12,15 @@ export interface EventMedia {
     } | null;
 }
 
+export interface EventReview {
+    id: number;
+    reviewer_name: string;
+    rating: number;
+    body: string;
+    image_url: string | null;
+    created_at: string;
+}
+
 export interface EventQuestion {
     id: number;
     question_text: string;
@@ -41,6 +50,7 @@ export interface PlatformEvent {
     cover_image_url: string | null;
     media: EventMedia[];
     questions: EventQuestion[];
+    reviews: EventReview[];
 }
 
 export interface BookingPayload {

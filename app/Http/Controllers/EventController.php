@@ -8,7 +8,9 @@ use App\Http\Resources\MerchandiseResource;
 use App\Models\Event;
 use App\Models\EventMedia;
 use App\Models\Merchandise;
+use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,7 +19,7 @@ class EventController extends Controller
     /**
      * Display the Discovery Feed with paginated published events.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $featuredEvents = Event::published()
             ->with('media')
@@ -39,10 +41,30 @@ class EventController extends Controller
             ->limit(4)
             ->get();
 
+        $pastEvents = Event::where('status', 'completed')
+            ->with('media')
+            ->orderByDesc('end_date')
+            ->paginate(6, ['*'], 'past_page')
+            ->withQueryString();
+
+        $reviews = Review::where('is_approved', true)
+            ->latest()
+            ->paginate(6, ['*'], 'reviews_page')
+            ->withQueryString();
+
         return Inertia::render('events/Home', [
             'featuredEvents' => EventResource::collection($featuredEvents),
             'featuredGallery' => EventMediaResource::collection($featuredGallery),
             'featuredMerchandise' => MerchandiseResource::collection($featuredMerchandise),
+            'pastEvents' => EventResource::collection($pastEvents),
+            'reviews' => $reviews->through(fn (Review $review) => [
+                'id' => $review->id,
+                'reviewer_name' => $review->reviewer_name,
+                'rating' => $review->rating,
+                'body' => $review->body,
+                'image_url' => $review->image_path ? Storage::url($review->image_path) : null,
+                'created_at' => $review->created_at?->toIso8601String(),
+            ]),
         ]);
     }
 
@@ -74,6 +96,7 @@ class EventController extends Controller
             ->with([
                 'media',
                 'questions' => fn ($query) => $query->orderBy('sort_order'),
+                'reviews' => fn ($query) => $query->where('is_approved', true)->latest()->limit(20),
             ])
             ->firstOrFail();
 

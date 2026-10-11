@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/vue3';
 import BookingBox from '@/components/events/BookingBox.vue';
 import BookingDrawer from '@/components/events/BookingDrawer.vue';
 import EventHeroGallery from '@/components/events/EventHeroGallery.vue';
+import EventReviewSection from '@/components/events/EventReviewSection.vue';
 import type { PlatformEvent } from '@/types';
 
 const props = defineProps<{
@@ -129,15 +130,12 @@ function openBooking(qty: number) {
                         </div>
                     </div> -->
 
-                    <!-- Reviews placeholder -->
-                    <div>
-                        <h2 class="mb-4 text-xl font-bold text-foreground">Reviews</h2>
-                        <div
-                            class="rounded-xl border border-border bg-card dark:border-slate-800 dark:bg-slate-900/50 p-6 text-center">
-                            <p class="text-muted-foreground">Reviews coming soon. Be the first to book and share your
-                                experience.</p>
-                        </div>
-                    </div>
+                    <!-- Reviews -->
+                    <EventReviewSection
+                        :event-id="eventData.id"
+                        :reviews="eventData.reviews ?? []"
+                        :is-completed="eventData.status === 'completed'"
+                    />
                 </div>
 
                 <!-- Right column: sticky booking box -->

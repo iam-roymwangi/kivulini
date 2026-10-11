@@ -1,56 +1,24 @@
 <script setup lang="ts">
-interface Review {
-    name: string;
-    location: string;
-    initials: string;
-    text: string;
-    rating: number;
+import { Link } from '@inertiajs/vue3';
+import type { EventReview } from '@/types';
+
+interface PaginatorLink {
+    url: string | null;
+    label: string;
+    active: boolean;
 }
 
-const reviews: Review[] = [
-    {
-        name: 'Wanjiku N.',
-        location: 'Nairobi, Kenya',
-        initials: 'WN',
-        rating: 5,
-        text: 'The Mt. Longonot hike was perfectly organized. The guides were professional and the bonfire at night was magical.',
-    },
-    {
-        name: 'David K.',
-        location: 'Kisumu, Kenya',
-        initials: 'DK',
-        rating: 5,
-        text: 'Kivulini makes booking trips genuinely simple. The digital consent forms and M-Pesa STK push payments are seamless.',
-    },
-    {
-        name: 'Sarah M.',
-        location: 'Mombasa, Kenya',
-        initials: 'SM',
-        rating: 5,
-        text: 'An absolute 10/10 experience. I met amazing people and caught the most beautiful sunsets on the Rift Valley road trip.',
-    },
-    {
-        name: 'John O.',
-        location: 'Eldoret, Kenya',
-        initials: 'JO',
-        rating: 5,
-        text: 'Highly recommend for anyone looking to explore Kenya in a group. Great vibe, safe environment, and well-planned routes.',
-    },
-    {
-        name: 'Amina H.',
-        location: 'Nakuru, Kenya',
-        initials: 'AH',
-        rating: 5,
-        text: 'From the first message to the final campfire, every detail was taken care of. Already booked my next trip.',
-    },
-    {
-        name: 'Brian T.',
-        location: 'Thika, Kenya',
-        initials: 'BT',
-        rating: 5,
-        text: 'The Aberdare hike was challenging in the best way. The crew was supportive and the scenery made every step worth it.',
-    },
-];
+interface ReviewsPaginator {
+    data: EventReview[];
+    current_page: number;
+    last_page: number;
+    total: number;
+    links: PaginatorLink[];
+}
+
+defineProps<{
+    reviews: ReviewsPaginator;
+}>();
 </script>
 
 <template>
@@ -68,14 +36,14 @@ const reviews: Review[] = [
             </div>
 
             <!-- Reviews grid -->
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div v-if="reviews.data.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <article
-                    v-for="(review, idx) in reviews"
-                    :key="idx"
+                    v-for="review in reviews.data"
+                    :key="review.id"
                     class="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/30 hover:shadow-md"
                 >
-                    <!-- Stars -->
                     <div>
+                        <!-- Stars -->
                         <div class="mb-4 flex items-center gap-0.5" :aria-label="`${review.rating} out of 5 stars`">
                             <svg
                                 v-for="star in 5"
@@ -91,8 +59,16 @@ const reviews: Review[] = [
                         </div>
 
                         <blockquote class="text-sm leading-relaxed text-foreground/80">
-                            "{{ review.text }}"
+                            "{{ review.body }}"
                         </blockquote>
+
+                        <img
+                            v-if="review.image_url"
+                            :src="review.image_url"
+                            :alt="`Photo by ${review.reviewer_name}`"
+                            class="mt-4 h-36 w-full rounded-xl border border-border object-cover"
+                            loading="lazy"
+                        />
                     </div>
 
                     <!-- Author -->
@@ -101,14 +77,35 @@ const reviews: Review[] = [
                             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-sm font-bold text-foreground"
                             aria-hidden="true"
                         >
-                            {{ review.initials }}
+                            {{ review.reviewer_name[0].toUpperCase() }}
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-foreground">{{ review.name }}</p>
-                            <p class="text-xs text-muted-foreground">{{ review.location }}</p>
-                        </div>
+                        <p class="text-sm font-bold text-foreground">{{ review.reviewer_name }}</p>
                     </footer>
                 </article>
+            </div>
+
+            <!-- Empty state -->
+            <div v-else class="rounded-2xl border border-border bg-card p-8 text-center">
+                <p class="text-muted-foreground text-sm">No reviews yet. Be the first to share your experience after a trip.</p>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="reviews.last_page > 1" class="mt-10 flex items-center justify-center gap-1.5">
+                <template v-for="link in reviews.links" :key="link.label">
+                    <Link
+                        v-if="link.url"
+                        :href="link.url"
+                        class="rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold transition-all hover:border-amber-400 hover:text-amber-500"
+                        :class="link.active ? 'border-amber-400 bg-amber-400/10 text-amber-500 font-bold' : 'text-muted-foreground'"
+                        preserve-scroll
+                        v-html="link.label"
+                    />
+                    <span
+                        v-else
+                        class="cursor-default rounded-xl border border-border/40 bg-card/40 px-4 py-2 text-sm text-muted-foreground/45"
+                        v-html="link.label"
+                    />
+                </template>
             </div>
         </div>
     </section>

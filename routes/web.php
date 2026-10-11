@@ -8,6 +8,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MerchandiseController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,7 @@ Route::get('/merchandise/{merchandise}', [MerchandiseController::class, 'show'])
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::post('/events/{event}/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::post('/events/{event}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 Route::get('/bookings/{booking}/pass', [BookingController::class, 'downloadPass'])->name('bookings.pass');
 

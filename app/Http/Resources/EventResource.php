@@ -43,6 +43,14 @@ class EventResource extends JsonResource
                 : null,
             'media' => EventMediaResource::collection($this->whenLoaded('media')),
             'questions' => EventQuestionResource::collection($this->whenLoaded('questions')),
+            'reviews' => $this->whenLoaded('reviews', fn () => $this->reviews->map(fn ($r) => [
+                'id' => $r->id,
+                'reviewer_name' => $r->reviewer_name,
+                'rating' => $r->rating,
+                'body' => $r->body,
+                'image_url' => $r->image_path ? Storage::url($r->image_path) : null,
+                'created_at' => $r->created_at?->toIso8601String(),
+            ])),
         ];
     }
 }

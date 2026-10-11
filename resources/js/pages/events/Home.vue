@@ -7,8 +7,33 @@ import MasonryGallery from '@/components/events/MasonryGallery.vue';
 import MerchSection from '@/components/events/MerchSection.vue';
 import ReviewsSection from '@/components/events/ReviewsSection.vue';
 import { gallery, list as eventsList } from '@/routes/events';
-import type { EventMedia, PlatformEvent } from '@/types';
+import type { EventMedia, EventReview, PlatformEvent } from '@/types';
 import type { MerchandiseItem } from '@/types/merchandise';
+
+interface PaginatorLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface Paginator<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    total: number;
+    links: PaginatorLink[];
+}
+
+interface ResourcePaginator<T> {
+    data: T[];
+    links: PaginatorLink[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        total: number;
+        links: PaginatorLink[];
+    };
+}
 
 interface PreviewCollection<T> {
     data: T[];
@@ -18,6 +43,8 @@ defineProps<{
     featuredEvents: PreviewCollection<PlatformEvent>;
     featuredGallery: PreviewCollection<EventMedia>;
     featuredMerchandise: PreviewCollection<MerchandiseItem>;
+    pastEvents: ResourcePaginator<PlatformEvent>;
+    reviews: Paginator<EventReview>;
 }>();
 
 const highlights = [
@@ -61,6 +88,7 @@ const highlights = [
     <main class="bg-background text-foreground transition-colors">
         <HeroSection />
 
+        <!-- Highlights -->
         <section class="mx-auto max-w-7xl px-4 py-16 md:px-8 lg:px-12 lg:py-20">
             <div class="grid gap-6 md:grid-cols-3">
                 <article
@@ -75,14 +103,15 @@ const highlights = [
             </div>
         </section>
 
+        <!-- Upcoming events -->
         <section id="events" class="mx-auto max-w-7xl px-4 pb-16 md:px-8 lg:px-12">
             <div class="mb-8 flex items-end justify-between gap-4">
                 <div>
-                    <p class="text-sm font-bold uppercase tracking-wider text-amber-500">Featured trips</p>
+                    <p class="text-sm font-bold uppercase tracking-wider text-amber-500">Featured events</p>
                     <h2 class="mt-2 text-3xl font-black text-foreground sm:text-4xl">Upcoming experiences worth booking</h2>
                 </div>
                 <Link :href="eventsList.url()" class="hidden text-sm font-semibold text-amber-500 hover:text-amber-400 sm:inline-flex">
-                    Browse all trips
+                    Browse all events
                 </Link>
             </div>
 
@@ -98,11 +127,48 @@ const highlights = [
             </div>
         </section>
 
+        <!-- Past events -->
+        <section v-if="pastEvents.meta.total > 0" class="border-t border-border bg-muted/30 px-4 py-16 transition-colors md:px-8 lg:px-12">
+            <div class="mx-auto max-w-7xl">
+                <div class="mb-8 flex items-end justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-bold uppercase tracking-wider text-amber-500">Past trips</p>
+                        <h2 class="mt-2 text-3xl font-black text-foreground sm:text-4xl">Where we've been</h2>
+                    </div>
+                    <span class="hidden text-sm text-muted-foreground sm:inline-block">{{ pastEvents.meta.total }} completed {{ pastEvents.meta.total === 1 ? 'trip' : 'trips' }}</span>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <EventCard v-for="event in pastEvents.data" :key="event.id" :event="event" />
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="pastEvents.meta.last_page > 1" class="mt-10 flex items-center justify-center gap-1.5">
+                    <template v-for="link in pastEvents.meta.links" :key="link.label">
+                        <Link
+                            v-if="link.url"
+                            :href="link.url"
+                            class="rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold transition-all hover:border-amber-400 hover:text-amber-500"
+                            :class="link.active ? 'border-amber-400 bg-amber-400/10 text-amber-500 font-bold' : 'text-muted-foreground'"
+                            preserve-scroll
+                            v-html="link.label"
+                        />
+                        <span
+                            v-else
+                            class="cursor-default rounded-xl border border-border/40 bg-card/40 px-4 py-2 text-sm text-muted-foreground/45"
+                            v-html="link.label"
+                        />
+                    </template>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery snapshot -->
         <section class="bg-muted/40 px-4 py-16 md:px-8 lg:px-12">
             <div class="mx-auto max-w-7xl">
                 <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <p class="text-sm font-bold uppercase tracking-wider text-amber-500">Past trips</p>
+                        <p class="text-sm font-bold uppercase tracking-wider text-amber-500">Gallery</p>
                         <h2 class="mt-2 text-3xl font-black text-foreground sm:text-4xl">A glimpse of the journey</h2>
                     </div>
                     <Link
@@ -129,6 +195,6 @@ const highlights = [
 
         <MerchSection :items="featuredMerchandise.data" />
 
-        <ReviewsSection />
+        <ReviewsSection :reviews="reviews" />
     </main>
 </template>
