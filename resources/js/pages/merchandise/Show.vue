@@ -94,7 +94,7 @@ const whatsappUrl = computed(() => `https://wa.me/?text=${whatsappMessage.value}
         <div class="mb-8">
             <Link :href="merchandiseIndex.url()" class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-amber-500">
                 <ArrowLeft class="h-4 w-4" />
-                Back to Merchandise
+                Back to Merch
             </Link>
         </div>
 

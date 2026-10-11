@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\EventMediaResource;
 use App\Http\Resources\EventResource;
+use App\Http\Resources\MerchandiseResource;
 use App\Models\Event;
 use App\Models\EventMedia;
+use App\Models\Merchandise;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,9 +33,16 @@ class EventController extends Controller
             ->limit(8)
             ->get();
 
+        $featuredMerchandise = Merchandise::published()
+            ->with('images')
+            ->latest()
+            ->limit(4)
+            ->get();
+
         return Inertia::render('events/Home', [
             'featuredEvents' => EventResource::collection($featuredEvents),
             'featuredGallery' => EventMediaResource::collection($featuredGallery),
+            'featuredMerchandise' => MerchandiseResource::collection($featuredMerchandise),
         ]);
     }
 

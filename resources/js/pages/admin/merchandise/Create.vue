@@ -55,7 +55,7 @@ function submit() {
             <a :href="index.url()" class="rounded-lg border border-border p-2 text-muted-foreground hover:text-foreground">
                 <ArrowLeft class="h-4 w-4" />
             </a>
-            <h1 class="text-2xl font-black text-foreground">Create Merchandise</h1>
+            <h1 class="text-2xl font-black text-foreground">Create Merch</h1>
         </div>
 
         <div v-if="Object.keys(errors).length > 0" class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-500">

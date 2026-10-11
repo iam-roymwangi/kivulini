@@ -4,8 +4,11 @@ import { GalleryHorizontal, HeartHandshake, MapPinned, Sparkles } from '@lucide/
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
 import MasonryGallery from '@/components/events/MasonryGallery.vue';
+import MerchSection from '@/components/events/MerchSection.vue';
+import ReviewsSection from '@/components/events/ReviewsSection.vue';
 import { gallery, list as eventsList } from '@/routes/events';
 import type { EventMedia, PlatformEvent } from '@/types';
+import type { MerchandiseItem } from '@/types/merchandise';
 
 interface PreviewCollection<T> {
     data: T[];
@@ -14,6 +17,7 @@ interface PreviewCollection<T> {
 defineProps<{
     featuredEvents: PreviewCollection<PlatformEvent>;
     featuredGallery: PreviewCollection<EventMedia>;
+    featuredMerchandise: PreviewCollection<MerchandiseItem>;
 }>();
 
 const highlights = [
@@ -122,5 +126,9 @@ const highlights = [
                 </div>
             </div>
         </section>
+
+        <MerchSection :items="featuredMerchandise.data" />
+
+        <ReviewsSection />
     </main>
 </template>

@@ -40,7 +40,7 @@ function confirmDelete(item: MerchandiseRow) {
     <div class="space-y-6 p-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-black text-foreground">Merchandise</h1>
+                <h1 class="text-2xl font-black text-foreground">Merch</h1>
                 <p class="text-sm text-muted-foreground">{{ merchandise.total }} items</p>
             </div>
             <Link

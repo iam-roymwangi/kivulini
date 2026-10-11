@@ -171,7 +171,7 @@ const filteredItems = computed(() => {
                     <input
                         v-model="searchQuery"
                         type="search"
-                        placeholder="Search merchandise..."
+                        placeholder="Search merch..."
                         class="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
                     />
                     <button
