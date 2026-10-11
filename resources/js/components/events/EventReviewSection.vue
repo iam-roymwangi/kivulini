@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { Star, ImagePlus, X, Loader2, CheckCircle } from '@lucide/vue';
 import type { EventReview } from '@/types';
 
@@ -24,9 +24,7 @@ const hoverRating = ref(0);
 const imagePreview = ref<string>('');
 const fileInput = ref<HTMLInputElement | null>(null);
 const converting = ref(false);
-
-const page = usePage();
-const justSubmitted = computed(() => (page.props.flash as Record<string, string> | undefined)?.success?.includes('review'));
+const showSuccessModal = ref(false);
 
 // ── WebP compression ──────────────────────────────────────────────────────────
 
@@ -93,8 +91,13 @@ function submitReview() {
             form.reset();
             imagePreview.value = '';
             hoverRating.value = 0;
+            showSuccessModal.value = true;
         },
     });
+}
+
+function closeModal() {
+    showSuccessModal.value = false;
 }
 
 // ── Display helpers ───────────────────────────────────────────────────────────
@@ -157,7 +160,7 @@ const averageRating = computed(() => {
                             <p class="text-xs text-muted-foreground">{{ formatDate(review.created_at) }}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-0.5 shrink-0" :aria-label="`${review.rating} out of 5`">
+                    <div class="flex shrink-0 items-center gap-0.5" :aria-label="`${review.rating} out of 5`">
                         <svg
                             v-for="s in 5"
                             :key="s"
@@ -184,167 +187,214 @@ const averageRating = computed(() => {
             </article>
         </div>
 
-        <!-- Empty state (no reviews yet) -->
-        <div
-            v-else
-            class="mb-10 rounded-xl border border-border bg-card p-6 text-center"
-        >
-            <p class="text-muted-foreground text-sm">No reviews yet. Be the first to share your experience.</p>
+        <!-- Empty state -->
+        <div v-else class="mb-10 rounded-xl border border-border bg-card p-6 text-center">
+            <p class="text-sm text-muted-foreground">No reviews yet. Be the first to share your experience.</p>
         </div>
 
         <!-- Submit form — only for completed events -->
-        <template v-if="isCompleted">
-            <!-- Success flash -->
-            <div
-                v-if="justSubmitted"
-                class="mb-6 flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-400"
-            >
-                <CheckCircle class="h-5 w-5 shrink-0" />
-                Your review has been submitted and is pending approval. Thank you!
-            </div>
+        <div v-if="isCompleted" class="rounded-xl border border-border bg-card p-6">
+            <h3 class="mb-5 text-base font-bold text-foreground">Leave a Review</h3>
 
-            <div v-else class="rounded-xl border border-border bg-card p-6">
-                <h3 class="mb-5 text-base font-bold text-foreground">Leave a Review</h3>
-
-                <form class="space-y-5" @submit.prevent="submitReview">
-                    <!-- Star rating -->
-                    <div class="space-y-1.5">
-                        <label class="block text-sm font-medium text-foreground">
-                            Rating <span class="text-red-500">*</span>
-                        </label>
-                        <div
-                            class="flex items-center gap-1"
-                            role="radiogroup"
-                            aria-label="Rating"
-                        >
-                            <button
-                                v-for="star in 5"
-                                :key="star"
-                                type="button"
-                                class="rounded p-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-                                :aria-label="`${star} star${star > 1 ? 's' : ''}`"
-                                :aria-pressed="form.rating === star"
-                                @click="setRating(star)"
-                                @mouseenter="hoverRating = star"
-                                @mouseleave="hoverRating = 0"
-                            >
-                                <Star
-                                    class="h-7 w-7 transition-colors"
-                                    :class="star <= (hoverRating || form.rating) ? 'text-amber-400 fill-amber-400' : 'text-border'"
-                                />
-                            </button>
-                        </div>
-                        <p v-if="form.errors.rating" class="text-xs text-red-500">{{ form.errors.rating }}</p>
-                    </div>
-
-                    <!-- Name + email -->
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div class="space-y-1.5">
-                            <label for="reviewer_name" class="block text-sm font-medium text-foreground">
-                                Name <span class="text-red-500">*</span>
-                            </label>
-                            <input
-                                id="reviewer_name"
-                                v-model="form.reviewer_name"
-                                type="text"
-                                autocomplete="name"
-                                placeholder="Your name"
-                                class="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
-                            />
-                            <p v-if="form.errors.reviewer_name" class="text-xs text-red-500">{{ form.errors.reviewer_name }}</p>
-                        </div>
-                        <div class="space-y-1.5">
-                            <label for="reviewer_email" class="block text-sm font-medium text-foreground">
-                                Email <span class="text-xs font-normal text-muted-foreground">(optional)</span>
-                            </label>
-                            <input
-                                id="reviewer_email"
-                                v-model="form.reviewer_email"
-                                type="email"
-                                autocomplete="email"
-                                placeholder="your@email.com"
-                                class="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
-                            />
-                            <p v-if="form.errors.reviewer_email" class="text-xs text-red-500">{{ form.errors.reviewer_email }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Review body -->
-                    <div class="space-y-1.5">
-                        <label for="review_body" class="block text-sm font-medium text-foreground">
-                            Your Review <span class="text-red-500">*</span>
-                        </label>
-                        <textarea
-                            id="review_body"
-                            v-model="form.body"
-                            rows="4"
-                            placeholder="Tell us about your experience..."
-                            class="w-full resize-none rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
-                        />
-                        <div class="flex items-center justify-between">
-                            <p v-if="form.errors.body" class="text-xs text-red-500">{{ form.errors.body }}</p>
-                            <p class="ml-auto text-xs text-muted-foreground">{{ form.body.length }} / 2000</p>
-                        </div>
-                    </div>
-
-                    <!-- Image upload -->
-                    <div class="space-y-1.5">
-                        <label class="block text-sm font-medium text-foreground">
-                            Photo <span class="text-xs font-normal text-muted-foreground">(optional)</span>
-                        </label>
-
-                        <div v-if="imagePreview" class="relative inline-block">
-                            <img
-                                :src="imagePreview"
-                                alt="Preview"
-                                class="h-32 w-auto rounded-xl border border-border object-cover"
-                            />
-                            <button
-                                type="button"
-                                class="absolute -right-2 -top-2 rounded-full bg-red-600 p-1 text-white shadow transition hover:bg-red-500"
-                                aria-label="Remove photo"
-                                @click="removeImage"
-                            >
-                                <X class="h-3.5 w-3.5" />
-                            </button>
-                        </div>
-
+            <form class="space-y-5" @submit.prevent="submitReview">
+                <!-- Star rating -->
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-foreground">
+                        Rating <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex items-center gap-1" role="radiogroup" aria-label="Rating">
                         <button
-                            v-else
+                            v-for="star in 5"
+                            :key="star"
                             type="button"
-                            class="flex items-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 px-5 py-3 text-sm text-muted-foreground transition hover:border-amber-400/60 hover:text-amber-500"
-                            :disabled="converting"
-                            @click="fileInput?.click()"
+                            class="rounded p-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                            :aria-label="`${star} star${star > 1 ? 's' : ''}`"
+                            :aria-pressed="form.rating === star"
+                            @click="setRating(star)"
+                            @mouseenter="hoverRating = star"
+                            @mouseleave="hoverRating = 0"
                         >
-                            <Loader2 v-if="converting" class="h-4 w-4 animate-spin" />
-                            <ImagePlus v-else class="h-4 w-4" />
-                            <span v-if="converting">Converting…</span>
-                            <span v-else>Add a photo</span>
+                            <Star
+                                class="h-7 w-7 transition-colors"
+                                :class="star <= (hoverRating || form.rating) ? 'fill-amber-400 text-amber-400' : 'text-border'"
+                            />
                         </button>
+                    </div>
+                    <p v-if="form.errors.rating" class="text-xs text-red-500">{{ form.errors.rating }}</p>
+                </div>
 
+                <!-- Name + email -->
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="space-y-1.5">
+                        <label for="reviewer_name" class="block text-sm font-medium text-foreground">
+                            Name <span class="text-red-500">*</span>
+                        </label>
                         <input
-                            ref="fileInput"
-                            type="file"
-                            accept="image/*"
-                            class="hidden"
-                            @change="handleImageChange"
+                            id="reviewer_name"
+                            v-model="form.reviewer_name"
+                            type="text"
+                            autocomplete="name"
+                            placeholder="Your name"
+                            class="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
                         />
-                        <p v-if="form.errors.image" class="text-xs text-red-500">{{ form.errors.image }}</p>
+                        <p v-if="form.errors.reviewer_name" class="text-xs text-red-500">{{ form.errors.reviewer_name }}</p>
                     </div>
+                    <div class="space-y-1.5">
+                        <label for="reviewer_email" class="block text-sm font-medium text-foreground">
+                            Email <span class="text-xs font-normal text-muted-foreground">(optional)</span>
+                        </label>
+                        <input
+                            id="reviewer_email"
+                            v-model="form.reviewer_email"
+                            type="email"
+                            autocomplete="email"
+                            placeholder="your@email.com"
+                            class="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
+                        />
+                        <p v-if="form.errors.reviewer_email" class="text-xs text-red-500">{{ form.errors.reviewer_email }}</p>
+                    </div>
+                </div>
 
-                    <!-- Submit -->
-                    <div class="flex justify-end">
+                <!-- Review body -->
+                <div class="space-y-1.5">
+                    <label for="review_body" class="block text-sm font-medium text-foreground">
+                        Your Review <span class="text-red-500">*</span>
+                    </label>
+                    <textarea
+                        id="review_body"
+                        v-model="form.body"
+                        rows="4"
+                        placeholder="Tell us about your experience..."
+                        class="w-full resize-none rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition focus:border-amber-400 focus:outline-none"
+                    />
+                    <div class="flex items-center justify-between">
+                        <p v-if="form.errors.body" class="text-xs text-red-500">{{ form.errors.body }}</p>
+                        <p class="ml-auto text-xs text-muted-foreground">{{ form.body.length }} / 2000</p>
+                    </div>
+                </div>
+
+                <!-- Image upload -->
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-foreground">
+                        Photo <span class="text-xs font-normal text-muted-foreground">(optional)</span>
+                    </label>
+
+                    <div v-if="imagePreview" class="relative inline-block">
+                        <img :src="imagePreview" alt="Preview" class="h-32 w-auto rounded-xl border border-border object-cover" />
                         <button
-                            type="submit"
-                            :disabled="form.processing || converting || form.rating === 0"
-                            class="rounded-xl bg-amber-400 px-7 py-2.5 text-sm font-bold text-slate-900 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+                            type="button"
+                            class="absolute -right-2 -top-2 rounded-full bg-red-600 p-1 text-white shadow transition hover:bg-red-500"
+                            aria-label="Remove photo"
+                            @click="removeImage"
                         >
-                            <span v-if="form.processing">Submitting…</span>
-                            <span v-else>Submit Review</span>
+                            <X class="h-3.5 w-3.5" />
                         </button>
                     </div>
-                </form>
-            </div>
-        </template>
+
+                    <button
+                        v-else
+                        type="button"
+                        class="flex items-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 px-5 py-3 text-sm text-muted-foreground transition hover:border-amber-400/60 hover:text-amber-500"
+                        :disabled="converting"
+                        @click="fileInput?.click()"
+                    >
+                        <Loader2 v-if="converting" class="h-4 w-4 animate-spin" />
+                        <ImagePlus v-else class="h-4 w-4" />
+                        <span v-if="converting">Converting…</span>
+                        <span v-else>Add a photo</span>
+                    </button>
+
+                    <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleImageChange" />
+                    <p class="text-xs text-muted-foreground">Images are compressed and converted to WebP before upload.</p>
+                    <p v-if="form.errors.image" class="text-xs text-red-500">{{ form.errors.image }}</p>
+                </div>
+
+                <!-- Submit -->
+                <div class="flex justify-end">
+                    <button
+                        type="submit"
+                        :disabled="form.processing || converting || form.rating === 0"
+                        class="rounded-xl bg-amber-400 px-7 py-2.5 text-sm font-bold text-slate-900 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        <span v-if="form.processing">Submitting…</span>
+                        <span v-else>Submit Review</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- ── Success modal ──────────────────────────────────────────────────── -->
+    <Teleport to="body">
+        <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="showSuccessModal"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="review-success-title"
+                @click.self="closeModal"
+            >
+                <Transition
+                    enter-active-class="transition duration-200 ease-out"
+                    enter-from-class="opacity-0 scale-95 translate-y-2"
+                    enter-to-class="opacity-100 scale-100 translate-y-0"
+                    leave-active-class="transition duration-150 ease-in"
+                    leave-from-class="opacity-100 scale-100"
+                    leave-to-class="opacity-0 scale-95"
+                >
+                    <div
+                        v-if="showSuccessModal"
+                        class="relative w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-2xl text-center"
+                    >
+                        <!-- Close -->
+                        <button
+                            type="button"
+                            class="absolute right-4 top-4 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                            aria-label="Close"
+                            @click="closeModal"
+                        >
+                            <X class="h-4 w-4" />
+                        </button>
+
+                        <!-- Icon -->
+                        <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border-4 border-amber-400/20 bg-amber-400/10">
+                            <CheckCircle class="h-8 w-8 text-amber-500" aria-hidden="true" />
+                        </div>
+
+                        <!-- Copy -->
+                        <h2 id="review-success-title" class="text-xl font-black text-foreground">
+                            Review Submitted
+                        </h2>
+                        <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+                            Thank you for sharing your experience. Your review is pending approval and will appear shortly once verified.
+                        </p>
+
+                        <!-- Star decoration -->
+                        <div class="mt-5 flex items-center justify-center gap-1" aria-hidden="true">
+                            <svg v-for="s in 5" :key="s" class="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        </div>
+
+                        <!-- CTA -->
+                        <button
+                            type="button"
+                            class="mt-7 w-full rounded-xl bg-amber-400 py-2.5 text-sm font-bold text-slate-900 transition hover:bg-amber-300 active:scale-95"
+                            @click="closeModal"
+                        >
+                            Done
+                        </button>
+                    </div>
+                </Transition>
+            </div>
+        </Transition>
+    </Teleport>
 </template>
