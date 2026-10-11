@@ -115,7 +115,7 @@ const filteredItems = computed(() => {
     </Head>
 
     <!-- Hero Banner -->
-    <section class="relative overflow-hidden px-4 pb-20 pt-32 text-white md:px-8 lg:px-12">
+    <section class="relative overflow-hidden px-4 pb-60 lg:pt-142 pt-82 text-white md:px-8 lg:px-12">
         <!-- Background image -->
         <div class="absolute inset-0">
             <img
