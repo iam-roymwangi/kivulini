@@ -35,6 +35,7 @@ function toggleTheme() {
 const navLinks = [
     { title: 'Home', href: '/' },
     { title: 'Events', href: '/events' },
+    { title: 'Merch', href: '/merchandise' },
     { title: 'Gallery', href: '/gallery' },
     { title: 'Contact', href: '/contact' },
 ];

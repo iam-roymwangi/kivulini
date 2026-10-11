@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Calendar, PlusCircle, ImagePlus } from '@lucide/vue';
+import { BookOpen, FolderGit2, LayoutGrid, Calendar, PlusCircle, ImagePlus, ShoppingBag } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,6 +17,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as adminEventsIndex, create as adminEventsCreate } from '@/routes/admin/events';
 import { index as adminGalleryIndex } from '@/routes/admin/gallery';
+import { index as adminMerchandiseIndex } from '@/routes/admin/merchandise';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -39,6 +40,11 @@ const mainNavItems: NavItem[] = [
         title: 'Manage Gallery',
         href: adminGalleryIndex.url(),
         icon: ImagePlus,
+    },
+    {
+        title: 'Merchandise',
+        href: adminMerchandiseIndex.url(),
+        icon: ShoppingBag,
     },
 ];
 
