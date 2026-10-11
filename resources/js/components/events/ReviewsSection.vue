@@ -61,23 +61,26 @@ defineProps<{
                         <blockquote class="text-sm leading-relaxed text-foreground/80">
                             "{{ review.body }}"
                         </blockquote>
-
-                        <img
-                            v-if="review.image_url"
-                            :src="review.image_url"
-                            :alt="`Photo by ${review.reviewer_name}`"
-                            class="mt-4 h-36 w-full rounded-xl border border-border object-cover"
-                            loading="lazy"
-                        />
                     </div>
 
                     <!-- Author -->
                     <footer class="mt-6 flex items-center gap-3 border-t border-border pt-4">
                         <div
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-sm font-bold text-foreground"
+                            class="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
                             aria-hidden="true"
                         >
-                            {{ review.reviewer_name[0].toUpperCase() }}
+                            <img
+                                v-if="review.image_url"
+                                :src="review.image_url"
+                                :alt="review.reviewer_name"
+                                class="h-full w-full object-cover"
+                            />
+                            <div
+                                v-else
+                                class="flex h-full w-full items-center justify-center text-sm font-bold text-foreground"
+                            >
+                                {{ review.reviewer_name[0].toUpperCase() }}
+                            </div>
                         </div>
                         <p class="text-sm font-bold text-foreground">{{ review.reviewer_name }}</p>
                     </footer>

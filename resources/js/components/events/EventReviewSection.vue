@@ -152,8 +152,19 @@ const averageRating = computed(() => {
             >
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-sm font-bold text-foreground">
-                            {{ review.reviewer_name[0].toUpperCase() }}
+                        <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border bg-muted">
+                            <img
+                                v-if="review.image_url"
+                                :src="review.image_url"
+                                :alt="review.reviewer_name"
+                                class="h-full w-full object-cover"
+                            />
+                            <div
+                                v-else
+                                class="flex h-full w-full items-center justify-center text-sm font-bold text-foreground"
+                            >
+                                {{ review.reviewer_name[0].toUpperCase() }}
+                            </div>
                         </div>
                         <div>
                             <p class="text-sm font-bold text-foreground">{{ review.reviewer_name }}</p>
@@ -176,14 +187,6 @@ const averageRating = computed(() => {
                 </div>
 
                 <p class="mt-3 text-sm leading-relaxed text-foreground/80">{{ review.body }}</p>
-
-                <img
-                    v-if="review.image_url"
-                    :src="review.image_url"
-                    :alt="`Photo from ${review.reviewer_name}`"
-                    class="mt-4 max-h-64 w-auto rounded-lg border border-border object-cover"
-                    loading="lazy"
-                />
             </article>
         </div>
 
