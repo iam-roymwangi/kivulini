@@ -226,18 +226,11 @@ const sortedEvents = computed(() => {
 <template>
     <Head title="Admin — Gallery Management" />
 
-    <div class="space-y-8 p-6 max-w-7xl mx-auto">
+    <div class="space-y-8 p-6 mx-auto">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-2xl font-black text-foreground">Gallery Management</h1>
                 <p class="text-sm text-muted-foreground">{{ media.total }} total images in gallery</p>
-            </div>
-            <div class="flex items-center gap-2 rounded-xl bg-amber-500/10 px-4 py-2 border border-amber-500/20 text-xs font-semibold text-amber-500">
-                <span class="relative flex h-2.5 w-2.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                </span>
-                WebP Compression & Clarity Auto-Optimization Active
             </div>
         </div>
 

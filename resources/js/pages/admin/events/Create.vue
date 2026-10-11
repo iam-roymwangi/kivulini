@@ -64,8 +64,8 @@ function submit() {
 <template>
     <Head title="New Event" />
 
-    <div class="mx-auto max-w-3xl space-y-6">
-        <div class="flex items-center gap-3">
+    <div class="space-y-6">
+        <div class="flex items-center gap-3 p-6">
             <a :href="index.url()" class="rounded-lg border border-border p-2 text-muted-foreground hover:text-foreground">
                 <ArrowLeft class="h-4 w-4" />
             </a>
@@ -77,7 +77,7 @@ function submit() {
             Please fix the errors below and try again.
         </div>
 
-        <div class="rounded-2xl border border-border bg-card p-6">
+        <div class="rounded-2xl bg-card p-6">
             <EventForm
                 :form="form"
                 :errors="errors"

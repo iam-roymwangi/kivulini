@@ -114,7 +114,7 @@ async function submitForm() {
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold uppercase tracking-wider text-muted-foreground">Call Us</h3>
-                                <p class="mt-1 font-bold text-foreground">+254 700 000 000</p>
+                                <p class="mt-1 font-bold text-foreground">+254 725 038 004</p>
                             </div>
                         </div>
                     </div>
@@ -127,18 +127,6 @@ async function submitForm() {
                             <div>
                                 <h3 class="text-sm font-bold uppercase tracking-wider text-muted-foreground">Location</h3>
                                 <p class="mt-1 font-bold text-foreground">Nairobi, Kenya</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Visual map card -->
-                    <div class="overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition-all">
-                        <div class="relative h-48 bg-slate-200 dark:bg-slate-800">
-                            <!-- Placeholder styled like a map -->
-                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-radial-gradient p-4 text-center">
-                                <MapPin class="h-8 w-8 animate-bounce text-amber-500" />
-                                <h4 class="mt-2 font-bold text-foreground">Kivulini HQ</h4>
-                                <p class="text-xs text-muted-foreground">Westlands, Nairobi, Kenya</p>
                             </div>
                         </div>
                     </div>

@@ -115,10 +115,20 @@ const filteredItems = computed(() => {
     </Head>
 
     <!-- Hero Banner -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800 px-4 pb-20 pt-32 text-white md:px-8 lg:px-12">
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-amber-400 blur-3xl" />
-            <div class="absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-amber-500 blur-3xl" />
+    <section class="relative overflow-hidden px-4 pb-20 pt-32 text-white md:px-8 lg:px-12">
+        <!-- Background image -->
+        <div class="absolute inset-0">
+            <img
+                src="/assets/images/hero.jpg"
+                alt=""
+                aria-hidden="true"
+                class="h-full w-full object-cover object-center"
+            />
+            <div class="absolute inset-0 bg-slate-900/70" />
+            <div class="absolute inset-0 opacity-20">
+                <div class="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-amber-400 blur-3xl" />
+                <div class="absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-amber-500 blur-3xl" />
+            </div>
         </div>
         <div class="relative mx-auto max-w-7xl text-center">
             <p class="mb-3 text-sm font-bold uppercase tracking-widest text-amber-400">Shop</p>
