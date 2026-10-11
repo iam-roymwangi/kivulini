@@ -63,6 +63,40 @@ class AdminGalleryController extends Controller
     }
 
     /**
+     * Update the gallery image — reassign event and/or replace with a cropped version.
+     */
+    public function update(Request $request, EventMedia $media, ProcessEventMedia $processor): RedirectResponse
+    {
+        $request->validate([
+            'event_id' => ['required', 'exists:events,id'],
+            'image' => ['nullable', 'image', 'max:10240', 'mimes:jpeg,jpg,png,gif,webp'],
+        ]);
+
+        $media->update(['event_id' => $request->input('event_id')]);
+
+        if ($request->hasFile('image')) {
+            // Delete the old file
+            if ($media->file_path) {
+                Storage::disk('public')->delete($media->file_path);
+            }
+
+            $event = Event::findOrFail($request->input('event_id'));
+
+            $processor->handle($event, $request->file('image'), [
+                'quality' => 90,
+                'is_featured' => $media->is_featured,
+                'sort_order' => $media->sort_order,
+            ]);
+
+            // The processor creates a new record; delete the old one
+            $media->delete();
+        }
+
+        return redirect()->route('admin.gallery.index')
+            ->with('success', 'Gallery image updated successfully.');
+    }
+
+    /**
      * Remove the specified gallery image.
      */
     public function destroy(EventMedia $media): RedirectResponse

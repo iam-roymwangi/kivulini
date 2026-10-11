@@ -119,7 +119,7 @@ const filteredItems = computed(() => {
         <!-- Background image -->
         <div class="absolute inset-0">
             <img
-                src="/assets/images/hero.jpg"
+                src="/assets/images/merch-hero.webp"
                 alt=""
                 aria-hidden="true"
                 class="h-full w-full object-cover object-center"

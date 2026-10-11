@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Admin gallery management
         Route::get('gallery', [AdminGalleryController::class, 'index'])->name('gallery.index');
         Route::post('gallery', [AdminGalleryController::class, 'store'])->name('gallery.store');
+        Route::post('gallery/{media}', [AdminGalleryController::class, 'update'])->name('gallery.update');
         Route::delete('gallery/{media}', [AdminGalleryController::class, 'destroy'])->name('gallery.destroy');
         Route::post('gallery/{media}/toggle-featured', [AdminGalleryController::class, 'toggleFeatured'])->name('gallery.toggle-featured');
     });
