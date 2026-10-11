@@ -16,6 +16,8 @@ const eventData = computed<PlatformEvent>(() => {
     return props.event && 'data' in props.event ? props.event.data : props.event;
 });
 
+const isCompleted = computed(() => eventData.value.status === 'completed');
+
 const showBooking = ref(false);
 const bookingQuantity = ref(1);
 
@@ -139,7 +141,7 @@ function openBooking(qty: number) {
                 </div>
 
                 <!-- Right column: sticky booking box -->
-                <div class="w-full lg:sticky lg:top-28 lg:w-80 xl:w-96">
+                <div v-if="!isCompleted" class="w-full lg:sticky lg:top-28 lg:w-80 xl:w-96">
                     <BookingBox :event="{ ...eventData, available_slots: availableSlots }"
                         @open-booking="openBooking" />
                 </div>
@@ -148,5 +150,5 @@ function openBooking(qty: number) {
     </div>
 
     <!-- Booking drawer -->
-    <BookingDrawer v-model:open="showBooking" :event="eventData" :initial-quantity="bookingQuantity" />
+    <BookingDrawer v-if="!isCompleted" v-model:open="showBooking" :event="eventData" :initial-quantity="bookingQuantity" />
 </template>

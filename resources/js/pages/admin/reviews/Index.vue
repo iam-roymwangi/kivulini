@@ -76,7 +76,7 @@ const activeFilter = props.filters.status ?? 'all';
 <template>
     <Head title="Admin — Reviews" />
 
-    <div class="space-y-6 p-6 mx-auto">
+    <div class="space-y-6 p-6">
         <!-- Header -->
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
