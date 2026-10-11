@@ -473,9 +473,6 @@ const sortedEvents = computed(() => {
                                 <span v-if="converting">Converting to WebP…</span>
                                 <template v-else>Drag & drop images here, or <span class="text-amber-500 underline">browse</span></template>
                             </p>
-                            <p class="text-xs text-muted-foreground mt-1">
-                                Images are compressed and converted to WebP in your browser before upload.
-                            </p>
                         </div>
                     </div>
                 </div>

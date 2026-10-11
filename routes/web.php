@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminGalleryController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\MerchandiseController as AdminMerchandiseController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -47,6 +48,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('gallery/{media}', [AdminGalleryController::class, 'update'])->name('gallery.update');
         Route::delete('gallery/{media}', [AdminGalleryController::class, 'destroy'])->name('gallery.destroy');
         Route::post('gallery/{media}/toggle-featured', [AdminGalleryController::class, 'toggleFeatured'])->name('gallery.toggle-featured');
+
+        // Admin review management
+        Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::post('reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+        Route::post('reviews/{review}/unapprove', [AdminReviewController::class, 'unapprove'])->name('reviews.unapprove');
+        Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
     });
 });
 

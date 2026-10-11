@@ -305,7 +305,6 @@ const averageRating = computed(() => {
                     </button>
 
                     <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleImageChange" />
-                    <p class="text-xs text-muted-foreground">Images are compressed and converted to WebP before upload.</p>
                     <p v-if="form.errors.image" class="text-xs text-red-500">{{ form.errors.image }}</p>
                 </div>
 
