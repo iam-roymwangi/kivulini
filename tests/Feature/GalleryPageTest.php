@@ -6,10 +6,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('gallery page returns 15 event media items per page ordered by featured status', function () {
+test('gallery page returns 15 event media items per page ordered by most recently uploaded', function () {
     $event = Event::factory()->create();
 
-    // Create 20 media items, only 1 featured
+    // Create 20 media items
     for ($i = 1; $i <= 20; $i++) {
         EventMedia::create([
             'event_id' => $event->id,

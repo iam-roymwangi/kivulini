@@ -95,7 +95,9 @@ onBeforeUnmount(() => {
                 <img
                     :src="item.url"
                     :alt="item.event?.title ? `Photo from ${item.event.title}` : `Gallery photo ${index + 1}`"
-                    loading="lazy"
+                    :loading="index < 4 ? 'eager' : 'lazy'"
+                    :fetchpriority="index === 0 ? 'high' : index < 4 ? 'auto' : 'low'"
+                    decoding="async"
                     class="w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-end p-4">
@@ -210,7 +212,7 @@ onBeforeUnmount(() => {
                                 :aria-label="`Jump to photo ${idx + 1}`"
                                 @click="currentIndex = idx"
                             >
-                                <img :src="thumb.url" alt="" class="h-full w-full object-cover" />
+                                <img :src="thumb.url" alt="" loading="lazy" decoding="async" class="h-full w-full object-cover" />
                             </button>
                         </div>
                     </div>
