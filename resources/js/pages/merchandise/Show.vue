@@ -80,9 +80,15 @@ const whatsappUrl = computed(() => `https://wa.me/?text=${whatsappMessage.value}
     <Head>
         <title>{{ merchandise.name }} – Kivulini Adventures</title>
         <meta name="description" :content="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`" />
+        <meta name="keywords" :content="`${merchandise.name}, Kivulini Adventures merch, Kenya adventure apparel`" />
         <meta property="og:title" :content="`${merchandise.name} – Kivulini Adventures`" />
         <meta property="og:description" :content="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`" />
+        <meta property="og:type" content="product" />
         <meta v-if="merchandise.cover_image_url" property="og:image" :content="merchandise.cover_image_url" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="`${merchandise.name} – Kivulini Adventures`" />
+        <meta name="twitter:description" :content="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`" />
+        <meta v-if="merchandise.cover_image_url" name="twitter:image" :content="merchandise.cover_image_url" />
     </Head>
 
     <!-- Keyboard handler for lightbox -->

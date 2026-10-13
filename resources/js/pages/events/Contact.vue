@@ -72,11 +72,17 @@ async function submitForm() {
 
 <template>
     <Head>
-        <title>Contact Us</title>
+        <title>Contact Us – Kivulini Adventures</title>
         <meta name="description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
+        <meta name="keywords" content="contact Kivulini Adventures, Kenya trips inquiry, group bookings Kenya, adventure travel contact" />
         <meta property="og:title" content="Contact Kivulini Adventures" />
         <meta property="og:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kivuliniadventures.com/contact" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Contact Kivulini Adventures" />
+        <meta name="twitter:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
+        <link rel="canonical" href="https://kivuliniadventures.com/contact" />
     </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">

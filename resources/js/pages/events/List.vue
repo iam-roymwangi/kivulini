@@ -91,12 +91,17 @@ const typeLabel = computed(() => ({
 
 <template>
     <Head>
-        <title>Upcoming Trips & Events</title>
+        <title>Upcoming Trips & Events – Kivulini Adventures</title>
         <meta name="description" content="Browse all upcoming hikes, road trips, and vacations in Kenya. Filter by category, price, and date to find your perfect adventure." />
-        <meta name="keywords" content="Kenya trips, upcoming events Kenya, hiking, road trips, group travel" />
+        <meta name="keywords" content="Kenya trips, upcoming events Kenya, hiking, road trips, group travel, Kivulini Adventures" />
         <meta property="og:title" content="Upcoming Trips & Events – Kivulini Adventures" />
         <meta property="og:description" content="Browse all upcoming hikes, road trips, and vacations in Kenya." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kivuliniadventures.com/events" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Upcoming Trips & Events – Kivulini Adventures" />
+        <meta name="twitter:description" content="Browse all upcoming hikes, road trips, and vacations in Kenya." />
+        <link rel="canonical" href="https://kivuliniadventures.com/events" />
     </Head>
 
     <div class="bg-background pb-24 pt-32 transition-colors">

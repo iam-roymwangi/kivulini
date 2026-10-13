@@ -111,7 +111,18 @@ const filteredItems = computed(() => {
 <template>
     <Head>
         <title>Merchandise – Kivulini Adventures</title>
-        <meta name="description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more." />
+        <meta name="description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more. Wear your adventures." />
+        <meta name="keywords" content="Kivulini Adventures merch, Kenya adventure apparel, hiking t-shirts Kenya, adventure hoodies" />
+        <meta property="og:title" content="Merchandise – Kivulini Adventures" />
+        <meta property="og:description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more. Wear your adventures." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kivuliniadventures.com/merchandise" />
+        <meta property="og:image" content="https://kivuliniadventures.com/assets/images/merch-hero.webp" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Merchandise – Kivulini Adventures" />
+        <meta name="twitter:description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more." />
+        <meta name="twitter:image" content="https://kivuliniadventures.com/assets/images/merch-hero.webp" />
+        <link rel="canonical" href="https://kivuliniadventures.com/merchandise" />
     </Head>
 
     <!-- Hero Banner -->

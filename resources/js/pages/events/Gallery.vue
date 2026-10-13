@@ -12,11 +12,17 @@ defineProps<{
 
 <template>
     <Head>
-        <title>Past Trips Photo Gallery</title>
+        <title>Past Trips Photo Gallery – Kivulini Adventures</title>
         <meta name="description" content="Browse photos from Kivulini Adventures' past hikes, road trips, and vacations across Kenya and East Africa." />
+        <meta name="keywords" content="Kivulini Adventures gallery, Kenya trip photos, hiking photos Kenya, adventure gallery East Africa" />
         <meta property="og:title" content="Past Trips Photo Gallery – Kivulini Adventures" />
         <meta property="og:description" content="Browse photos from our past hikes, road trips, and vacations across Kenya." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kivuliniadventures.com/gallery" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Past Trips Photo Gallery – Kivulini Adventures" />
+        <meta name="twitter:description" content="Browse photos from our past hikes, road trips, and vacations across Kenya." />
+        <link rel="canonical" href="https://kivuliniadventures.com/gallery" />
     </Head>
 
     <div class="bg-background pt-32 pb-24 transition-colors">
