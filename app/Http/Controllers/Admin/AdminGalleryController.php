@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\ProcessEventMedia;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\EventMediaResource;
 use App\Models\Event;
 use App\Models\EventMedia;
 use Illuminate\Http\RedirectResponse;
@@ -22,14 +21,27 @@ class AdminGalleryController extends Controller
     {
         $media = EventMedia::with('event')
             ->orderByDesc('created_at')
-            ->paginate(12);
+            ->paginate(12)
+            ->through(fn (EventMedia $item) => [
+                'id' => $item->id,
+                'file_path' => $item->file_path,
+                'type' => $item->type,
+                'is_featured' => $item->is_featured,
+                'sort_order' => $item->sort_order,
+                'url' => Storage::url($item->file_path),
+                'event' => $item->event ? [
+                    'id' => $item->event->id,
+                    'title' => $item->event->title,
+                    'status' => $item->event->status,
+                ] : null,
+            ]);
 
         $events = Event::orderByDesc('status')
             ->orderBy('title')
             ->get(['id', 'title', 'status', 'type']);
 
         return Inertia::render('admin/gallery/Index', [
-            'media' => EventMediaResource::collection($media),
+            'media' => $media,
             'events' => $events,
         ]);
     }
