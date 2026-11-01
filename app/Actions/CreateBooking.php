@@ -10,12 +10,10 @@ use Illuminate\Support\Facades\DB;
 class CreateBooking
 {
     /**
-     * Create a new booking for the given event.
+     * Create a new pending booking for the given event.
      *
-     * Checks capacity before entering the transaction, then atomically creates
-     * the Booking, BookingResponse records, and an optional Consent record.
-     * booked_slots is NOT incremented here — that only happens when payment
-     * transitions to 'paid' via markAsPaid().
+     * Capacity is reserved immediately so the slot cannot be sold twice while
+     * the STK push is outstanding. booked_slots is released if payment fails.
      *
      * @param  array<string, mixed>  $data  Validated data from StoreBookingRequest
      *
@@ -23,25 +21,26 @@ class CreateBooking
      */
     public function handle(Event $event, array $data, string $ipAddress): Booking
     {
-        if ($event->available_slots < $data['quantity']) {
-            throw new BookingCapacityException;
-        }
-
         return DB::transaction(function () use ($event, $data, $ipAddress): Booking {
+            /** @var Event $lockedEvent */
+            $lockedEvent = Event::query()->lockForUpdate()->findOrFail($event->id);
+
+            if ($lockedEvent->available_slots < $data['quantity']) {
+                throw new BookingCapacityException;
+            }
+
             /** @var Booking $booking */
             $booking = Booking::create([
-                'event_id' => $event->id,
+                'event_id' => $lockedEvent->id,
                 'contact_name' => $data['contact_name'],
                 'contact_email' => $data['contact_email'],
                 'contact_phone' => $data['contact_phone'],
                 'quantity' => $data['quantity'],
-                'total_price' => $event->price * $data['quantity'],
-                'payment_status' => 'paid',
+                'total_price' => $lockedEvent->price * $data['quantity'],
+                'payment_status' => 'pending',
             ]);
 
-            Event::where('id', $event->id)
-                ->lockForUpdate()
-                ->increment('booked_slots', $data['quantity']);
+            $lockedEvent->increment('booked_slots', $data['quantity']);
 
             foreach ($data['responses'] ?? [] as $response) {
                 $booking->responses()->create([
@@ -52,10 +51,10 @@ class CreateBooking
 
             if (
                 ! empty($data['consent']['agreed']) &&
-                $event->liability_waiver_text !== null
+                $lockedEvent->liability_waiver_text !== null
             ) {
                 $booking->consent()->create([
-                    'agreed_terms_text' => $event->liability_waiver_text,
+                    'agreed_terms_text' => $lockedEvent->liability_waiver_text,
                     'signer_name' => $data['consent']['signer_name'],
                     'signer_ip_address' => $ipAddress,
                     'signed_at' => now(),
@@ -63,23 +62,6 @@ class CreateBooking
             }
 
             return $booking;
-        });
-    }
-
-    /**
-     * Transition a booking to 'paid' and increment the event's booked_slots.
-     *
-     * Uses a lockForUpdate() on the event row to prevent concurrent over-booking.
-     */
-    public static function markAsPaid(Booking $booking): void
-    {
-        DB::transaction(function () use ($booking): void {
-            $booking->payment_status = 'paid';
-            $booking->save();
-
-            Event::where('id', $booking->event_id)
-                ->lockForUpdate()
-                ->increment('booked_slots', $booking->quantity);
         });
     }
 }

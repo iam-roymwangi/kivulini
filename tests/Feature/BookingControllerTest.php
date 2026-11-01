@@ -3,6 +3,7 @@
 use App\Models\Booking;
 use App\Models\Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
@@ -37,20 +38,45 @@ function validPayload(array $overrides = []): array
             'agreed' => true,
             'signer_name' => 'Jane Doe',
         ],
+        'payment_method' => 'mpesa',
+        'mpesa_phone' => '0700000001',
     ], $overrides);
+}
+
+function fakeBookingStkPush(): void
+{
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'https://sandbox.safaricom.co.ke/oauth/v1/generate*' => Http::response([
+            'access_token' => 'test-token',
+            'expires_in' => '3599',
+        ]),
+        'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest' => Http::response([
+            'MerchantRequestID' => 'mr-123',
+            'CheckoutRequestID' => 'ws_CO_BOOKING',
+            'ResponseCode' => '0',
+            'CustomerMessage' => 'Success. Request accepted for processing',
+        ]),
+    ]);
 }
 
 // --- store() ---
 
 test('store creates booking and returns 201 with booking reference', function () {
+    fakeBookingStkPush();
+
     $event = makeEvent(['capacity' => 10, 'booked_slots' => 0]);
 
     $response = $this->postJson("/events/{$event->id}/bookings", validPayload(['quantity' => 3]));
 
     $response->assertStatus(201)
-        ->assertJsonStructure(['booking_reference', 'booking_id']);
+        ->assertJsonStructure(['booking_reference', 'booking_id', 'payment_id']);
 
-    $this->assertDatabaseHas('bookings', ['contact_email' => 'jane@example.com']);
+    $this->assertDatabaseHas('bookings', [
+        'contact_email' => 'jane@example.com',
+        'payment_status' => 'pending',
+    ]);
     expect($event->fresh()->booked_slots)->toBe(3);
     expect($event->fresh()->available_slots)->toBe(7);
 });
@@ -155,7 +181,7 @@ test('cancel updates payment_status to cancelled and releases booked slots if pa
     expect($event->fresh()->booked_slots)->toBe(1);
 });
 
-test('cancel updates pending booking payment_status to cancelled without changing slots', function () {
+test('cancel updates pending booking payment_status to cancelled and releases reserved slots', function () {
     $event = makeEvent(['capacity' => 10, 'booked_slots' => 2]);
 
     $booking = Booking::create([
@@ -172,7 +198,7 @@ test('cancel updates pending booking payment_status to cancelled without changin
 
     $response->assertStatus(200);
     expect($booking->fresh()->payment_status)->toBe('cancelled');
-    expect($event->fresh()->booked_slots)->toBe(2);
+    expect($event->fresh()->booked_slots)->toBe(0);
 });
 
 test('cancel returns 422 if booking is already cancelled', function () {

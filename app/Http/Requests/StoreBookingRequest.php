@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\KenyanMpesaPhone;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -33,6 +34,8 @@ class StoreBookingRequest extends FormRequest
             'responses.*.answer' => ['nullable', 'string'],
             'consent.agreed' => ['required', 'accepted'],
             'consent.signer_name' => ['required', 'string', 'max:255'],
+            'payment_method' => ['required', 'in:mpesa'],
+            'mpesa_phone' => ['required', 'string', 'max:20', new KenyanMpesaPhone],
         ];
     }
 }

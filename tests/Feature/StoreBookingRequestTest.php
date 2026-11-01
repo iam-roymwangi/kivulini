@@ -32,6 +32,8 @@ function validBookingPayload(): array
             'agreed' => true,
             'signer_name' => 'Jane Doe',
         ],
+        'payment_method' => 'mpesa',
+        'mpesa_phone' => '0700000001',
     ];
 }
 
@@ -138,6 +140,23 @@ test('contact_name max 255 characters enforced', function () {
     $validator = validateBookingRequest($data);
 
     expect($validator->errors()->has('contact_name'))->toBeTrue();
+});
+
+test('payment_method is required', function () {
+    $data = validBookingPayload();
+    unset($data['payment_method']);
+
+    $validator = validateBookingRequest($data);
+
+    expect($validator->errors()->has('payment_method'))->toBeTrue();
+});
+
+test('mpesa_phone must be a valid kenyan number', function () {
+    $data = array_merge(validBookingPayload(), ['mpesa_phone' => '123']);
+
+    $validator = validateBookingRequest($data);
+
+    expect($validator->errors()->has('mpesa_phone'))->toBeTrue();
 });
 
 test('contact_phone max 30 characters enforced', function () {

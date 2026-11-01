@@ -32,5 +32,16 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="MPESA_ENVIRONMENT" value="sandbox"/>
+        <env name="MPESA_CONSUMER_KEY" value="test-consumer-key"/>
+        <env name="MPESA_CONSUMER_SECRET" value="test-consumer-secret"/>
+        <env name="MPESA_SHORTCODE" value="174379"/>
+        <env name="MPESA_PASSKEY" value="test-passkey"/>
+        <env name="MPESA_TRANSACTION_TYPE" value="CustomerPayBillOnline"/>
+        <env name="MPESA_CALLBACK_SECRET" value="test-callback-secret"/>
+        <env name="MPESA_CONNECT_TIMEOUT" value="5"/>
+        <env name="MPESA_RESPONSE_TIMEOUT" value="20"/>
+        <env name="MPESA_PENDING_TTL_MINUTES" value="15"/>
+        <env name="MPESA_QUERY_AFTER_SECONDS" value="45"/>
     </php>
 </phpunit>

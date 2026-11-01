@@ -60,13 +60,18 @@ class MerchandiseController extends Controller
             ->with('success', "Merchandise \"{$item->name}\" created.");
     }
 
-    public function edit(Merchandise $merchandise): Response
+    public function edit(Request $request, Merchandise $merchandise): Response
     {
         $merchandise->load('images');
 
         return Inertia::render('admin/merchandise/Edit', [
             'merchandise' => $merchandise,
-            'existingImages' => MerchandiseImageResource::collection($merchandise->images),
+            // Resolve to a plain, wrap-free array. Passing the collection
+            // directly would let Inertia serialize it via toResponse(), which
+            // wraps the payload as { data: [...] } and breaks .map() on the
+            // frontend (props.existingImages would be an object, not a list).
+            'existingImages' => MerchandiseImageResource::collection($merchandise->images)
+                ->resolve($request),
         ]);
     }
 

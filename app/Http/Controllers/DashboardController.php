@@ -16,8 +16,8 @@ class DashboardController extends Controller
     public function __invoke(Request $request): Response
     {
         $totalRevenue = Booking::where('payment_status', 'paid')->sum('total_price');
-        $totalBookings = Booking::count();
-        $ticketsSold = Booking::sum('quantity') ?? 0;
+        $totalBookings = Booking::where('payment_status', 'paid')->count();
+        $ticketsSold = Booking::where('payment_status', 'paid')->sum('quantity') ?? 0;
         $activeEventsCount = Event::published()->count();
         $totalEventsCount = Event::count();
 

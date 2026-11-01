@@ -7,6 +7,7 @@ import BookingStep1 from '@/components/events/BookingStep1.vue';
 import BookingStep2 from '@/components/events/BookingStep2.vue';
 import BookingStep3 from '@/components/events/BookingStep3.vue';
 import BookingStep4 from '@/components/events/BookingStep4.vue';
+import MpesaStkStatus from '@/components/payments/MpesaStkStatus.vue';
 import type { BookingPayload, PlatformEvent } from '@/types';
 
 const DEFAULT_WAIVER = `By completing this booking, you acknowledge and agree to the following:
@@ -53,9 +54,12 @@ const currentStepIndex = ref(0);
 const currentStep = computed(() => steps.value[currentStepIndex.value]);
 const totalSteps = computed(() => steps.value.length);
 
+const isWaiting = ref(false);
 const isConfirmed = ref(false);
 const confirmedReference = ref('');
 const confirmedBookingId = ref(0);
+const paymentId = ref('');
+const paymentError = ref('');
 
 const bookingPayload = ref<Partial<BookingPayload>>({
     quantity: props.initialQuantity ?? 1,
@@ -92,17 +96,32 @@ function goBack() {
     }
 }
 
-function handleConfirmed(reference: string, bookingId: number) {
-    confirmedReference.value = reference;
-    confirmedBookingId.value = bookingId;
+function handleInitiated(payload: { reference: string; bookingId: number; paymentId: string }) {
+    confirmedReference.value = payload.reference;
+    confirmedBookingId.value = payload.bookingId;
+    paymentId.value = payload.paymentId;
+    paymentError.value = '';
+    isWaiting.value = true;
+}
+
+function handlePaid() {
+    isWaiting.value = false;
     isConfirmed.value = true;
+}
+
+function handleFailed(message: string) {
+    isWaiting.value = false;
+    paymentError.value = message;
 }
 
 function handleClose() {
     currentStepIndex.value = 0;
+    isWaiting.value = false;
     isConfirmed.value = false;
     confirmedReference.value = '';
     confirmedBookingId.value = 0;
+    paymentId.value = '';
+    paymentError.value = '';
     bookingPayload.value = {
         quantity: props.initialQuantity ?? 1,
         responses: [],
@@ -124,7 +143,7 @@ function handleClose() {
             <div class="flex shrink-0 items-center justify-between border-b border-border px-5 py-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                        {{ isConfirmed ? 'Booking Confirmed' : `Step ${currentStepIndex + 1} of ${totalSteps}` }}
+                        {{ isConfirmed ? 'Booking Confirmed' : isWaiting ? 'Waiting for payment' : `Step ${currentStepIndex + 1} of ${totalSteps}` }}
                     </p>
                     <p class="mt-0.5 text-sm font-bold text-foreground line-clamp-1">{{ event.title }}</p>
                 </div>
@@ -132,7 +151,7 @@ function handleClose() {
             </div>
 
             <!-- Progress bar (not shown on confirmation) -->
-            <div v-if="!isConfirmed" class="shrink-0 px-5 pt-4">
+            <div v-if="!isConfirmed && !isWaiting" class="shrink-0 px-5 pt-4">
                 <div class="flex gap-1.5">
                     <div
                         v-for="(step, i) in steps"
@@ -164,6 +183,13 @@ function handleClose() {
                     @close="handleClose"
                 />
 
+                <MpesaStkStatus
+                    v-else-if="isWaiting"
+                    :payment-id="paymentId"
+                    @completed="handlePaid"
+                    @failed="handleFailed"
+                />
+
                 <template v-else>
                     <BookingStep1
                         v-if="currentStep === 1"
@@ -190,9 +216,12 @@ function handleClose() {
                         v-else-if="currentStep === 4"
                         :event="event"
                         :payload="bookingPayload as BookingPayload"
-                        @confirmed="handleConfirmed"
+                        @initiated="handleInitiated"
                         @back="goBack"
                     />
+                    <div v-if="paymentError" class="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                        <p class="text-sm text-red-400">{{ paymentError }}</p>
+                    </div>
                 </template>
             </div>
         </SheetContent>

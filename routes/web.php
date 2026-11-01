@@ -9,6 +9,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MerchandiseController;
+use App\Http\Controllers\MerchandiseOrderController;
+use App\Http\Controllers\PaymentStatusController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +27,15 @@ Route::get('/merchandise/{merchandise}', [MerchandiseController::class, 'show'])
 
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-Route::post('/events/{event}/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::post('/events/{event}/bookings', [BookingController::class, 'store'])
+    ->middleware('throttle:mpesa-stk')
+    ->name('bookings.store');
+Route::post('/merchandise/{merchandise}/orders', [MerchandiseOrderController::class, 'store'])
+    ->middleware('throttle:mpesa-stk')
+    ->name('merchandise.orders.store');
+Route::get('/payments/{mpesaTransaction}', PaymentStatusController::class)
+    ->middleware('throttle:mpesa-status')
+    ->name('payments.status');
 Route::post('/events/{event}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 Route::get('/bookings/{booking}/pass', [BookingController::class, 'downloadPass'])->name('bookings.pass');

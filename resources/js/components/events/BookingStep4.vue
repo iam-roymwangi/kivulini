@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { store as storeBooking } from '@/routes/bookings';
+import { csrfHeaders } from '@/lib/utils';
 import type { BookingPayload, PlatformEvent } from '@/types';
 
 const props = defineProps<{
@@ -8,13 +10,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'confirmed', reference: string, bookingId: number): void;
+    (e: 'initiated', payload: { reference: string; bookingId: number; paymentId: string }): void;
     (e: 'back'): void;
 }>();
 
-type PaymentMethod = 'mpesa' | 'card';
-const paymentMethod = ref<PaymentMethod>('mpesa');
-const mpesaPhone = ref('');
+const mpesaPhone = ref(props.payload.contact_phone ?? '');
 const submitting = ref(false);
 const serverErrors = ref<string[]>([]);
 const phoneError = ref('');
@@ -38,7 +38,7 @@ async function submit() {
     phoneError.value = '';
     serverErrors.value = [];
 
-    if (paymentMethod.value === 'mpesa' && !mpesaPhone.value.trim()) {
+    if (!mpesaPhone.value.trim()) {
         phoneError.value = 'M-Pesa phone number is required.';
         return;
     }
@@ -46,32 +46,25 @@ async function submit() {
     submitting.value = true;
 
     try {
-        const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
-        const csrf = csrfMeta?.content ?? '';
-
-        const body = JSON.stringify({
-            ...props.payload,
-            payment_method: paymentMethod.value,
-            mpesa_phone: paymentMethod.value === 'mpesa' ? mpesaPhone.value.trim() : undefined,
-        });
-
-        const res = await fetch(`/events/${props.event.id}/bookings`, {
+        const res = await fetch(storeBooking.url(props.event.id), {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-Inertia': 'false',
-            },
-            body,
+            headers: csrfHeaders(),
+            body: JSON.stringify({
+                ...props.payload,
+                payment_method: 'mpesa',
+                mpesa_phone: mpesaPhone.value.trim(),
+            }),
         });
 
         const json = await res.json();
 
         if (res.ok) {
-            emit('confirmed', json.booking_reference, json.booking_id);
+            emit('initiated', {
+                reference: json.booking_reference,
+                bookingId: json.booking_id,
+                paymentId: json.payment_id,
+            });
         } else if (res.status === 422) {
-            // Validation errors
             const errs = json.errors ?? {};
             const msgs = Object.values(errs).flat() as string[];
             serverErrors.value = msgs.length ? msgs : [json.message ?? 'Validation failed.'];
@@ -90,11 +83,10 @@ async function submit() {
     <div class="space-y-6 px-1 pb-6">
         <div>
             <h2 class="text-xl font-bold text-foreground">Payment</h2>
-            <p class="mt-1 text-sm text-muted-foreground">Review your order and complete payment.</p>
+            <p class="mt-1 text-sm text-muted-foreground">Review your order and pay with M-Pesa.</p>
         </div>
 
-        <!-- Order summary -->
-        <div class="rounded-2xl border border-border bg-muted/30 p-4 space-y-3">
+        <div class="space-y-3 rounded-2xl border border-border bg-muted/30 p-4">
             <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Order Summary</p>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
@@ -117,38 +109,17 @@ async function submit() {
                     <span>{{ formattedUnit }}</span>
                 </div>
             </div>
-            <div class="border-t border-border pt-3 flex justify-between font-bold">
+            <div class="flex justify-between border-t border-border pt-3 font-bold">
                 <span class="text-foreground">Total</span>
                 <span class="text-lg text-amber-500">{{ formattedTotal }}</span>
             </div>
         </div>
 
-        <!-- Server errors -->
         <div v-if="serverErrors.length > 0" class="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
             <p v-for="(msg, i) in serverErrors" :key="i" class="text-sm text-red-400">{{ msg }}</p>
         </div>
 
-        <!-- Payment method toggle -->
         <div>
-            <p class="mb-3 text-sm font-semibold text-foreground">Payment method</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button
-                    v-for="method in [{ id: 'mpesa', label: 'M-Pesa' }, { id: 'card', label: 'Card' }]"
-                    :key="method.id"
-                    type="button"
-                    class="rounded-xl border py-3 text-sm font-bold transition-all"
-                    :class="paymentMethod === method.id
-                        ? 'border-amber-400 bg-amber-400/10 text-amber-500'
-                        : 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'"
-                    @click="paymentMethod = method.id as PaymentMethod"
-                >
-                    {{ method.label }}
-                </button>
-            </div>
-        </div>
-
-        <!-- M-Pesa phone -->
-        <div v-if="paymentMethod === 'mpesa'">
             <label for="mpesa_phone" class="mb-1.5 block text-sm font-medium text-foreground">
                 M-Pesa phone number <span class="text-amber-500" aria-hidden="true">*</span>
             </label>
@@ -161,15 +132,9 @@ async function submit() {
                 :class="phoneError ? 'border-red-500' : 'border-border'"
             />
             <p v-if="phoneError" class="mt-1 text-xs text-red-400" role="alert">{{ phoneError }}</p>
-            <p class="mt-2 text-xs text-muted-foreground">An STK push will be sent to this number.</p>
+            <p class="mt-2 text-xs text-muted-foreground">An STK push will be sent to this number. Use the Safaricom line registered to M-Pesa.</p>
         </div>
 
-        <!-- Card placeholder -->
-        <div v-else class="rounded-xl border border-border bg-muted/20 p-4 text-center text-sm text-muted-foreground">
-            Card payments coming soon. Please use M-Pesa for now.
-        </div>
-
-        <!-- Actions -->
         <div class="flex gap-3 pt-2">
             <button
                 type="button"
@@ -185,7 +150,7 @@ async function submit() {
                 class="flex-1 rounded-xl bg-amber-400 py-3.5 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-300 active:scale-95 disabled:opacity-60"
                 @click="submit"
             >
-                {{ submitting ? 'Processing...' : 'Confirm & Pay' }}
+                {{ submitting ? 'Sending STK push...' : 'Pay with M-Pesa' }}
             </button>
         </div>
     </div>
