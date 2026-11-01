@@ -4,7 +4,6 @@ namespace App\Actions;
 
 use App\Contracts\MpesaPayable;
 use App\Exceptions\MpesaException;
-use App\Jobs\SendStkPush;
 use App\Models\MpesaTransaction;
 use App\Services\Mpesa\DarajaClient;
 use App\Support\KenyanPhoneNumber;
@@ -17,13 +16,13 @@ class InitiateStkPush
     public function __construct(private DarajaClient $daraja) {}
 
     /**
-     * Validate, create a pending transaction, and dispatch the STK push as a
-     * queued job so that cPanel's slow / throttled outbound connections don't
-     * hold up the HTTP response.
+     * Validate, create a pending transaction, then fire the actual Daraja STK
+     * push *after* the HTTP response is already sent to the browser.
      *
-     * The frontend already polls PaymentStatusController by payment_id, so it
-     * will pick up the CheckoutRequestID once the job fires and the callback
-     * arrives — no change needed on the frontend side.
+     * Laravel's defer() helper schedules the callback to run in the
+     * InvokeDeferredCallbacks terminate middleware — the response is flushed
+     * first, then the deferred work runs in the same PHP process. No queue
+     * worker, no cron dependency, no cPanel-specific configuration required.
      *
      * @param  Model&MpesaPayable  $payable
      */
@@ -50,8 +49,8 @@ class InitiateStkPush
         }
 
         // M-Pesa production enforces a minimum of KES 10 per transaction.
-        // Sending less results in result code 2029 ("Failed due to an unresolved
-        // reason type") — Safaricom's undocumented floor-amount rejection.
+        // Sending less results in result code 2029 — Safaricom's undocumented
+        // floor-amount rejection ("Failed due to an unresolved reason type").
         if ($amount < 10) {
             throw new MpesaException("The minimum M-Pesa payment is KES 10 (order total: KES {$amount}).");
         }
@@ -66,28 +65,43 @@ class InitiateStkPush
             'status' => MpesaTransaction::STATUS_PENDING,
         ]);
 
-        // Dispatch asynchronously so the HTTP response is not held open while
-        // waiting for the Daraja connection (cURL error 28 on cPanel).
-        SendStkPush::dispatch($payable, $transaction, $normalizedPhone);
+        // defer() runs the STK push after the HTTP response is sent.
+        // This prevents cURL timeouts from surfacing to the customer while
+        // still firing the request in the same process — no queue or cron needed.
+        $daraja = $this->daraja;
+
+        defer(function () use ($transaction, $payable, $normalizedPhone, $daraja): void {
+            // Re-fetch in case the transaction was already resolved during the
+            // response (e.g. via a race condition or duplicate request).
+            $fresh = $transaction->fresh();
+
+            if ($fresh === null || ! $fresh->isPending() || $fresh->checkout_request_id !== null) {
+                return;
+            }
+
+            $this->push($fresh, $payable, $normalizedPhone, $daraja);
+        });
 
         return $transaction;
     }
 
     /**
      * Execute the actual Daraja STK push request.
-     * Called by SendStkPush job — not called directly from the HTTP layer.
+     * Called by the deferred callback — runs after the HTTP response is sent.
      *
      * @param  Model&MpesaPayable  $payable
      */
-    public function push(MpesaTransaction $transaction, Model $payable, string $phone): void
+    public function push(MpesaTransaction $transaction, Model $payable, string $phone, ?DarajaClient $daraja = null): void
     {
+        $daraja ??= $this->daraja;
+
         try {
-            $response = $this->daraja->stkPush(
+            $response = $daraja->stkPush(
                 $phone,
                 $transaction->amount,
                 $transaction->account_reference,
                 $transaction->description,
-                $this->daraja->callbackUrl(),
+                $daraja->callbackUrl(),
             );
         } catch (MpesaException $exception) {
             $this->failTransaction($transaction, $payable, $exception->getMessage());
