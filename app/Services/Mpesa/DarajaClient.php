@@ -174,15 +174,27 @@ class DarajaClient
 
     private function client(): PendingRequest
     {
-        $base = config('mpesa.environment') === 'production'
-            ? (string) config('mpesa.production_base_url')
-            : (string) config('mpesa.sandbox_base_url');
-
-        return Http::baseUrl($base)
+        return Http::baseUrl($this->baseUrl())
             ->acceptJson()
             ->asJson()
             ->connectTimeout((int) config('mpesa.timeouts.connect'))
             ->timeout((int) config('mpesa.timeouts.response'));
+    }
+
+    /**
+     * Resolve the Daraja base URL from MPESA_ENVIRONMENT.
+     *
+     * Accepts "sandbox" or "production" (case-insensitive) and throws for
+     * anything else, so a typo'd or invalid environment can't silently route
+     * live STK traffic to the wrong host.
+     */
+    private function baseUrl(): string
+    {
+        return match (strtolower((string) config('mpesa.environment'))) {
+            'production' => (string) config('mpesa.production_base_url'),
+            'sandbox' => (string) config('mpesa.sandbox_base_url'),
+            default => throw new MpesaException('MPESA_ENVIRONMENT must be set to "sandbox" or "production".'),
+        };
     }
 
     private function retryWhen(Throwable $exception): bool
