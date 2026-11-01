@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Calendar, PlusCircle, ImagePlus, ShoppingBag, Star } from '@lucide/vue';
+import {
+    BookOpen,
+    FolderGit2,
+    LayoutGrid,
+    Calendar,
+    PlusCircle,
+    ImagePlus,
+    ShoppingBag,
+    Star,
+    Package,
+} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,9 +25,13 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index as adminEventsIndex, create as adminEventsCreate } from '@/routes/admin/events';
+import {
+    index as adminEventsIndex,
+    create as adminEventsCreate,
+} from '@/routes/admin/events';
 import { index as adminGalleryIndex } from '@/routes/admin/gallery';
 import { index as adminMerchandiseIndex } from '@/routes/admin/merchandise';
+import { index as adminOrdersIndex } from '@/routes/admin/orders';
 import { index as adminReviewsIndex } from '@/routes/admin/reviews';
 import type { NavItem } from '@/types';
 
@@ -46,6 +60,11 @@ const mainNavItems: NavItem[] = [
         title: 'Merchandise',
         href: adminMerchandiseIndex.url(),
         icon: ShoppingBag,
+    },
+    {
+        title: 'Merch Orders',
+        href: adminOrdersIndex.url(),
+        icon: Package,
     },
     {
         title: 'Reviews',

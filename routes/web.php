@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminGalleryController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\MerchandiseController as AdminMerchandiseController;
+use App\Http\Controllers\Admin\MerchandiseOrderController as AdminMerchandiseOrderController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
@@ -51,6 +52,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Admin merchandise management
         Route::resource('merchandise', AdminMerchandiseController::class);
+
+        // Admin merchandise order tracking
+        Route::resource('orders', AdminMerchandiseOrderController::class)->only(['index', 'show']);
 
         // Admin gallery management
         Route::get('gallery', [AdminGalleryController::class, 'index'])->name('gallery.index');
