@@ -40,7 +40,8 @@ class DarajaClient
                     'TransactionDesc' => $description,
                 ]);
         } catch (ConnectionException|RequestException $exception) {
-            Log::warning('M-Pesa STK push HTTP error', [
+            Log::warning('M-Pesa STK push connection error', [
+                'error' => $exception->getMessage(),
                 'status' => $exception instanceof RequestException ? $exception->response?->status() : null,
             ]);
 
@@ -95,7 +96,8 @@ class DarajaClient
                     'CheckoutRequestID' => $checkoutRequestId,
                 ]);
         } catch (ConnectionException|RequestException $exception) {
-            Log::warning('M-Pesa STK query HTTP error', [
+            Log::warning('M-Pesa STK query connection error', [
+                'error' => $exception->getMessage(),
                 'status' => $exception instanceof RequestException ? $exception->response?->status() : null,
             ]);
 
@@ -162,12 +164,16 @@ class DarajaClient
                         'grant_type' => 'client_credentials',
                     ]);
             } catch (ConnectionException|RequestException $exception) {
+                Log::warning('M-Pesa OAuth connection error', [
+                    'error' => $exception->getMessage(),
+                    'status' => $exception instanceof RequestException ? $exception->response?->status() : null,
+                ]);
+
                 throw new MpesaException(
                     'Unable to authenticate with M-Pesa.',
                     $exception instanceof RequestException ? $exception->response?->status() : null,
                 );
             }
-
             $token = $response->json('access_token');
 
             if (! is_string($token) || $token === '') {
@@ -185,9 +191,16 @@ class DarajaClient
 
     private function client(): PendingRequest
     {
+        // Point curl at the bundled CA certificate file so TLS verification
+        // succeeds on cPanel servers where the system CA bundle may be
+        // outdated or missing. The file ships with the project at
+        // resources/ssl/cacert.pem (Mozilla/curl bundle).
+        $caBundle = base_path('resources/ssl/cacert.pem');
+
         return Http::baseUrl($this->baseUrl())
             ->acceptJson()
             ->asJson()
+            ->when(file_exists($caBundle), fn ($req) => $req->withOptions(['verify' => $caBundle]))
             ->connectTimeout((int) config('mpesa.timeouts.connect'))
             ->timeout((int) config('mpesa.timeouts.response'));
     }
