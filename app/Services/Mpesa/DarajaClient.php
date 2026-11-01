@@ -74,6 +74,14 @@ class DarajaClient
             throw new MpesaException('M-Pesa did not return a checkout request.');
         }
 
+        Log::info('M-Pesa STK push accepted', [
+            'checkout_request_id' => $payload['CheckoutRequestID'],
+            'amount_sent' => $amount,
+            'phone' => $phone,
+            'environment' => config('mpesa.environment'),
+            'shortcode' => config('mpesa.shortcode'),
+        ]);
+
         return $payload;
     }
 

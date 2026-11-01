@@ -22,6 +22,9 @@ class MpesaCallbackController extends Controller
         Log::info('M-Pesa STK callback received', [
             'checkout_request_id' => data_get($request->all(), 'Body.stkCallback.CheckoutRequestID'),
             'result_code' => data_get($request->all(), 'Body.stkCallback.ResultCode'),
+            'result_desc' => data_get($request->all(), 'Body.stkCallback.ResultDesc'),
+            'amount' => data_get($request->all(), 'Body.stkCallback.CallbackMetadata.Item.0.Value'),
+            'full_payload' => $request->all(),
         ]);
 
         return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Accepted']);
