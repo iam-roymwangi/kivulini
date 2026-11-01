@@ -166,10 +166,12 @@ test('stk push failure marks the booking failed and releases reserved slots', fu
 
     $event = Event::factory()->create(['price' => 1500, 'capacity' => 10, 'booked_slots' => 0, 'status' => 'published']);
 
+    // With async dispatch (sync queue in tests), the HTTP layer returns 201 and the
+    // job runs inline. A Daraja 400 makes the job fail the transaction and release slots.
     $this->postJson("/events/{$event->id}/bookings", validPayload([
         'payment_method' => 'mpesa',
         'mpesa_phone' => '0700000001',
-    ]))->assertStatus(502);
+    ]))->assertCreated();
 
     expect(Booking::query()->first()?->payment_status)->toBe('failed');
     expect($event->fresh()->booked_slots)->toBe(0);
@@ -180,6 +182,7 @@ test('booking store does not create a booking when mpesa is not configured', fun
 
     $event = Event::factory()->create(['status' => 'published', 'capacity' => 5, 'booked_slots' => 0]);
 
+    // isConfigured() fails before any dispatch — no booking is created.
     $this->postJson("/events/{$event->id}/bookings", validPayload())
         ->assertStatus(502);
 

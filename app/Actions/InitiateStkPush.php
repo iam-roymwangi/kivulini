@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Contracts\MpesaPayable;
 use App\Exceptions\MpesaException;
+use App\Jobs\SendStkPush;
 use App\Models\MpesaTransaction;
 use App\Services\Mpesa\DarajaClient;
 use App\Support\KenyanPhoneNumber;
@@ -16,6 +17,14 @@ class InitiateStkPush
     public function __construct(private DarajaClient $daraja) {}
 
     /**
+     * Validate, create a pending transaction, and dispatch the STK push as a
+     * queued job so that cPanel's slow / throttled outbound connections don't
+     * hold up the HTTP response.
+     *
+     * The frontend already polls PaymentStatusController by payment_id, so it
+     * will pick up the CheckoutRequestID once the job fires and the callback
+     * arrives — no change needed on the frontend side.
+     *
      * @param  Model&MpesaPayable  $payable
      */
     public function handle(Model $payable, string $phone, string $accountReference, string $description): MpesaTransaction
@@ -57,10 +66,25 @@ class InitiateStkPush
             'status' => MpesaTransaction::STATUS_PENDING,
         ]);
 
+        // Dispatch asynchronously so the HTTP response is not held open while
+        // waiting for the Daraja connection (cURL error 28 on cPanel).
+        SendStkPush::dispatch($payable, $transaction, $normalizedPhone);
+
+        return $transaction;
+    }
+
+    /**
+     * Execute the actual Daraja STK push request.
+     * Called by SendStkPush job — not called directly from the HTTP layer.
+     *
+     * @param  Model&MpesaPayable  $payable
+     */
+    public function push(MpesaTransaction $transaction, Model $payable, string $phone): void
+    {
         try {
             $response = $this->daraja->stkPush(
-                $normalizedPhone,
-                $amount,
+                $phone,
+                $transaction->amount,
                 $transaction->account_reference,
                 $transaction->description,
                 $this->daraja->callbackUrl(),
@@ -83,14 +107,12 @@ class InitiateStkPush
             'merchant_request_id' => $response['MerchantRequestID'] ?? null,
             'checkout_request_id' => $checkoutRequestId,
         ])->save();
-
-        return $transaction->fresh();
     }
 
     /**
      * @param  Model&MpesaPayable  $payable
      */
-    private function failTransaction(MpesaTransaction $transaction, Model $payable, string $message): void
+    public function failTransaction(MpesaTransaction $transaction, Model $payable, string $message): void
     {
         $transaction->forceFill([
             'status' => MpesaTransaction::STATUS_FAILED,
