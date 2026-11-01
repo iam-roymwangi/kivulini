@@ -80,6 +80,10 @@ class CompleteMpesaPayment
         ?string $receiptNumber,
         array $payload,
     ): ?MpesaTransaction {
+        // Normalise undocumented or opaque Safaricom result descriptions to
+        // something a customer (or support agent) can actually act on.
+        $resultDesc = $this->humanResultDesc($resultCode, $resultDesc);
+
         return DB::transaction(function () use ($checkoutRequestId, $resultCode, $resultDesc, $amount, $receiptNumber, $payload): ?MpesaTransaction {
             /** @var MpesaTransaction|null $transaction */
             $transaction = MpesaTransaction::query()
@@ -163,5 +167,24 @@ class CompleteMpesaPayment
 
             return $transaction->fresh();
         });
+    }
+
+    /**
+     * Map Safaricom result codes to human-readable descriptions.
+     * Safaricom's own ResultDesc strings are often internal jargon.
+     */
+    private function humanResultDesc(string $resultCode, string $fallback): string
+    {
+        return match ($resultCode) {
+            '0' => $fallback, // success — keep the receipt description
+            '1' => 'The balance is insufficient to complete this payment.',
+            '1001' => 'A payment is already in progress on this number. Please wait and try again.',
+            '1019' => 'The M-Pesa prompt expired before a PIN was entered. Please try again.',
+            '1032' => 'Payment was cancelled.',
+            '1037' => 'The M-Pesa prompt could not be delivered to the phone. Please try again.',
+            '2029' => 'The payment amount is below the minimum allowed by M-Pesa.',
+            '9999' => 'M-Pesa is temporarily unavailable. Please try again shortly.',
+            default => $fallback !== '' ? $fallback : 'Payment was not completed. Please try again.',
+        };
     }
 }
