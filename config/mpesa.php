@@ -50,10 +50,11 @@ return [
     'callback_secret' => env('MPESA_CALLBACK_SECRET'),
 
     /*
-    | Leave empty to generate CallBackURL from APP_URL + the secret path.
-    | On cPanel this must be a public HTTPS URL Safaricom can reach, with no
-    | HTTP basic auth or IP restriction that would block Daraja.
-    |
+    | Leave blank to auto-generate the CallBackURL from APP_URL + MPESA_CALLBACK_SECRET
+    | via the webhooks.mpesa.stk route. On cPanel this requires APP_URL to be the public
+    | HTTPS origin (e.g. https://kivuliniadventures.com). Only set this manually if you
+    | need to override (e.g. an ngrok tunnel for local testing). Do NOT set it to
+    | "${APP_URL}/..." — .env does not support shell-style variable interpolation.
     */
     'callback_url' => env('MPESA_CALLBACK_URL'),
 

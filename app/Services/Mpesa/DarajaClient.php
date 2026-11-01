@@ -23,21 +23,32 @@ class DarajaClient
         $timestamp = now()->format('YmdHis');
         $shortcode = (string) config('mpesa.shortcode');
 
-        $response = $this->client()
-            ->withToken($this->accessToken())
-            ->post('/mpesa/stkpush/v1/processrequest', [
-                'BusinessShortCode' => $shortcode,
-                'Password' => $this->password($timestamp),
-                'Timestamp' => $timestamp,
-                'TransactionType' => config('mpesa.transaction_type'),
-                'Amount' => $amount,
-                'PartyA' => $phone,
-                'PartyB' => (string) config('mpesa.party_b'),
-                'PhoneNumber' => $phone,
-                'CallBackURL' => $callbackUrl,
-                'AccountReference' => $accountReference,
-                'TransactionDesc' => $description,
+        try {
+            $response = $this->client()
+                ->withToken($this->accessToken())
+                ->post('/mpesa/stkpush/v1/processrequest', [
+                    'BusinessShortCode' => $shortcode,
+                    'Password' => $this->password($timestamp),
+                    'Timestamp' => $timestamp,
+                    'TransactionType' => config('mpesa.transaction_type'),
+                    'Amount' => $amount,
+                    'PartyA' => $phone,
+                    'PartyB' => (string) config('mpesa.party_b'),
+                    'PhoneNumber' => $phone,
+                    'CallBackURL' => $callbackUrl,
+                    'AccountReference' => $accountReference,
+                    'TransactionDesc' => $description,
+                ]);
+        } catch (ConnectionException|RequestException $exception) {
+            Log::warning('M-Pesa STK push HTTP error', [
+                'status' => $exception instanceof RequestException ? $exception->response?->status() : null,
             ]);
+
+            throw new MpesaException(
+                'Unable to initiate M-Pesa payment. Please try again.',
+                $exception instanceof RequestException ? $exception->response?->status() : null,
+            );
+        }
 
         if ($response->failed()) {
             Log::warning('M-Pesa STK push HTTP error', [
