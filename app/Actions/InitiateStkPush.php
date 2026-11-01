@@ -48,11 +48,13 @@ class InitiateStkPush
             throw new MpesaException('This order has no payable amount.');
         }
 
-        // M-Pesa production enforces a minimum of KES 10 per transaction.
-        // Sending less results in result code 2029 — Safaricom's undocumented
-        // floor-amount rejection ("Failed due to an unresolved reason type").
-        if ($amount < 10) {
-            throw new MpesaException("The minimum M-Pesa payment is KES 10 (order total: KES {$amount}).");
+        // M-Pesa enforces a minimum transaction amount. The sandbox accepts KES 1
+        // but production rejects anything below KES 10 with result code 2029
+        // ("Failed due to an unresolved reason type").
+        $minAmount = app()->isProduction() ? 10 : 1;
+
+        if ($amount < $minAmount) {
+            throw new MpesaException("The payment amount (KES {$amount}) is below the M-Pesa minimum of KES {$minAmount}.");
         }
 
         $transaction = MpesaTransaction::create([

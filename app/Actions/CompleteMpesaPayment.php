@@ -182,7 +182,7 @@ class CompleteMpesaPayment
             '1019' => 'The M-Pesa prompt expired before a PIN was entered. Please try again.',
             '1032' => 'Payment was cancelled.',
             '1037' => 'The M-Pesa prompt could not be delivered to the phone. Please try again.',
-            '2029' => 'The payment amount is below the minimum allowed by M-Pesa.',
+            '2029' => 'The payment amount is below the minimum allowed by M-Pesa. Please contact support.',
             '9999' => 'M-Pesa is temporarily unavailable. Please try again shortly.',
             default => $fallback !== '' ? $fallback : 'Payment was not completed. Please try again.',
         };
