@@ -54,6 +54,7 @@ class DarajaClient
         if ($response->failed()) {
             Log::warning('M-Pesa STK push HTTP error', [
                 'status' => $response->status(),
+                'body' => $response->json() ?? $response->body(),
             ]);
 
             throw new MpesaException(status: $response->status());
@@ -177,6 +178,11 @@ class DarajaClient
             $token = $response->json('access_token');
 
             if (! is_string($token) || $token === '') {
+                Log::warning('M-Pesa OAuth token missing', [
+                    'status' => $response->status(),
+                    'body' => $response->json() ?? $response->body(),
+                ]);
+
                 throw new MpesaException('Unable to authenticate with M-Pesa.', $response->status());
             }
 
