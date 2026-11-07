@@ -32,6 +32,23 @@ class DarajaClient
         //   PartyB            = Paybill shortcode (same)
         //   Password          = base64(Shortcode + Passkey + Timestamp)
         $shortcode = (string) config('mpesa.shortcode');
+        $partyB = (string) config('mpesa.party_b');
+        $transactionType = (string) config('mpesa.transaction_type');
+
+        // Safe diagnostic log — no passwords, tokens or passkeys included.
+        Log::info('M-Pesa STK push outgoing payload', [
+            'environment' => config('mpesa.environment'),
+            'BusinessShortCode' => $shortcode,
+            'TransactionType' => $transactionType,
+            'Amount' => $amount,
+            'PartyA' => $phone,
+            'PartyB' => $partyB,
+            'PhoneNumber' => $phone,
+            'AccountReference' => $accountReference,
+            'TransactionDesc' => $description,
+            'CallBackURL' => $callbackUrl,
+            'Timestamp' => $timestamp,
+        ]);
 
         try {
             $response = $this->client()
@@ -40,10 +57,10 @@ class DarajaClient
                     'BusinessShortCode' => $shortcode,
                     'Password' => $this->password($timestamp),
                     'Timestamp' => $timestamp,
-                    'TransactionType' => config('mpesa.transaction_type'),
+                    'TransactionType' => $transactionType,
                     'Amount' => $amount,
                     'PartyA' => $phone,
-                    'PartyB' => (string) config('mpesa.party_b'),
+                    'PartyB' => $partyB,
                     'PhoneNumber' => $phone,
                     'CallBackURL' => $callbackUrl,
                     'AccountReference' => $accountReference,
