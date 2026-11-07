@@ -160,8 +160,20 @@ class CompleteMpesaPayment
             if ($payable instanceof MpesaPayable) {
                 if ($success) {
                     $payable->markPaymentCompleted((string) $receiptNumber);
-                } else {
+                } elseif (! $this->isTransientError($resultCode)) {
+                    // Transient Safaricom errors (GV50113, 9999) leave the payable in
+                    // "pending" so the customer can retry without losing their slot or
+                    // having reserved stock released. The transaction itself is still
+                    // marked failed — this STK request is dead — but the booking/order
+                    // remains open for a fresh payment attempt.
                     $payable->markPaymentFailed();
+                } else {
+                    Log::notice('M-Pesa transient error — payable left pending for retry', [
+                        'transaction_uuid' => $transaction->uuid,
+                        'result_code' => $resultCode,
+                        'payable_type' => $transaction->payable_type,
+                        'payable_id' => $transaction->payable_id,
+                    ]);
                 }
             }
 
@@ -184,7 +196,26 @@ class CompleteMpesaPayment
             '1037' => 'The M-Pesa prompt could not be delivered to the phone. Please try again.',
             '2029' => 'Payment could not be processed. Please ensure your M-Pesa is active and try again.',
             '9999' => 'M-Pesa is temporarily unavailable. Please try again shortly.',
+            'GV50113' => 'Payment could not be processed due to a temporary M-Pesa error. Please try again.',
             default => $fallback !== '' ? $fallback : 'Payment was not completed. Please try again.',
         };
+    }
+
+    /**
+     * Transient Safaricom result codes where the failure is on Safaricom's
+     * side — not caused by the customer and not a permanent rejection.
+     *
+     * For these codes the MpesaTransaction is marked failed (the STK request
+     * is dead and cannot be recovered), but markPaymentFailed() is NOT called
+     * on the payable. The booking/order stays in "pending" payment status so
+     * the customer can initiate a fresh STK push without losing their slot or
+     * having their stock reservation released.
+     */
+    private function isTransientError(string $resultCode): bool
+    {
+        return in_array($resultCode, [
+            'GV50113', // receiver party routing failure — transient Safaricom internal error
+            '9999',    // M-Pesa system unavailable
+        ], strict: true);
     }
 }
