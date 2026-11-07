@@ -59,8 +59,8 @@ return [
     'callback_url' => env('MPESA_CALLBACK_URL'),
 
     'timeouts' => [
-        'connect' => (int) env('MPESA_CONNECT_TIMEOUT', 5),
-        'response' => (int) env('MPESA_RESPONSE_TIMEOUT', 20),
+        'connect' => (int) env('MPESA_CONNECT_TIMEOUT', 15),
+        'response' => (int) env('MPESA_RESPONSE_TIMEOUT', 45),
     ],
 
     'pending_ttl_minutes' => (int) env('MPESA_PENDING_TTL_MINUTES', 15),

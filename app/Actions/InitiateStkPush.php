@@ -8,6 +8,7 @@ use App\Models\MpesaTransaction;
 use App\Services\Mpesa\DarajaClient;
 use App\Support\KenyanPhoneNumber;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -49,8 +50,7 @@ class InitiateStkPush
         }
 
         // M-Pesa enforces a minimum transaction amount. The sandbox accepts KES 1
-        // but production rejects anything below KES 10 with result code 2029
-        // ("Failed due to an unresolved reason type").
+        // but production requires at least KES 10.
         $minAmount = app()->isProduction() ? 10 : 1;
 
         if ($amount < $minAmount) {
@@ -83,6 +83,11 @@ class InitiateStkPush
 
             $this->push($fresh, $payable, $normalizedPhone, $daraja);
         });
+        // Note: push() is intentionally invoked via defer() so the STK HTTP
+        // request happens after the browser response is flushed. A cURL timeout
+        // inside push() means Safaricom *may* have accepted the request even
+        // though we did not receive a 200 — the expire-pending cron will query
+        // the transaction later and reconcile it.
 
         return $transaction;
     }
@@ -90,6 +95,11 @@ class InitiateStkPush
     /**
      * Execute the actual Daraja STK push request.
      * Called by the deferred callback — runs after the HTTP response is sent.
+     *
+     * On a network timeout (ConnectionException), the transaction is intentionally
+     * left in "pending" status rather than marked failed. Safaricom may have
+     * accepted the request before the connection dropped. The expire-pending cron
+     * will query the status via stkQuery and reconcile the real outcome.
      *
      * @param  Model&MpesaPayable  $payable
      */
@@ -106,6 +116,19 @@ class InitiateStkPush
                 $daraja->callbackUrl(),
             );
         } catch (MpesaException $exception) {
+            // A network timeout means Safaricom may still have received and
+            // queued the STK prompt. Leave the transaction pending so the
+            // expire-pending cron can reconcile it via stkQuery.
+            if ($exception->getPrevious() instanceof ConnectionException) {
+                Log::notice('M-Pesa STK push timed out — leaving transaction pending for cron reconciliation', [
+                    'transaction_uuid' => $transaction->uuid,
+                    'payable_type' => $transaction->payable_type,
+                    'payable_id' => $transaction->payable_id,
+                ]);
+
+                return;
+            }
+
             $this->failTransaction($transaction, $payable, $exception->getMessage());
 
             throw $exception;

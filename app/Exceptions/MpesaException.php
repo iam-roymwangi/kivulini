@@ -11,8 +11,9 @@ class MpesaException extends Exception
     public function __construct(
         string $message = 'Unable to initiate M-Pesa payment. Please try again.',
         public readonly ?int $status = null,
+        ?\Throwable $previous = null,
     ) {
-        parent::__construct($message);
+        parent::__construct($message, 0, $previous);
     }
 
     /**

@@ -21,6 +21,16 @@ class DarajaClient
         string $callbackUrl,
     ): array {
         $timestamp = now()->format('YmdHis');
+
+        // For CustomerBuyGoodsOnline (Till/Buy Goods):
+        //   BusinessShortCode = Store shortcode (e.g. 1358532)
+        //   PartyB            = Till number (e.g. 1826991)
+        //   Password          = base64(StoreShortCode + Passkey + Timestamp)
+        //
+        // For CustomerPayBillOnline (Paybill):
+        //   BusinessShortCode = Paybill shortcode
+        //   PartyB            = Paybill shortcode (same)
+        //   Password          = base64(Shortcode + Passkey + Timestamp)
         $shortcode = (string) config('mpesa.shortcode');
 
         try {
@@ -39,15 +49,30 @@ class DarajaClient
                     'AccountReference' => $accountReference,
                     'TransactionDesc' => $description,
                 ]);
-        } catch (ConnectionException|RequestException $exception) {
-            Log::warning('M-Pesa STK push connection error', [
+        } catch (ConnectionException $exception) {
+            Log::warning('M-Pesa STK push connection timeout', [
                 'error' => $exception->getMessage(),
-                'status' => $exception instanceof RequestException ? $exception->response?->status() : null,
+                'environment' => config('mpesa.environment'),
+            ]);
+
+            // Wrap but preserve the ConnectionException as previous so callers
+            // can detect a network timeout and leave the transaction pending
+            // rather than marking it failed — the expire-pending cron will
+            // query Safaricom later and reconcile the real outcome.
+            throw new MpesaException(
+                'Unable to initiate M-Pesa payment. Please try again.',
+                previous: $exception,
+            );
+        } catch (RequestException $exception) {
+            Log::warning('M-Pesa STK push HTTP error', [
+                'error' => $exception->getMessage(),
+                'status' => $exception->response?->status(),
             ]);
 
             throw new MpesaException(
                 'Unable to initiate M-Pesa payment. Please try again.',
-                $exception instanceof RequestException ? $exception->response?->status() : null,
+                $exception->response?->status(),
+                $exception,
             );
         }
 
@@ -113,6 +138,7 @@ class DarajaClient
             throw new MpesaException(
                 'Unable to check M-Pesa payment status.',
                 $exception instanceof RequestException ? $exception->response?->status() : null,
+                $exception,
             );
         }
 
@@ -181,6 +207,7 @@ class DarajaClient
                 throw new MpesaException(
                     'Unable to authenticate with M-Pesa.',
                     $exception instanceof RequestException ? $exception->response?->status() : null,
+                    $exception,
                 );
             }
             $token = $response->json('access_token');
