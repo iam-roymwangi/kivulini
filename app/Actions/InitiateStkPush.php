@@ -49,14 +49,6 @@ class InitiateStkPush
             throw new MpesaException('This order has no payable amount.');
         }
 
-        // M-Pesa enforces a minimum transaction amount. The sandbox accepts KES 1
-        // but production requires at least KES 10.
-        $minAmount = app()->isProduction() ? 10 : 1;
-
-        if ($amount < $minAmount) {
-            throw new MpesaException("The payment amount (KES {$amount}) is below the M-Pesa minimum of KES {$minAmount}.");
-        }
-
         $transaction = MpesaTransaction::create([
             'payable_type' => $payable->getMorphClass(),
             'payable_id' => $payable->getKey(),
