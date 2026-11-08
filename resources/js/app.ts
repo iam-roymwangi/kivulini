@@ -1,4 +1,5 @@
 import { createInertiaApp } from '@inertiajs/vue3';
+import { createApp, h } from 'vue';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
@@ -29,6 +30,18 @@ createInertiaApp({
                 return [AppLayout, SettingsLayout];
             default:
                 return AppLayout;
+        }
+    },
+    setup({ el, App, props, plugin }) {
+        const app = createApp({ render: () => h(App, props) });
+        app.use(plugin);
+        app.mount(el);
+
+        // Dismiss the preloader once Vue has mounted
+        const preloader = document.getElementById('app-preloader');
+        if (preloader) {
+            preloader.classList.add('fade-out');
+            preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });
         }
     },
     progress: {
