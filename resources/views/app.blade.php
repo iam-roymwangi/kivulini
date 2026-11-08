@@ -122,8 +122,8 @@
     <body class="font-sans antialiased">
         <div id="app-preloader" aria-hidden="true">
             <div class="preloader-inner">
-                <img class="preloader-logo-light" src="/assets/images/logo-dark.png" alt="Kivulini Adventures">
-                <img class="preloader-logo-dark"  src="/assets/images/kivulini_logo.png"     alt="Kivulini Adventures">
+                <img class="preloader-logo-light" src="/assets/images/kivulini_logo.png" alt="Kivulini Adventures">
+                <img class="preloader-logo-dark"  src="/assets/images/logo-dark.png"     alt="Kivulini Adventures">
                 <div class="preloader-dots">
                     <span></span>
                     <span></span>
