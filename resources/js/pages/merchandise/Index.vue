@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, X, ShoppingBag, Tag } from '@lucide/vue';
+import SEOHead from '@/components/SEOHead.vue';
 import { show as merchandiseShow } from '@/routes/merchandise';
 import type { MerchandiseItem, MerchandiseType } from '@/types/merchandise';
 
@@ -109,21 +110,13 @@ const filteredItems = computed(() => {
 </script>
 
 <template>
-    <Head>
-        <title>Merchandise – Kivulini Adventures</title>
-        <meta name="description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more. Wear your adventures." />
-        <meta name="keywords" content="Kivulini Adventures merch, Kenya adventure apparel, hiking t-shirts Kenya, adventure hoodies" />
-        <meta property="og:title" content="Merchandise – Kivulini Adventures" />
-        <meta property="og:description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more. Wear your adventures." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/merchandise" />
-        <meta property="og:image" content="https://kivuliniadventures.com/assets/images/merch-hero.webp" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Merchandise – Kivulini Adventures" />
-        <meta name="twitter:description" content="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more." />
-        <meta name="twitter:image" content="https://kivuliniadventures.com/assets/images/merch-hero.webp" />
-        <link rel="canonical" href="https://kivuliniadventures.com/merchandise" />
-    </Head>
+    <SEOHead
+        title="Merchandise – Wear the Adventure"
+        description="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more. Wear your adventures."
+        keywords="Kivulini Adventures merch, Kenya adventure apparel, hiking t-shirts Kenya, adventure hoodies"
+        canonical="https://kivuliniadventures.com/merchandise"
+        og-image="https://kivuliniadventures.com/assets/images/merch-hero.webp"
+    />
 
     <!-- Hero Banner -->
     <section class="relative overflow-hidden px-4 pb-60 lg:pt-142 pt-82 text-white md:px-8 lg:px-12">

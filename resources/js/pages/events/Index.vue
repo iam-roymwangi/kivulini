@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, X } from '@lucide/vue';
+import SEOHead from '@/components/SEOHead.vue';
 import CategoryFilter from '@/components/events/CategoryFilter.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
@@ -112,23 +113,13 @@ const testimonials = [
 
 <template>
 
-    <Head>
-        <title>Explore Upcoming Trips & Adventures in Kenya</title>
-        <meta name="description"
-            content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa with Kivulini Adventures." />
-        <meta name="keywords"
-            content="Kenya adventures, hiking Kenya, road trips East Africa, group travel Kenya, Kivulini" />
-        <meta property="og:title" content="Kivulini Adventures – Explore Upcoming Trips" />
-        <meta property="og:description"
-            content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Kivulini Adventures – Explore Upcoming Trips" />
-        <meta name="twitter:description"
-            content="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa." />
-        <link rel="canonical" href="https://kivuliniadventures.com/" />
-    </Head>
+    <SEOHead
+        title="Explore Upcoming Trips & Adventures in Kenya"
+        description="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa with Kivulini Adventures."
+        keywords="Kenya adventures, hiking Kenya, road trips East Africa, group travel Kenya, Kivulini"
+        canonical="https://kivuliniadventures.com/events"
+        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
+    />
 
     <!-- Hero -->
     <HeroSection v-model="activeFilter" />

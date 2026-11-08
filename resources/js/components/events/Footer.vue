@@ -13,6 +13,7 @@ const exploreLinks = [
 ];
 
 const categoryLinks = [
+    { label: 'About Us', href: '/about' },
     { label: 'Past Trips Gallery', href: '/gallery' },
     { label: 'Contact Us', href: '/contact' },
 ];
@@ -100,9 +101,8 @@ const contactInfo = [
                     &copy; {{ currentYear }} Kivulini. All rights reserved.
                 </p>
                 <div class="flex items-center gap-6">
-                    <Link href="#" class="text-xs text-muted-foreground hover:text-amber-500">Privacy Policy</Link>
-                    <Link href="#" class="text-xs text-muted-foreground hover:text-amber-500">Terms of Service</Link>
-                    <Link href="#" class="text-xs text-muted-foreground hover:text-amber-500">Booking Policy</Link>
+                    <Link href="/privacy" class="text-xs text-muted-foreground hover:text-amber-500">Privacy Policy</Link>
+                    <Link href="/terms" class="text-xs text-muted-foreground hover:text-amber-500">Terms of Service</Link>
                 </div>
             </div>
         </div>

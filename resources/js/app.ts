@@ -19,6 +19,7 @@ createInertiaApp({
                 return null;
             case name.startsWith('events/'):
             case name.startsWith('merchandise/'):
+            case name.startsWith('legal/'):
                 return PublicLayout;
             case name.startsWith('admin/'):
                 return AppLayout;

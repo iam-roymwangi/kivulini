@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import SEOHead from '@/components/SEOHead.vue';
 import { GalleryHorizontal, MapPin, Users, Star, Flag } from '@lucide/vue';
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
@@ -57,30 +58,14 @@ defineProps<{
 </script>
 
 <template>
-    <Head>
-        <title>Kivulini Adventures | Explore Kenya with Curated Trips</title>
-        <meta
-            name="description"
-            content="Kivulini Adventures curates road trips, hikes, and getaway vacations across Kenya. Discover upcoming experiences, browse past trips, and book your next adventure."
-        />
-        <meta
-            name="keywords"
-            content="Kivulini Adventures, Kenya trips, hiking Kenya, road trips Kenya, group travel Kenya, vacations Kenya"
-        />
-        <meta property="og:title" content="Kivulini Adventures | Explore Kenya with Curated Trips" />
-        <meta
-            property="og:description"
-            content="Discover upcoming adventures, browse past trips, and book curated road trips, hikes, and vacations across Kenya."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/" />
-        <meta property="og:image" content="https://kivuliniadventures.com/assets/images/og-home.webp" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Kivulini Adventures | Explore Kenya with Curated Trips" />
-        <meta name="twitter:description" content="Discover upcoming adventures, browse past trips, and book curated road trips, hikes, and vacations across Kenya." />
-        <meta name="twitter:image" content="https://kivuliniadventures.com/assets/images/og-home.webp" />
-        <link rel="canonical" href="https://kivuliniadventures.com/" />
-    </Head>
+    <SEOHead
+        title="Kivulini Adventures | Explore Kenya with Curated Trips"
+        description="Kivulini Adventures curates road trips, hikes, and getaway vacations across Kenya. Discover upcoming experiences, browse past trips, and book your next adventure."
+        keywords="Kivulini Adventures, Kenya trips, hiking Kenya, road trips Kenya, group travel Kenya, vacations Kenya"
+        canonical="https://kivuliniadventures.com/"
+        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
+        twitter-card="summary_large_image"
+    />
 
     <main class="bg-background text-foreground transition-colors">
         <HeroSection />

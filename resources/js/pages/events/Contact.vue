@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { Head } from '@inertiajs/vue3';
 import { AlertCircle, CheckCircle2, Mail, MapPin, Phone, Send } from '@lucide/vue';
+import SEOHead from '@/components/SEOHead.vue';
 
 const submitted = ref(false);
 const processing = ref(false);
@@ -71,19 +71,13 @@ async function submitForm() {
 </script>
 
 <template>
-    <Head>
-        <title>Contact Us – Kivulini Adventures</title>
-        <meta name="description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
-        <meta name="keywords" content="contact Kivulini Adventures, Kenya trips inquiry, group bookings Kenya, adventure travel contact" />
-        <meta property="og:title" content="Contact Kivulini Adventures" />
-        <meta property="og:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/contact" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Contact Kivulini Adventures" />
-        <meta name="twitter:description" content="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships." />
-        <link rel="canonical" href="https://kivuliniadventures.com/contact" />
-    </Head>
+    <SEOHead
+        title="Contact Us"
+        description="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships."
+        keywords="contact Kivulini Adventures, Kenya trips inquiry, group bookings Kenya, adventure travel contact"
+        canonical="https://kivuliniadventures.com/contact"
+        twitter-card="summary"
+    />
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

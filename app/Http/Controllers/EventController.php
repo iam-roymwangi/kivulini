@@ -136,4 +136,12 @@ class EventController extends Controller
     {
         return Inertia::render('events/Contact');
     }
+
+    /**
+     * Display the About Us page.
+     */
+    public function aboutPage(): Response
+    {
+        return Inertia::render('events/About');
+    }
 }

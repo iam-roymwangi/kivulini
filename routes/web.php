@@ -9,20 +9,21 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\MerchandiseController;
 use App\Http\Controllers\MerchandiseOrderController;
 use App\Http\Controllers\PaymentStatusController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/', [EventController::class, 'index'])->name('home');
 Route::get('/events', [EventController::class, 'list'])->name('events.list');
 Route::get('/events/{slug}', [EventController::class, 'show'])->name('events.show');
 Route::get('/gallery', [EventController::class, 'galleryPage'])->name('events.gallery');
 Route::get('/contact', [EventController::class, 'contactPage'])->name('contact');
+Route::get('/about', [EventController::class, 'aboutPage'])->name('about');
+Route::get('/terms', [LegalController::class, 'terms'])->name('terms');
+Route::get('/privacy', [LegalController::class, 'privacy'])->name('privacy');
 Route::get('/merchandise', [MerchandiseController::class, 'index'])->name('merchandise.index');
 Route::get('/merchandise/{merchandise}', [MerchandiseController::class, 'show'])->name('merchandise.show');
 

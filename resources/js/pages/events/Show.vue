@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
+import SEOHead from '@/components/SEOHead.vue';
 import BookingBox from '@/components/events/BookingBox.vue';
 import BookingDrawer from '@/components/events/BookingDrawer.vue';
 import EventHeroGallery from '@/components/events/EventHeroGallery.vue';
@@ -16,6 +17,8 @@ const eventData = computed<PlatformEvent>(() => {
     return props.event && 'data' in props.event ? props.event.data : props.event;
 });
 
+const page = usePage();
+
 const isCompleted = computed(() => eventData.value.status === 'completed');
 
 const showBooking = ref(false);
@@ -29,21 +32,15 @@ function openBooking(qty: number) {
 
 <template>
 
-    <Head>
-        <title>{{ eventData.title }}</title>
-        <meta name="description" :content="eventData.summary" />
-        <meta name="keywords"
-            :content="`${eventData.title}, ${eventData.location}, Kenya adventures, ${eventData.type?.replace('_', ' ')}`" />
-        <meta property="og:title" :content="`${eventData.title} – Kivulini Adventures`" />
-        <meta property="og:description" :content="eventData.summary" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" :content="$page.url" />
-        <meta v-if="eventData.media?.[0]?.url" property="og:image" :content="eventData.media[0].url" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" :content="`${eventData.title} – Kivulini Adventures`" />
-        <meta name="twitter:description" :content="eventData.summary" />
-        <meta v-if="eventData.media?.[0]?.url" name="twitter:image" :content="eventData.media[0].url" />
-    </Head>
+    <SEOHead
+        :title="eventData.title"
+        :description="eventData.summary"
+        :keywords="`${eventData.title}, ${eventData.location}, Kenya adventures, ${eventData.type?.replace('_', ' ')}`"
+        :canonical="`https://kivuliniadventures.com${page.url}`"
+        og-type="article"
+        :og-image="eventData.media?.[0]?.url"
+        twitter-card="summary_large_image"
+    />
 
     <div class="pt-24 pb-16">
         <!-- Hero gallery -->

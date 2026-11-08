@@ -37,6 +37,7 @@ const navLinks = [
     { title: 'Events', href: '/events' },
     { title: 'Merch', href: '/merchandise' },
     { title: 'Gallery', href: '/gallery' },
+    { title: 'About', href: '/about' },
     { title: 'Contact', href: '/contact' },
 ];
 </script>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, X } from '@lucide/vue';
+import SEOHead from '@/components/SEOHead.vue';
 import CategoryFilter from '@/components/events/CategoryFilter.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import type { PlatformEvent } from '@/types';
@@ -90,19 +91,13 @@ const typeLabel = computed(() => ({
 </script>
 
 <template>
-    <Head>
-        <title>Upcoming Trips & Events – Kivulini Adventures</title>
-        <meta name="description" content="Browse all upcoming hikes, road trips, and vacations in Kenya. Filter by category, price, and date to find your perfect adventure." />
-        <meta name="keywords" content="Kenya trips, upcoming events Kenya, hiking, road trips, group travel, Kivulini Adventures" />
-        <meta property="og:title" content="Upcoming Trips & Events – Kivulini Adventures" />
-        <meta property="og:description" content="Browse all upcoming hikes, road trips, and vacations in Kenya." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/events" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Upcoming Trips & Events – Kivulini Adventures" />
-        <meta name="twitter:description" content="Browse all upcoming hikes, road trips, and vacations in Kenya." />
-        <link rel="canonical" href="https://kivuliniadventures.com/events" />
-    </Head>
+    <SEOHead
+        title="Upcoming Trips & Events"
+        description="Browse all upcoming hikes, road trips, and vacations in Kenya. Filter by category, price, and date to find your perfect adventure."
+        keywords="Kenya trips, upcoming events Kenya, hiking, road trips, group travel, Kivulini Adventures"
+        canonical="https://kivuliniadventures.com/events"
+        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
+    />
 
     <div class="bg-background pb-24 pt-32 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

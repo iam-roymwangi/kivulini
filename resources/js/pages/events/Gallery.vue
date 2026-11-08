@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import SEOHead from '@/components/SEOHead.vue';
 import MasonryGallery from '@/components/events/MasonryGallery.vue';
 import ModernPagination from '@/components/events/ModernPagination.vue';
 import type { EventMedia } from '@/types/events';
@@ -11,19 +11,13 @@ defineProps<{
 </script>
 
 <template>
-    <Head>
-        <title>Past Trips Photo Gallery – Kivulini Adventures</title>
-        <meta name="description" content="Browse photos from Kivulini Adventures' past hikes, road trips, and vacations across Kenya and East Africa." />
-        <meta name="keywords" content="Kivulini Adventures gallery, Kenya trip photos, hiking photos Kenya, adventure gallery East Africa" />
-        <meta property="og:title" content="Past Trips Photo Gallery – Kivulini Adventures" />
-        <meta property="og:description" content="Browse photos from our past hikes, road trips, and vacations across Kenya." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://kivuliniadventures.com/gallery" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Past Trips Photo Gallery – Kivulini Adventures" />
-        <meta name="twitter:description" content="Browse photos from our past hikes, road trips, and vacations across Kenya." />
-        <link rel="canonical" href="https://kivuliniadventures.com/gallery" />
-    </Head>
+    <SEOHead
+        title="Past Trips Photo Gallery"
+        description="Browse photos from Kivulini Adventures' past hikes, road trips, and vacations across Kenya and East Africa."
+        keywords="Kivulini Adventures gallery, Kenya trip photos, hiking photos Kenya, adventure gallery East Africa"
+        canonical="https://kivuliniadventures.com/gallery"
+        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
+    />
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

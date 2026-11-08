@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, ShoppingBag, Tag, Ruler, Palette, Package, ChevronLeft, ChevronRight, X } from '@lucide/vue';
 import { index as merchandiseIndex } from '@/routes/merchandise';
+import SEOHead from '@/components/SEOHead.vue';
 import MerchandiseCheckout from '@/components/merchandise/MerchandiseCheckout.vue';
 import type { MerchandiseItem, MerchandiseImage } from '@/types/merchandise';
 
@@ -55,6 +56,7 @@ function onKeydown(e: KeyboardEvent) {
 // ── Selection state ───────────────────────────────────────────────────────────
 const selectedSize = ref('');
 const selectedColor = ref('');
+const page = usePage();
 
 const isInStock = computed(() => props.merchandise.stock > 0);
 const canOrder = computed(() => {
@@ -65,19 +67,15 @@ const canOrder = computed(() => {
 </script>
 
 <template>
-    <Head>
-        <title>{{ merchandise.name }} – Kivulini Adventures</title>
-        <meta name="description" :content="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`" />
-        <meta name="keywords" :content="`${merchandise.name}, Kivulini Adventures merch, Kenya adventure apparel`" />
-        <meta property="og:title" :content="`${merchandise.name} – Kivulini Adventures`" />
-        <meta property="og:description" :content="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`" />
-        <meta property="og:type" content="product" />
-        <meta v-if="merchandise.cover_image_url" property="og:image" :content="merchandise.cover_image_url" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" :content="`${merchandise.name} – Kivulini Adventures`" />
-        <meta name="twitter:description" :content="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`" />
-        <meta v-if="merchandise.cover_image_url" name="twitter:image" :content="merchandise.cover_image_url" />
-    </Head>
+    <SEOHead
+        :title="merchandise.name"
+        :description="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`"
+        :keywords="`${merchandise.name}, Kivulini Adventures merch, Kenya adventure apparel`"
+        :canonical="`https://kivuliniadventures.com${page.url}`"
+        og-type="product"
+        :og-image="merchandise.cover_image_url ?? undefined"
+        twitter-card="summary_large_image"
+    />
 
     <!-- Keyboard handler for lightbox -->
     <div tabindex="-1" class="outline-none" @keydown="onKeydown">
