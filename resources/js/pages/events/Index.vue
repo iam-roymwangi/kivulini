@@ -105,7 +105,7 @@ const activeFilterLabel = computed(() => {
 
 const testimonials = [
     { name: 'Wanjiku N.', location: 'Nairobi, Kenya', initials: 'WN', text: 'The Mt. Longonot hike was perfectly organized! The guides were very professional and the bonfire at night was magical.' },
-    { name: 'David K.', location: 'Kisumu, Kenya', initials: 'DK', text: 'Kivulini makes booking trips so simple. The digital consent and STK push payments are seamless!' },
+    { name: 'David K.', location: 'Kisumu, Kenya', initials: 'DK', text: 'Kivulini makes booking trips so simple. The digital consent and payments are seamless!' },
     { name: 'Sarah M.', location: 'Mombasa, Kenya', initials: 'SM', text: 'An absolute 10/10 experience! I met amazing people and saw the most beautiful sunsets on the Rift Valley road trip.' },
     { name: 'John O.', location: 'Eldoret, Kenya', initials: 'JO', text: 'Highly recommend Kivulini for anyone looking to explore Kenya in groups. Great vibe, safe environment!' },
 ];

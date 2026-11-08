@@ -1,5 +1,6 @@
 import { createInertiaApp } from '@inertiajs/vue3';
 import { createApp, h } from 'vue';
+import PagePreloader from '@/components/PagePreloader.vue';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
@@ -37,11 +38,13 @@ createInertiaApp({
         app.use(plugin);
         app.mount(el);
 
-        // Dismiss the preloader once Vue has mounted
-        const preloader = document.getElementById('app-preloader');
-        if (preloader) {
-            preloader.classList.add('fade-out');
-            preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });
+        // Dismiss the initial HTML preloader once Vue has mounted (client-only)
+        if (typeof document !== 'undefined') {
+            const preloader = document.getElementById('app-preloader');
+            if (preloader) {
+                preloader.classList.add('fade-out');
+                preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });
+            }
         }
     },
     progress: {
@@ -51,3 +54,10 @@ createInertiaApp({
 
 // This will listen for flash toast data from the server...
 initializeFlashToast();
+
+// Mount the page preloader as a standalone app so it works across all layouts (client-only)
+if (typeof document !== 'undefined') {
+    const preloaderEl = document.createElement('div');
+    document.body.appendChild(preloaderEl);
+    createApp(PagePreloader).mount(preloaderEl);
+}

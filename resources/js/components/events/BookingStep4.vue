@@ -132,7 +132,7 @@ async function submit() {
                 :class="phoneError ? 'border-red-500' : 'border-border'"
             />
             <p v-if="phoneError" class="mt-1 text-xs text-red-400" role="alert">{{ phoneError }}</p>
-            <p class="mt-2 text-xs text-muted-foreground">An STK push will be sent to this number. Use the Safaricom line registered to M-Pesa.</p>
+            <p class="mt-2 text-xs text-muted-foreground">A prompt will be sent to this number. Use the Safaricom line registered to M-Pesa.</p>
         </div>
 
         <div class="flex gap-3 pt-2">

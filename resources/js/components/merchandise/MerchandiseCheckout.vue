@@ -141,7 +141,7 @@ function handleFailed(message: string): void {
         <form v-else class="space-y-4" novalidate @submit.prevent="submit">
             <div>
                 <h3 class="text-lg font-bold text-foreground">Pay with M-Pesa</h3>
-                <p class="mt-1 text-sm text-muted-foreground">We'll send an STK push to your Safaricom number.</p>
+                <p class="mt-1 text-sm text-muted-foreground">We'll send a prompt to your Safaricom number.</p>
             </div>
 
             <div v-if="serverErrors.length > 0" class="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
@@ -185,7 +185,7 @@ function handleFailed(message: string): void {
                 :disabled="submitting"
                 class="w-full rounded-xl bg-amber-400 py-3.5 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-300 disabled:opacity-60"
             >
-                {{ submitting ? 'Sending STK push...' : 'Pay with M-Pesa' }}
+                {{ submitting ? 'Sending prompt...' : 'Pay with M-Pesa' }}
             </button>
         </form>
     </div>
