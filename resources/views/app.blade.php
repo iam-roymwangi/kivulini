@@ -116,14 +116,14 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>Kivulini Adventures</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
         <div id="app-preloader" aria-hidden="true">
             <div class="preloader-inner">
-                <img class="preloader-logo-light" src="/assets/images/kivulini_logo.png" alt="Kivulini Adventures">
-                <img class="preloader-logo-dark"  src="/assets/images/logo-dark.png"     alt="Kivulini Adventures">
+                <img class="preloader-logo-light" src="/assets/images/logo-dark.png" alt="Kivulini Adventures">
+                <img class="preloader-logo-dark"  src="/assets/images/kivulini_logo.png"     alt="Kivulini Adventures">
                 <div class="preloader-dots">
                     <span></span>
                     <span></span>
