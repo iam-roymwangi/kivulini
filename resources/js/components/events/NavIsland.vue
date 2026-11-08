@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Menu, X, Moon, Sun } from '@lucide/vue';
+import { Menu, X, Moon, Sun, Home, CalendarDays, ShoppingBag, Images, Info, MessageCircle } from '@lucide/vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,12 +36,12 @@ watch(mobileOpen, (val) => {
 });
 
 const navLinks = [
-    { title: 'Home',    href: '/',            icon: '🏠' },
-    { title: 'Events',  href: '/events',       icon: '🏕️' },
-    { title: 'Merch',   href: '/merchandise',  icon: '👕' },
-    { title: 'Gallery', href: '/gallery',      icon: '🖼️' },
-    { title: 'About',   href: '/about',        icon: '✨' },
-    { title: 'Contact', href: '/contact',      icon: '💬' },
+    { title: 'Home',    href: '/',            icon: Home },
+    { title: 'Events',  href: '/events',       icon: CalendarDays },
+    { title: 'Merch',   href: '/merchandise',  icon: ShoppingBag },
+    { title: 'Gallery', href: '/gallery',      icon: Images },
+    { title: 'About',   href: '/about',        icon: Info },
+    { title: 'Contact', href: '/contact',      icon: MessageCircle },
 ];
 
 function isActive(href: string): boolean {
@@ -196,7 +196,11 @@ function isActive(href: string): boolean {
                                         : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'"
                                     :style="{ transitionDelay: `${i * 40}ms` }"
                                 >
-                                    <span class="text-xl" aria-hidden="true">{{ link.icon }}</span>
+                                    <component
+                                        :is="link.icon"
+                                        class="h-5 w-5 shrink-0"
+                                        aria-hidden="true"
+                                    />
                                     {{ link.title }}
                                     <span
                                         v-if="isActive(link.href)"
@@ -209,7 +213,7 @@ function isActive(href: string): boolean {
                         <!-- Divider -->
                         <div class="my-5 border-t border-slate-100 dark:border-slate-800" />
 
-                        <!-- Bottom row: theme toggle + social links + auth -->
+                        <!-- Bottom row: theme toggle + social links -->
                         <div class="flex items-center justify-between">
                             <button
                                 class="flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
@@ -221,7 +225,6 @@ function isActive(href: string): boolean {
                             </button>
 
                             <div class="flex items-center gap-2">
-                                <!-- Social links -->
                                 <a
                                     href="https://www.instagram.com/_kivulini.adventures/"
                                     target="_blank"
@@ -240,26 +243,6 @@ function isActive(href: string): boolean {
                                 >
                                     <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
                                 </a>
-
-                                <template v-if="!user">
-                                    <Link
-                                        href="/login"
-                                        class="rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-sm transition-colors hover:bg-amber-500"
-                                    >
-                                        Sign in
-                                    </Link>
-                                </template>
-                                <template v-else>
-                                    <div class="flex items-center gap-3">
-                                        <Avatar class="size-8 overflow-hidden rounded-full">
-                                            <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-                                            <AvatarFallback class="rounded-full bg-amber-400 text-xs font-semibold text-slate-900">
-                                                {{ getInitials(user.name) }}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ user.name }}</span>
-                                    </div>
-                                </template>
                             </div>
                         </div>
                     </div>
