@@ -10,7 +10,7 @@ jobs:
 
     steps:
       # 1. Checkout Code
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 2. Setup PHP
       - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
@@ -24,7 +24,7 @@ jobs:
 
       # 4. Setup Node & Build Frontend
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: "20"
       
@@ -39,7 +39,7 @@ jobs:
       # Uploads everything to /cacumator/ EXCEPT the public folder
       # ---------------------------------------------------------
       - name: Deploy Backend to /kivulini
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -62,7 +62,7 @@ jobs:
       # Uploads contents of 'public/' to /public_html/
       # ---------------------------------------------------------
       - name: Deploy Assets to /public_html
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
