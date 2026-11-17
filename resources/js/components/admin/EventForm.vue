@@ -407,6 +407,7 @@ const remainingMedia = computed(() =>
                                 :value="q.question_text"
                                 @input="updateQuestion(i, { question_text: ($event.target as HTMLInputElement).value })"
                             />
+                            <p v-if="errors[`questions.${i}.question_text`]" class="form-error">{{ errors[`questions.${i}.question_text`] }}</p>
                             <div class="flex flex-wrap gap-3">
                                 <select class="form-input w-auto" :value="q.type" @change="updateQuestion(i, { type: ($event.target as HTMLSelectElement).value as QuestionRow['type'] })">
                                     <option value="text">Text input</option>

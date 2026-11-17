@@ -62,10 +62,21 @@ class StoreEventRequest extends FormRequest
             'price_tiers.*.price' => ['required', 'numeric', 'min:1'],
             'price_tiers.*.description' => ['nullable', 'string', 'max:255'],
             'questions' => ['nullable', 'array'],
-            'questions.*.question_text' => ['required', 'string', 'max:255'],
+            'questions.*.question_text' => ['required', 'string', 'max:255', 'distinct:ignore_case'],
             'questions.*.type' => ['required', 'in:text,textarea,select'],
             'questions.*.is_required' => ['boolean'],
             'questions.*.options' => ['nullable', 'array'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'questions.*.question_text.distinct' => 'This question has already been added to the event.',
+            'price_tiers.*.name.distinct' => 'Each ticket tier needs a different name.',
         ];
     }
 }

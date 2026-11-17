@@ -189,3 +189,19 @@ test('pass shows the ticket tier', function () {
 
     expect(view('bookings.pass-pdf', ['booking' => $booking])->render())->toContain('VVIP');
 });
+
+test('admin edit page loads the event description and price tiers', function () {
+    $this->actingAs(User::factory()->create());
+
+    $event = Event::factory()->create(['description' => '<h2>Itinerary</h2><p><strong>Day 1</strong></p>']);
+    $vip = EventPriceTier::factory()->for($event)->create(['name' => 'VIP', 'price' => 5000, 'description' => 'Front row', 'sort_order' => 0]);
+
+    $this->get(route('admin.events.edit', $event))
+        ->assertInertia(fn ($page) => $page
+            ->component('admin/events/Edit')
+            ->where('event.description', '<h2>Itinerary</h2><p><strong>Day 1</strong></p>')
+            ->has('event.price_tiers', 1)
+            ->where('event.price_tiers.0.id', $vip->id)
+            ->where('event.price_tiers.0.name', 'VIP')
+            ->where('event.price_tiers.0.description', 'Front row'));
+});
