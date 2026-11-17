@@ -30,6 +30,13 @@ export interface EventQuestion {
     sort_order: number;
 }
 
+export interface PriceTier {
+    id: number;
+    name: string;
+    price: string;
+    description: string | null;
+}
+
 export interface PlatformEvent {
     id: number;
     title: string;
@@ -42,6 +49,8 @@ export interface PlatformEvent {
     start_date: string;
     end_date: string;
     price: string;
+    price_tiers?: PriceTier[];
+    price_tiers_count?: number;
     capacity: number;
     booked_slots: number;
     available_slots: number;
@@ -58,6 +67,7 @@ export interface BookingPayload {
     contact_email: string;
     contact_phone: string;
     quantity: number;
+    event_price_tier_id?: number | null;
     responses: { event_question_id: number; answer: string }[];
     consent: { agreed: boolean; signer_name: string };
 }

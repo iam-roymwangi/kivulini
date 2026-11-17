@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { CalendarDays, MapPin } from '@lucide/vue';
+import { computed } from 'vue';
 import { show as showEvent } from '@/routes/events';
 import type { PlatformEvent } from '@/types';
 
@@ -14,11 +14,13 @@ const props = withDefaults(defineProps<{
 
 const isSoldOut = computed(() => props.event.available_slots === 0);
 
-const formattedPrice = computed(() =>
-    new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(
+const formattedPrice = computed(() => {
+    const amount = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(
         parseFloat(props.event.price),
-    ),
-);
+    );
+
+    return (props.event.price_tiers_count ?? 0) > 1 ? `From ${amount}` : amount;
+});
 
 const formattedDate = computed(() =>
     new Date(props.event.start_date).toLocaleDateString('en-KE', {

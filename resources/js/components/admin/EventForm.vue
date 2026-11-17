@@ -16,6 +16,7 @@ export interface EventFormData {
     capacity: string;
     status: string;
     liability_waiver_text: string;
+    price_tiers: PriceTierRow[];
     questions: QuestionRow[];
     // For new uploads
     images: File[];
@@ -23,6 +24,13 @@ export interface EventFormData {
     delete_media_ids: number[];
     featured_media_id: number | null;
     delete_question_ids: number[];
+}
+
+export interface PriceTierRow {
+    id?: number;
+    name: string;
+    price: string;
+    description: string;
 }
 
 export interface QuestionRow {
@@ -84,6 +92,31 @@ function markDeleteMedia(id: number) {
 
 function setFeatured(id: number) {
     patch({ featured_media_id: id });
+}
+
+// Price tiers
+const tierPresets = ['Regular', 'VIP', 'VVIP'];
+const hasTiers = computed(() => props.form.price_tiers.length > 0);
+const lowestTierPrice = computed(() => {
+    const prices = props.form.price_tiers.map((t) => parseFloat(t.price)).filter((p) => !Number.isNaN(p));
+
+    return prices.length ? Math.min(...prices) : null;
+});
+
+function addTier(name = '') {
+    patch({ price_tiers: [...props.form.price_tiers, { name, price: '', description: '' }] });
+}
+
+function removeTier(index: number) {
+    patch({ price_tiers: props.form.price_tiers.filter((_, i) => i !== index) });
+}
+
+function updateTier(index: number, partial: Partial<PriceTierRow>) {
+    patch({ price_tiers: props.form.price_tiers.map((t, i) => (i === index ? { ...t, ...partial } : t)) });
+}
+
+function tierError(index: number, field: keyof PriceTierRow): string | undefined {
+    return props.errors[`price_tiers.${index}.${field}`];
 }
 
 // Questions
@@ -185,7 +218,18 @@ const remainingMedia = computed(() =>
 
             <div>
                 <label class="form-label">Price (KES) *</label>
-                <input type="number" min="0" class="form-input" :value="form.price" @input="patch({ price: ($event.target as HTMLInputElement).value })" />
+                <input
+                    v-if="!hasTiers"
+                    type="number"
+                    min="0"
+                    class="form-input"
+                    :value="form.price"
+                    @input="patch({ price: ($event.target as HTMLInputElement).value })"
+                />
+                <p v-else class="form-input text-muted-foreground">
+                    From KES {{ lowestTierPrice !== null ? lowestTierPrice.toLocaleString('en-KE') : '—' }}
+                    <span class="text-xs">(set by ticket tiers)</span>
+                </p>
                 <p v-if="errors.price" class="form-error">{{ errors.price }}</p>
             </div>
 
@@ -265,6 +309,77 @@ const remainingMedia = computed(() =>
                 Click to add images
                 <input type="file" accept="image/*" multiple class="hidden" @change="handleImageFiles" />
             </label>
+        </div>
+
+        <!-- Ticket tiers -->
+        <div>
+            <div class="mb-1 flex flex-wrap items-center justify-between gap-2">
+                <h3 class="text-sm font-semibold text-foreground">Ticket Tiers</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        v-for="preset in tierPresets"
+                        :key="preset"
+                        type="button"
+                        class="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted disabled:opacity-40"
+                        :disabled="form.price_tiers.some((t) => t.name.trim().toLowerCase() === preset.toLowerCase())"
+                        @click="addTier(preset)"
+                    >
+                        + {{ preset }}
+                    </button>
+                    <button type="button" class="flex items-center gap-1 rounded-lg bg-amber-400 px-3 py-1.5 text-xs font-bold text-slate-900 hover:bg-amber-300" @click="addTier()">
+                        <Plus class="h-3 w-3" /> Custom Tier
+                    </button>
+                </div>
+            </div>
+            <p class="mb-3 text-xs text-muted-foreground">
+                Optional. Add tiers like Regular, VIP or VVIP and buyers will pick one when booking. Leave empty to sell at the single price above.
+            </p>
+            <p v-if="errors.price_tiers" class="form-error mb-2">{{ errors.price_tiers }}</p>
+
+            <div class="space-y-3">
+                <div
+                    v-for="(tier, i) in form.price_tiers"
+                    :key="tier.id ?? `new-${i}`"
+                    class="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4 md:grid-cols-[1fr_10rem_auto]"
+                >
+                    <div>
+                        <input
+                            type="text"
+                            class="form-input"
+                            placeholder="Tier name, e.g. VIP"
+                            maxlength="50"
+                            :value="tier.name"
+                            @input="updateTier(i, { name: ($event.target as HTMLInputElement).value })"
+                        />
+                        <p v-if="tierError(i, 'name')" class="form-error">{{ tierError(i, 'name') }}</p>
+                    </div>
+                    <div>
+                        <input
+                            type="number"
+                            min="1"
+                            class="form-input"
+                            placeholder="Price (KES)"
+                            :value="tier.price"
+                            @input="updateTier(i, { price: ($event.target as HTMLInputElement).value })"
+                        />
+                        <p v-if="tierError(i, 'price')" class="form-error">{{ tierError(i, 'price') }}</p>
+                    </div>
+                    <button type="button" class="justify-self-end text-red-500 hover:text-red-700 md:mt-2" aria-label="Remove tier" @click="removeTier(i)">
+                        <Trash2 class="h-4 w-4" />
+                    </button>
+                    <div class="md:col-span-3">
+                        <input
+                            type="text"
+                            class="form-input"
+                            placeholder="What's included (optional), e.g. Front seats, dinner & drinks"
+                            maxlength="255"
+                            :value="tier.description"
+                            @input="updateTier(i, { description: ($event.target as HTMLInputElement).value })"
+                        />
+                        <p v-if="tierError(i, 'description')" class="form-error">{{ tierError(i, 'description') }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Questions -->

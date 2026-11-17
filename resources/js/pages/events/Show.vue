@@ -23,9 +23,11 @@ const isCompleted = computed(() => eventData.value.status === 'completed');
 
 const showBooking = ref(false);
 const bookingQuantity = ref(1);
+const bookingTierId = ref<number | null>(null);
 
-function openBooking(qty: number) {
+function openBooking(qty: number, tierId: number | null) {
     bookingQuantity.value = qty;
+    bookingTierId.value = tierId;
     showBooking.value = true;
 }
 </script>
@@ -147,5 +149,5 @@ function openBooking(qty: number) {
     </div>
 
     <!-- Booking drawer -->
-    <BookingDrawer v-if="!isCompleted" v-model:open="showBooking" :event="eventData" :initial-quantity="bookingQuantity" />
+    <BookingDrawer v-if="!isCompleted" v-model:open="showBooking" :event="eventData" :initial-quantity="bookingQuantity" :initial-tier-id="bookingTierId" />
 </template>

@@ -29,6 +29,12 @@ class CreateBooking
                 throw new BookingCapacityException;
             }
 
+            $tier = filled($data['event_price_tier_id'] ?? null)
+                ? $lockedEvent->priceTiers()->findOrFail($data['event_price_tier_id'])
+                : null;
+
+            $unitPrice = $tier !== null ? $tier->price : $lockedEvent->price;
+
             /** @var Booking $booking */
             $booking = Booking::create([
                 'event_id' => $lockedEvent->id,
@@ -36,7 +42,10 @@ class CreateBooking
                 'contact_email' => $data['contact_email'],
                 'contact_phone' => $data['contact_phone'],
                 'quantity' => $data['quantity'],
-                'total_price' => $lockedEvent->price * $data['quantity'],
+                'event_price_tier_id' => $tier?->id,
+                'tier_name' => $tier?->name,
+                'unit_price' => $unitPrice,
+                'total_price' => $unitPrice * $data['quantity'],
                 'payment_status' => 'pending',
             ]);
 

@@ -24,6 +24,7 @@ class EventController extends Controller
     {
         $featuredEvents = Event::published()
             ->with('media')
+            ->withCount('priceTiers')
             ->orderBy('start_date')
             ->limit(3)
             ->get();
@@ -82,7 +83,7 @@ class EventController extends Controller
      */
     public function list(Request $request): Response
     {
-        $query = Event::published()->with('media');
+        $query = Event::published()->with('media')->withCount('priceTiers');
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -104,6 +105,7 @@ class EventController extends Controller
         $event = Event::query()->whereRaw('slug = ?', [$slug], 'and')
             ->with([
                 'media',
+                'priceTiers',
                 'questions' => fn ($query) => $query->orderBy('sort_order'),
                 'reviews' => fn ($query) => $query->where('is_approved', true)->latest()->limit(20),
             ])

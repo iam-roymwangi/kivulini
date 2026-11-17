@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\ProcessEventMedia;
+use App\Actions\SyncEventPriceTiers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreEventRequest;
 use App\Http\Requests\Admin\UpdateEventRequest;
@@ -45,11 +46,11 @@ class EventController extends Controller
     /**
      * Store a newly created event.
      */
-    public function store(StoreEventRequest $request, ProcessEventMedia $processor): RedirectResponse
+    public function store(StoreEventRequest $request, ProcessEventMedia $processor, SyncEventPriceTiers $syncPriceTiers): RedirectResponse
     {
-        $event = DB::transaction(function () use ($request, $processor): Event {
+        $event = DB::transaction(function () use ($request, $processor, $syncPriceTiers): Event {
             $event = Event::create([
-                ...$request->safe()->except(['images', 'questions']),
+                ...$request->safe()->except(['images', 'questions', 'price_tiers']),
                 'slug' => Str::slug($request->title).'-'.Str::lower(Str::random(6)),
             ]);
 
@@ -62,6 +63,8 @@ class EventController extends Controller
                     ]);
                 }
             }
+
+            $syncPriceTiers->handle($event, $request->validated('price_tiers') ?? []);
 
             // Create questions
             foreach ($request->input('questions', []) as $i => $q) {
@@ -87,7 +90,7 @@ class EventController extends Controller
      */
     public function edit(Event $event): Response
     {
-        $event->load(['media', 'questions']);
+        $event->load(['media', 'questions', 'priceTiers']);
 
         return Inertia::render('admin/events/Edit', [
             'event' => $event,
@@ -97,10 +100,12 @@ class EventController extends Controller
     /**
      * Update the event.
      */
-    public function update(UpdateEventRequest $request, Event $event, ProcessEventMedia $processor): RedirectResponse
+    public function update(UpdateEventRequest $request, Event $event, ProcessEventMedia $processor, SyncEventPriceTiers $syncPriceTiers): RedirectResponse
     {
-        DB::transaction(function () use ($request, $event, $processor): void {
-            $event->update($request->safe()->except(['images', 'delete_media_ids', 'featured_media_id', 'questions', 'delete_question_ids']));
+        DB::transaction(function () use ($request, $event, $processor, $syncPriceTiers): void {
+            $event->update($request->safe()->except(['images', 'delete_media_ids', 'featured_media_id', 'questions', 'delete_question_ids', 'price_tiers']));
+
+            $syncPriceTiers->handle($event, $request->validated('price_tiers') ?? []);
 
             // Delete removed media
             foreach ($request->input('delete_media_ids', []) as $mediaId) {

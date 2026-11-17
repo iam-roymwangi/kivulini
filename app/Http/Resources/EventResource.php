@@ -33,6 +33,13 @@ class EventResource extends JsonResource
             'start_date' => $this->start_date?->toIso8601String(),
             'end_date' => $this->end_date?->toIso8601String(),
             'price' => $this->price,
+            'price_tiers' => $this->whenLoaded('priceTiers', fn () => $this->priceTiers->map(fn ($tier) => [
+                'id' => $tier->id,
+                'name' => $tier->name,
+                'price' => $tier->price,
+                'description' => $tier->description,
+            ])),
+            'price_tiers_count' => $this->whenCounted('priceTiers'),
             'capacity' => $this->capacity,
             'booked_slots' => $this->booked_slots,
             'available_slots' => $this->available_slots,

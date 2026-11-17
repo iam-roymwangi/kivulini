@@ -26,6 +26,9 @@ class Booking extends Model implements MpesaPayable
         'emergency_contact_name',
         'emergency_contact_phone',
         'quantity',
+        'event_price_tier_id',
+        'tier_name',
+        'unit_price',
         'total_price',
         'payment_status',
         'payment_reference',
@@ -38,6 +41,7 @@ class Booking extends Model implements MpesaPayable
     {
         return [
             'quantity' => 'integer',
+            'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
         ];
     }
@@ -57,6 +61,11 @@ class Booking extends Model implements MpesaPayable
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    public function priceTier(): BelongsTo
+    {
+        return $this->belongsTo(EventPriceTier::class, 'event_price_tier_id');
     }
 
     public function user(): BelongsTo

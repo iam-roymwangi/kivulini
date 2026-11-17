@@ -14,12 +14,21 @@ class UpdateEventRequest extends FormRequest
     }
 
     /**
-     * Strip unsafe markup from the rich text description before validation.
+     * Strip unsafe markup from the description and, when price tiers are
+     * given, use the cheapest tier as the event's base ("from") price.
      */
     protected function prepareForValidation(): void
     {
         if (is_string($this->input('description'))) {
             $this->merge(['description' => RichText::sanitize($this->input('description'))]);
+        }
+
+        $tierPrices = collect($this->input('price_tiers', []))
+            ->pluck('price')
+            ->filter(fn (mixed $price): bool => is_numeric($price));
+
+        if ($tierPrices->isNotEmpty()) {
+            $this->merge(['price' => $tierPrices->min()]);
         }
     }
 
@@ -46,6 +55,11 @@ class UpdateEventRequest extends FormRequest
             'delete_media_ids' => ['nullable', 'array'],
             'delete_media_ids.*' => ['integer', 'exists:event_media,id'],
             'featured_media_id' => ['nullable', 'integer', 'exists:event_media,id'],
+            'price_tiers' => ['nullable', 'array', 'max:10'],
+            'price_tiers.*.id' => ['nullable', 'integer'],
+            'price_tiers.*.name' => ['required', 'string', 'max:50', 'distinct:ignore_case'],
+            'price_tiers.*.price' => ['required', 'numeric', 'min:1'],
+            'price_tiers.*.description' => ['nullable', 'string', 'max:255'],
             'questions' => ['nullable', 'array'],
             'questions.*.id' => ['nullable', 'integer', 'exists:event_questions,id'],
             'questions.*.question_text' => ['required', 'string', 'max:255'],

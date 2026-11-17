@@ -19,6 +19,7 @@ const form = ref<EventFormData>({
     capacity: '',
     status: 'draft',
     liability_waiver_text: '',
+    price_tiers: [],
     questions: [],
     images: [],
     delete_media_ids: [],
@@ -41,6 +42,13 @@ function submit() {
         'start_date', 'end_date', 'price', 'capacity', 'status', 'liability_waiver_text',
     ];
     scalar.forEach((k) => data.append(k, (form.value[k] as string) ?? ''));
+
+    form.value.price_tiers.forEach((t, i) => {
+        if (t.id) { data.append(`price_tiers[${i}][id]`, String(t.id)); }
+        data.append(`price_tiers[${i}][name]`, t.name);
+        data.append(`price_tiers[${i}][price]`, t.price);
+        data.append(`price_tiers[${i}][description]`, t.description);
+    });
 
     // Images
     form.value.images.forEach((f) => data.append('images[]', f));

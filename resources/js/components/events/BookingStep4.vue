@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { store as storeBooking } from '@/routes/bookings';
 import { csrfHeaders } from '@/lib/utils';
+import { store as storeBooking } from '@/routes/bookings';
 import type { BookingPayload, PlatformEvent } from '@/types';
 
 const props = defineProps<{
@@ -19,7 +19,10 @@ const submitting = ref(false);
 const serverErrors = ref<string[]>([]);
 const phoneError = ref('');
 
-const unitPrice = computed(() => parseFloat(props.event.price));
+const selectedTier = computed(() =>
+    (props.event.price_tiers ?? []).find((t) => t.id === props.payload.event_price_tier_id) ?? null,
+);
+const unitPrice = computed(() => parseFloat(selectedTier.value?.price ?? props.event.price));
 const totalPrice = computed(() => unitPrice.value * props.payload.quantity);
 
 const formatKES = (n: number) =>
@@ -40,6 +43,7 @@ async function submit() {
 
     if (!mpesaPhone.value.trim()) {
         phoneError.value = 'M-Pesa phone number is required.';
+
         return;
     }
 
@@ -99,6 +103,10 @@ async function submit() {
                 <div class="flex justify-between text-muted-foreground">
                     <span>Location</span>
                     <span>{{ event.location }}</span>
+                </div>
+                <div v-if="selectedTier" class="flex justify-between text-muted-foreground">
+                    <span>Ticket type</span>
+                    <span class="font-semibold text-foreground">{{ selectedTier.name }}</span>
                 </div>
                 <div class="flex justify-between text-muted-foreground">
                     <span>Slots</span>

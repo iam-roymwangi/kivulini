@@ -7,22 +7,27 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'open-booking', quantity: number): void;
+    (e: 'open-booking', quantity: number, tierId: number | null): void;
 }>();
 
 const quantity = ref(1);
 
+const tiers = computed(() => props.event.price_tiers ?? []);
+const selectedTierId = ref<number | null>(tiers.value[0]?.id ?? null);
+const selectedTier = computed(() => tiers.value.find((t) => t.id === selectedTierId.value) ?? null);
+
 const isPublished = computed(() => props.event.status === 'published');
 const isSoldOut = computed(() => props.event.available_slots === 0);
 
-const unitPrice = computed(() => parseFloat(props.event.price));
+const unitPrice = computed(() => parseFloat(selectedTier.value?.price ?? props.event.price));
 const totalPrice = computed(() => unitPrice.value * quantity.value);
 
 const maxQuantity = computed(() => Math.min(props.event.available_slots, 10));
 
-const formattedUnit = computed(() =>
-    new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(unitPrice.value),
-);
+const formatKES = (amount: number | string) =>
+    new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(Number(amount));
+
+const formattedUnit = computed(() => formatKES(unitPrice.value));
 
 const formattedTotal = computed(() =>
     new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 }).format(totalPrice.value),
@@ -38,8 +43,11 @@ const formattedDate = computed(() =>
 );
 
 function proceedToBooking() {
-    if (!isPublished.value || isSoldOut.value) { return; }
-    emit('open-booking', quantity.value);
+    if (!isPublished.value || isSoldOut.value) {
+ return; 
+}
+
+    emit('open-booking', quantity.value, selectedTier.value?.id ?? null);
 }
 </script>
 
@@ -63,6 +71,36 @@ function proceedToBooking() {
             </p>
             <p v-else class="text-sm font-bold text-red-500">Sold Out</p>
         </div>
+
+        <!-- Ticket tier selector -->
+        <fieldset v-if="tiers.length > 0 && !isSoldOut && isPublished" class="mb-5">
+            <legend class="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">Ticket type</legend>
+            <div class="space-y-2">
+                <label
+                    v-for="tier in tiers"
+                    :key="tier.id"
+                    class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors"
+                    :class="selectedTierId === tier.id
+                        ? 'border-amber-400 bg-amber-400/10'
+                        : 'border-slate-200 hover:border-amber-400/60 dark:border-slate-700'"
+                >
+                    <input
+                        v-model="selectedTierId"
+                        type="radio"
+                        name="ticket-tier"
+                        :value="tier.id"
+                        class="mt-1 accent-amber-400"
+                    />
+                    <span class="min-w-0 flex-1">
+                        <span class="flex items-baseline justify-between gap-2">
+                            <span class="font-bold text-slate-900 dark:text-white">{{ tier.name }}</span>
+                            <span class="shrink-0 text-sm font-bold text-amber-500 dark:text-amber-400">{{ formatKES(tier.price) }}</span>
+                        </span>
+                        <span v-if="tier.description" class="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">{{ tier.description }}</span>
+                    </span>
+                </label>
+            </div>
+        </fieldset>
 
         <!-- Quantity selector -->
         <div v-if="!isSoldOut && isPublished" class="mb-5">
@@ -99,7 +137,7 @@ function proceedToBooking() {
         <!-- Price breakdown -->
         <div class="mb-6 space-y-2 border-t border-slate-200 pt-4 dark:border-slate-700">
             <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400">
-                <span>{{ formattedUnit }} × {{ quantity }}</span>
+                <span>{{ selectedTier ? `${selectedTier.name} · ` : '' }}{{ formattedUnit }} × {{ quantity }}</span>
                 <span class="text-slate-900 dark:text-white">{{ formattedTotal }}</span>
             </div>
             <div class="flex justify-between font-bold text-slate-900 dark:text-white">

@@ -27,6 +27,7 @@ By proceeding, you confirm that you have read, understood, and agree to these te
 const props = defineProps<{
     event: PlatformEvent;
     initialQuantity?: number;
+    initialTierId?: number | null;
 }>();
 
 const open = defineModel<boolean>('open', { default: false });
@@ -63,6 +64,7 @@ const paymentError = ref('');
 
 const bookingPayload = ref<Partial<BookingPayload>>({
     quantity: props.initialQuantity ?? 1,
+    event_price_tier_id: props.initialTierId ?? null,
     responses: [],
     consent: { agreed: false, signer_name: '' },
 });
@@ -80,6 +82,9 @@ watch(
 watch(open, (isOpen) => {
     if (isOpen && props.initialQuantity) {
         bookingPayload.value.quantity = props.initialQuantity;
+    }
+    if (isOpen) {
+        bookingPayload.value.event_price_tier_id = props.initialTierId ?? null;
     }
 });
 
@@ -124,6 +129,7 @@ function handleClose() {
     paymentError.value = '';
     bookingPayload.value = {
         quantity: props.initialQuantity ?? 1,
+        event_price_tier_id: props.initialTierId ?? null,
         responses: [],
         consent: { agreed: false, signer_name: '' },
     };

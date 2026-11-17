@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { X, ChevronLeft, ChevronRight, ZoomIn, Play } from '@lucide/vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import type { EventMedia } from '@/types';
 
 const props = defineProps<{
@@ -9,17 +9,33 @@ const props = defineProps<{
 
 // --- normalise the media list regardless of resource wrapper shape ---
 const mediaList = computed<EventMedia[]>(() => {
-    if (!props.media) { return []; }
-    if (Array.isArray(props.media)) { return props.media; }
+    if (!props.media) {
+ return []; 
+}
+
+    if (Array.isArray(props.media)) {
+ return props.media; 
+}
+
     if (typeof props.media === 'object' && 'data' in (props.media as any)) {
         return (props.media as any).data ?? [];
     }
+
     return [];
 });
 
-const sorted = computed(() =>
-    [...mediaList.value].sort((a, b) => a.sort_order - b.sort_order),
-);
+// The cover (featured) image leads, matching the cover used on event cards;
+// the rest follow in their admin-defined order.
+const sorted = computed(() => {
+    const ordered = [...mediaList.value].sort((a, b) => a.sort_order - b.sort_order);
+    const coverIndex = ordered.findIndex((m) => m.is_featured);
+
+    if (coverIndex > 0) {
+        ordered.unshift(...ordered.splice(coverIndex, 1));
+    }
+
+    return ordered;
+});
 
 // ---- lightbox state ----
 const lightboxOpen = ref(false);
@@ -45,10 +61,17 @@ function next() {
 }
 
 function onKeydown(e: KeyboardEvent) {
-    if (!lightboxOpen.value) { return; }
-    if (e.key === 'ArrowLeft') { prev(); }
-    else if (e.key === 'ArrowRight') { next(); }
-    else if (e.key === 'Escape') { closeLightbox(); }
+    if (!lightboxOpen.value) {
+ return; 
+}
+
+    if (e.key === 'ArrowLeft') {
+ prev(); 
+} else if (e.key === 'ArrowRight') {
+ next(); 
+} else if (e.key === 'Escape') {
+ closeLightbox(); 
+}
 }
 
 onMounted(() => window.addEventListener('keydown', onKeydown));
@@ -79,41 +102,37 @@ const remaining = computed(() => sorted.value.length - 5); // items beyond slot 
             <span class="text-xs font-semibold uppercase tracking-widest text-slate-600">No photos yet</span>
         </div>
 
-        <!-- ── Main grid layout ── -->
-        <div
-            v-else
-            class="grid gap-2"
-            :class="{
-                'grid-cols-1':                        extras.length === 0,
-                'grid-cols-1 md:grid-cols-2':         extras.length === 1,
-                'grid-cols-2 md:grid-cols-3':         extras.length >= 2,
-            }"
-        >
-            <!-- Hero cell — always spans full height on left -->
+        <!-- ── Main layout ── -->
+        <div v-else class="space-y-2">
+            <!-- Poster — shown uncropped at its natural aspect ratio -->
             <div
-                class="group relative cursor-pointer overflow-hidden rounded-2xl bg-slate-900"
-                :class="{
-                    'aspect-video':                   extras.length === 0,
-                    'md:row-span-2':                  extras.length >= 2,
-                    'aspect-video md:aspect-auto':    extras.length >= 2,
-                }"
+                class="group relative flex cursor-pointer items-center justify-center overflow-hidden rounded-2xl bg-slate-900"
                 @click="openLightbox(0)"
             >
+                <!-- Blurred backdrop fills the side space around portrait posters -->
+                <img
+                    v-if="hero.type !== 'video'"
+                    :src="hero.url"
+                    alt=""
+                    aria-hidden="true"
+                    class="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-2xl"
+                />
                 <video
                     v-if="hero.type === 'video'"
                     :src="hero.url"
-                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    class="relative max-h-[85vh] w-full object-contain"
                     muted
                     playsinline
                 />
                 <img
                     v-else
                     :src="hero.url"
-                    alt="Event photo 1"
-                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    alt="Event poster"
+                    class="relative mx-auto block h-auto max-h-[85vh] w-auto max-w-full object-contain shadow-2xl"
+                    fetchpriority="high"
                 />
                 <!-- hover overlay -->
-                <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/30">
+                <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/20">
                     <div class="scale-75 rounded-full bg-white/20 p-3 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
                         <Play v-if="hero.type === 'video'" class="h-6 w-6 text-white" />
                         <ZoomIn v-else class="h-6 w-6 text-white" />
@@ -121,11 +140,12 @@ const remaining = computed(() => sorted.value.length - 5); // items beyond slot 
                 </div>
             </div>
 
-            <!-- Extra cells — right column(s) -->
-            <template v-for="(item, i) in extras" :key="item.id">
+            <!-- Other photos -->
+            <div v-if="extras.length > 0" class="grid grid-cols-2 gap-2 md:grid-cols-4">
                 <div
-                    class="group relative cursor-pointer overflow-hidden rounded-2xl bg-slate-900"
-                    :class="extras.length >= 2 ? 'aspect-square md:aspect-video' : 'aspect-video'"
+                    v-for="(item, i) in extras"
+                    :key="item.id"
+                    class="group relative aspect-video cursor-pointer overflow-hidden rounded-2xl bg-slate-900"
                     @click="openLightbox(i + 1)"
                 >
                     <img
@@ -152,7 +172,7 @@ const remaining = computed(() => sorted.value.length - 5); // items beyond slot 
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
         </div>
 
         <!-- ── Lightbox ── -->

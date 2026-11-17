@@ -63,6 +63,11 @@ class Event extends Model
         return $this->hasMany(EventQuestion::class)->orderBy('sort_order');
     }
 
+    public function priceTiers(): HasMany
+    {
+        return $this->hasMany(EventPriceTier::class)->orderBy('sort_order');
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);

@@ -260,7 +260,7 @@
                         <div class="brand-sub">Trip Pass &middot; Keep this with you</div>
                     </td>
                     <td style="vertical-align: middle; text-align: right;">
-                        <span class="admit">Admit {{ $booking->quantity }}</span>
+                        <span class="admit">@if ($booking->tier_name){{ $booking->tier_name }} &middot; @endif Admit {{ $booking->quantity }}</span>
                     </td>
                 </tr>
             </table>
@@ -319,7 +319,7 @@
                         <div class="fact">
                             <div class="eyebrow">Guests</div>
                             <div class="fact-value">{{ $booking->quantity }} {{ \Illuminate\Support\Str::plural('Traveller', $booking->quantity) }}</div>
-                            <div class="fact-sub">Lead: {{ \Illuminate\Support\Str::limit($booking->contact_name, 18) }}</div>
+                            <div class="fact-sub">{{ $booking->tier_name ? $booking->tier_name.' ticket' : 'Lead: '.\Illuminate\Support\Str::limit($booking->contact_name, 18) }}</div>
                         </div>
                     </td>
                 </tr>

@@ -23,6 +23,13 @@ interface QuestionRecord {
     sort_order: number;
 }
 
+interface PriceTierRecord {
+    id: number;
+    name: string;
+    price: string;
+    description: string | null;
+}
+
 interface EventRecord {
     id: number;
     title: string;
@@ -41,6 +48,7 @@ interface EventRecord {
     slug: string;
     media: EventMediaRecord[];
     questions: QuestionRecord[];
+    price_tiers?: PriceTierRecord[];
 }
 
 const props = defineProps<{
@@ -80,6 +88,12 @@ const form = ref<EventFormData>({
     capacity: String(props.event.capacity),
     status: props.event.status,
     liability_waiver_text: props.event.liability_waiver_text ?? '',
+    price_tiers: (props.event.price_tiers ?? []).map((t) => ({
+        id: t.id,
+        name: t.name,
+        price: String(Math.round(parseFloat(t.price))),
+        description: t.description ?? '',
+    })),
     questions: props.event.questions
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((q) => ({
@@ -118,6 +132,13 @@ function submit() {
 
     form.value.delete_media_ids.forEach((id) => data.append('delete_media_ids[]', String(id)));
     form.value.delete_question_ids.forEach((id) => data.append('delete_question_ids[]', String(id)));
+
+    form.value.price_tiers.forEach((t, i) => {
+        if (t.id) { data.append(`price_tiers[${i}][id]`, String(t.id)); }
+        data.append(`price_tiers[${i}][name]`, t.name);
+        data.append(`price_tiers[${i}][price]`, t.price);
+        data.append(`price_tiers[${i}][description]`, t.description);
+    });
 
     form.value.images.forEach((f) => data.append('images[]', f));
 
