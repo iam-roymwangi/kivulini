@@ -59,6 +59,8 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    --color-brand: var(--brand);
 }
 
 /*
@@ -115,6 +117,7 @@
     --chart-4: hsl(43 74% 66%);
     --chart-5: hsl(27 87% 67%);
     --radius: 0.5rem;
+    --brand: hsl(154 36% 12%);
     --sidebar-background: hsl(0 0% 98%);
     --sidebar-foreground: hsl(240 5.3% 26.1%);
     --sidebar-primary: hsl(0 0% 10%);
@@ -146,6 +149,7 @@
     --border: hsl(0 0% 14.9%);
     --input: hsl(0 0% 14.9%);
     --ring: hsl(0 0% 83.1%);
+    --brand: hsl(154 36% 12%);
     --chart-1: hsl(220 70% 50%);
     --chart-2: hsl(160 60% 45%);
     --chart-3: hsl(30 80% 55%);
@@ -168,5 +172,44 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/* Rendered output of the admin rich text editor (event descriptions). */
+@layer components {
+    .rich-text {
+        line-height: 1.75;
+        overflow-wrap: anywhere;
+    }
+    .rich-text > * + * {
+        margin-top: 1em;
+    }
+    .rich-text h2 {
+        @apply mt-6 text-xl font-bold text-foreground;
+    }
+    .rich-text h3 {
+        @apply mt-5 text-lg font-semibold text-foreground;
+    }
+    .rich-text h4 {
+        @apply mt-4 font-semibold text-foreground;
+    }
+    .rich-text strong,
+    .rich-text b {
+        @apply font-semibold text-foreground;
+    }
+    .rich-text a {
+        @apply text-amber-500 underline underline-offset-2 hover:text-amber-600;
+    }
+    .rich-text ul {
+        @apply list-disc pl-6;
+    }
+    .rich-text ol {
+        @apply list-decimal pl-6;
+    }
+    .rich-text li + li {
+        margin-top: 0.25em;
+    }
+    .rich-text blockquote {
+        @apply border-l-4 border-amber-400 pl-4 italic;
     }
 }

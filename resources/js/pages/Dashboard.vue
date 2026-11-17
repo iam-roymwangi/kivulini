@@ -75,7 +75,7 @@ function formatDate(dateStr: string) {
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950 p-6 md:p-8 shadow-xl">
             <!-- Decorative backdrop glow -->
             <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-500/20 blur-3xl" />
-            <div class="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
+            <div class="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-brand/10 blur-3xl" />
             
             <div class="relative z-10 space-y-2">
                 <h1 class="text-3xl font-black tracking-tight text-white sm:text-4xl">
@@ -141,7 +141,7 @@ function formatDate(dateStr: string) {
             <div class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/30 hover:shadow-md dark:border-slate-800">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-muted-foreground">Tickets Sold</span>
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 dark:bg-blue-500/20">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand dark:bg-brand/20">
                         <Users class="h-5 w-5" />
                     </div>
                 </div>

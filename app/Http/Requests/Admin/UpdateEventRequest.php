@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Support\RichText;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -10,6 +11,16 @@ class UpdateEventRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    /**
+     * Strip unsafe markup from the rich text description before validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('description'))) {
+            $this->merge(['description' => RichText::sanitize($this->input('description'))]);
+        }
     }
 
     /**

@@ -157,6 +157,28 @@ test('downloadPass view contains required booking and event fields', function ()
         ->toContain($booking->contact_email);
 });
 
+test('downloadPass view shows the amount paid and M-Pesa receipt', function () {
+    $event = makeEvent();
+
+    $booking = Booking::create([
+        'event_id' => $event->id,
+        'contact_name' => 'Jane Doe',
+        'contact_email' => 'jane@example.com',
+        'contact_phone' => '+254700000001',
+        'quantity' => 2,
+        'total_price' => '3000.00',
+        'payment_status' => 'paid',
+        'payment_reference' => 'SKL4ABC9XY',
+    ]);
+
+    $html = view('bookings.pass-pdf', ['booking' => $booking])->render();
+
+    expect($html)
+        ->toContain('KES 3,000')
+        ->toContain('SKL4ABC9XY')
+        ->toContain('Admit 2');
+});
+
 // --- cancel() ---
 
 test('cancel updates payment_status to cancelled and releases booked slots if paid', function () {

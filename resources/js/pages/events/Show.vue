@@ -84,7 +84,7 @@ function openBooking(qty: number) {
                     <div>
                         <h2 class="mb-4 text-xl font-bold text-foreground">About this Trip</h2>
                         <!-- eslint-disable-next-line vue/no-v-html -->
-                        <div class="prose max-w-none text-slate-700 dark:prose-invert dark:text-slate-300"
+                        <div class="rich-text max-w-none text-slate-700 dark:text-slate-300"
                             v-html="eventData.description" />
                     </div>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Plus, Trash2, GripVertical } from '@lucide/vue';
+import RichTextEditor from '@/components/admin/RichTextEditor.vue';
 
 export interface EventFormData {
     title: string;
@@ -203,7 +204,7 @@ const remainingMedia = computed(() =>
 
         <div>
             <label class="form-label">Description *</label>
-            <textarea rows="6" class="form-input" :value="form.description" @input="patch({ description: ($event.target as HTMLTextAreaElement).value })" />
+            <RichTextEditor :model-value="form.description" placeholder="Describe the trip..." @update:model-value="patch({ description: $event })" />
             <p v-if="errors.description" class="form-error">{{ errors.description }}</p>
         </div>
 

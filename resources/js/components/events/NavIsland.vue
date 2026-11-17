@@ -53,7 +53,7 @@ function isActive(href: string): boolean {
 <template>
     <div class="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
         <nav
-            class="flex w-full max-w-4xl items-center justify-between rounded-full border border-slate-200/60 bg-white/80 px-6 py-3 shadow-lg backdrop-blur-md transition-colors dark:border-slate-700/50 dark:bg-slate-900/80"
+            class="flex w-full max-w-4xl items-center justify-between rounded-full border border-brand/40 bg-brand px-6 py-3 shadow-lg backdrop-blur-md transition-colors dark:border-brand/60 dark:bg-brand"
             aria-label="Main navigation"
         >
             <!-- Logo -->
@@ -73,8 +73,8 @@ function isActive(href: string): boolean {
                     :href="link.href"
                     class="relative text-sm font-medium transition-colors"
                     :class="isActive(link.href)
-                        ? 'text-amber-500 dark:text-amber-400'
-                        : 'text-slate-600 hover:text-amber-500 dark:text-slate-300 dark:hover:text-amber-400'"
+                        ? 'text-amber-400'
+                        : 'text-white/80 hover:text-amber-400'"
                 >
                     {{ link.title }}
                     <span
@@ -113,7 +113,7 @@ function isActive(href: string): boolean {
                 <Button
                     variant="ghost"
                     size="icon"
-                    class="h-9 w-9 text-slate-600 hover:text-amber-500 dark:text-slate-300 dark:hover:text-amber-400"
+                    class="h-9 w-9 text-white/80 hover:text-amber-400 hover:bg-white/10"
                     :aria-label="resolvedAppearance === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
                     @click="toggleTheme"
                 >
@@ -123,7 +123,7 @@ function isActive(href: string): boolean {
 
                 <!-- Mobile hamburger -->
                 <button
-                    class="relative flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white md:hidden"
+                    class="relative flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 md:hidden"
                     :aria-label="mobileOpen ? 'Close menu' : 'Open menu'"
                     :aria-expanded="mobileOpen"
                     @click="mobileOpen = !mobileOpen"
@@ -192,7 +192,7 @@ function isActive(href: string): boolean {
                                     :href="link.href"
                                     class="flex items-center gap-4 rounded-2xl px-4 py-3.5 text-base font-semibold transition-colors"
                                     :class="isActive(link.href)
-                                        ? 'bg-amber-50 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400'
+                                        ? 'bg-brand/10 text-brand dark:bg-brand/20 dark:text-brand'
                                         : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'"
                                     :style="{ transitionDelay: `${i * 40}ms` }"
                                 >
@@ -204,7 +204,7 @@ function isActive(href: string): boolean {
                                     {{ link.title }}
                                     <span
                                         v-if="isActive(link.href)"
-                                        class="ml-auto h-2 w-2 rounded-full bg-amber-400"
+                                        class="ml-auto h-2 w-2 rounded-full bg-brand"
                                     />
                                 </Link>
                             </TransitionGroup>
@@ -230,7 +230,7 @@ function isActive(href: string): boolean {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="Instagram"
-                                    class="rounded-full border border-slate-200 p-2 text-slate-500 transition-all hover:border-amber-400 hover:text-amber-500 dark:border-slate-700 dark:text-slate-400"
+                                    class="rounded-full border border-slate-200 p-2 text-slate-500 transition-all hover:border-brand hover:text-brand dark:border-slate-700 dark:text-slate-400"
                                 >
                                     <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
                                 </a>
@@ -239,7 +239,7 @@ function isActive(href: string): boolean {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="TikTok"
-                                    class="rounded-full border border-slate-200 p-2 text-slate-500 transition-all hover:border-amber-400 hover:text-amber-500 dark:border-slate-700 dark:text-slate-400"
+                                    class="rounded-full border border-slate-200 p-2 text-slate-500 transition-all hover:border-brand hover:text-brand dark:border-slate-700 dark:text-slate-400"
                                 >
                                     <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
                                 </a>
