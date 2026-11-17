@@ -6,16 +6,22 @@ const { resolvedAppearance } = useAppearance();
 
 const currentYear = new Date().getFullYear();
 
-const exploreLinks = [
-    { label: 'All Trips & Events', href: '/events' },
-    { label: 'Road Trips', href: '/events?type=road_trip' },
-    { label: 'Vacations & Getaways', href: '/events?type=vacation' },
+const quickLinks = [
+    { label: 'Home', href: '/' },
+    { label: 'Upcoming Trips & Events', href: '/events' },
+    { label: 'Kivulini Merchandise', href: '/merchandise' },
+    { label: 'Past Trips Gallery', href: '/gallery' },
+    { label: 'About Kivulini Adventures', href: '/about' },
+    { label: 'Contact Us', href: '/contact' },
 ];
 
 const categoryLinks = [
-    { label: 'About Us', href: '/about' },
-    { label: 'Past Trips Gallery', href: '/gallery' },
-    { label: 'Contact Us', href: '/contact' },
+    { label: 'Road Trips in Kenya', href: '/events?type=road_trip' },
+    { label: 'Hiking Trips', href: '/events?type=hiking' },
+    { label: 'Wildlife Safaris', href: '/events?type=wildlife_safari' },
+    { label: 'Cultural & Heritage Tours', href: '/events?type=cultural_heritage' },
+    { label: 'Food & Music Experiences', href: '/events?type=food_music' },
+    { label: 'Vacations & Getaways', href: '/events?type=vacation' },
 ];
 
 const contactInfo = [
@@ -52,29 +58,29 @@ const contactInfo = [
                     </div>
                 </div>
 
-                <!-- Column 2: Explore -->
-                <div class="space-y-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-foreground">Explore</h3>
+                <!-- Column 2: Quick Links -->
+                <nav class="space-y-4" aria-labelledby="footer-quick-links">
+                    <h3 id="footer-quick-links" class="text-sm font-bold uppercase tracking-wider text-foreground">Quick Links</h3>
                     <ul class="space-y-2.5">
-                        <li v-for="link in exploreLinks" :key="link.label">
+                        <li v-for="link in quickLinks" :key="link.href">
                             <Link :href="link.href" class="text-sm text-muted-foreground transition-all duration-200 hover:text-amber-500 hover:translate-x-0.5 inline-block">
                                 {{ link.label }}
                             </Link>
                         </li>
                     </ul>
-                </div>
+                </nav>
 
                 <!-- Column 3: Trip Categories -->
-                <div class="space-y-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-foreground">Categories</h3>
+                <nav class="space-y-4" aria-labelledby="footer-trip-categories">
+                    <h3 id="footer-trip-categories" class="text-sm font-bold uppercase tracking-wider text-foreground">Trip Categories</h3>
                     <ul class="space-y-2.5">
-                        <li v-for="link in categoryLinks" :key="link.label">
+                        <li v-for="link in categoryLinks" :key="link.href">
                             <Link :href="link.href" class="text-sm text-muted-foreground transition-all duration-200 hover:text-amber-500 hover:translate-x-0.5 inline-block">
                                 {{ link.label }}
                             </Link>
                         </li>
                     </ul>
-                </div>
+                </nav>
 
                 <!-- Column 4: Contact -->
                 <div class="space-y-4">
