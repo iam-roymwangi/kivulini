@@ -49,6 +49,7 @@ function tierBookingPayload(array $overrides = []): array
         'consent' => ['agreed' => true, 'signer_name' => 'Jane Doe'],
         'payment_method' => 'mpesa',
         'mpesa_phone' => '0700000001',
+        'accept_terms' => true,
     ], $overrides);
 }
 

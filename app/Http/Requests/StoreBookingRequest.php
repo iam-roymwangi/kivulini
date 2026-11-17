@@ -45,6 +45,7 @@ class StoreBookingRequest extends FormRequest
             'responses.*.answer' => ['nullable', 'string'],
             'consent.agreed' => ['required', 'accepted'],
             'consent.signer_name' => ['required', 'string', 'max:255'],
+            'accept_terms' => ['accepted'],
             'payment_method' => ['required', 'in:mpesa'],
             'mpesa_phone' => ['required', 'string', 'max:20', new KenyanMpesaPhone],
         ];
@@ -58,6 +59,7 @@ class StoreBookingRequest extends FormRequest
         return [
             'event_price_tier_id.required' => 'Please choose a ticket type.',
             'event_price_tier_id.exists' => 'The selected ticket type is no longer available.',
+            'accept_terms.accepted' => 'You must agree to the Privacy Policy and Terms of Service to book.',
         ];
     }
 }

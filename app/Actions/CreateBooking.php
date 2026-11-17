@@ -47,6 +47,7 @@ class CreateBooking
                 'unit_price' => $unitPrice,
                 'total_price' => $unitPrice * $data['quantity'],
                 'payment_status' => 'pending',
+                'terms_accepted_at' => now(),
             ]);
 
             $lockedEvent->increment('booked_slots', $data['quantity']);

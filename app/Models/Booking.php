@@ -32,6 +32,7 @@ class Booking extends Model implements MpesaPayable
         'total_price',
         'payment_status',
         'payment_reference',
+        'terms_accepted_at',
     ];
 
     /**
@@ -43,6 +44,7 @@ class Booking extends Model implements MpesaPayable
             'quantity' => 'integer',
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
+            'terms_accepted_at' => 'datetime',
         ];
     }
 

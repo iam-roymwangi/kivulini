@@ -40,6 +40,7 @@ function validPayload(array $overrides = []): array
         ],
         'payment_method' => 'mpesa',
         'mpesa_phone' => '0700000001',
+        'accept_terms' => true,
     ], $overrides);
 }
 
@@ -79,6 +80,18 @@ test('store creates booking and returns 201 with booking reference', function ()
     ]);
     expect($event->fresh()->booked_slots)->toBe(3);
     expect($event->fresh()->available_slots)->toBe(7);
+    expect(Booking::sole()->terms_accepted_at)->not->toBeNull();
+});
+
+test('store rejects a booking when the privacy policy and terms are not accepted', function () {
+    $event = makeEvent(['capacity' => 10, 'booked_slots' => 0]);
+
+    $this->postJson("/events/{$event->id}/bookings", validPayload(['accept_terms' => false]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('accept_terms');
+
+    expect(Booking::count())->toBe(0)
+        ->and($event->fresh()->booked_slots)->toBe(0);
 });
 
 test('store returns 422 when event is sold out', function () {

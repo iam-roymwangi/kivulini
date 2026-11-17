@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { csrfHeaders } from '@/lib/utils';
+import { privacy, terms } from '@/routes';
 import { store as storeBooking } from '@/routes/bookings';
 import type { BookingPayload, PlatformEvent } from '@/types';
 
@@ -18,6 +19,8 @@ const mpesaPhone = ref(props.payload.contact_phone ?? '');
 const submitting = ref(false);
 const serverErrors = ref<string[]>([]);
 const phoneError = ref('');
+const acceptedTerms = ref(false);
+const termsError = ref('');
 
 const selectedTier = computed(() =>
     (props.event.price_tiers ?? []).find((t) => t.id === props.payload.event_price_tier_id) ?? null,
@@ -41,9 +44,17 @@ async function submit() {
     phoneError.value = '';
     serverErrors.value = [];
 
+    termsError.value = '';
+
     if (!mpesaPhone.value.trim()) {
         phoneError.value = 'M-Pesa phone number is required.';
+    }
 
+    if (!acceptedTerms.value) {
+        termsError.value = 'Please agree to the Privacy Policy and Terms of Service to continue.';
+    }
+
+    if (phoneError.value || termsError.value) {
         return;
     }
 
@@ -57,6 +68,7 @@ async function submit() {
                 ...props.payload,
                 payment_method: 'mpesa',
                 mpesa_phone: mpesaPhone.value.trim(),
+                accept_terms: acceptedTerms.value,
             }),
         });
 
@@ -143,6 +155,31 @@ async function submit() {
             <p class="mt-2 text-xs text-muted-foreground">A prompt will be sent to this number. Use the Safaricom line registered to M-Pesa.</p>
         </div>
 
+        <div>
+            <label
+                class="flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors hover:bg-muted/20"
+                :class="termsError ? 'border-red-500' : acceptedTerms ? 'border-amber-400/50 bg-amber-400/5' : 'border-border'"
+            >
+                <input
+                    v-model="acceptedTerms"
+                    type="checkbox"
+                    required
+                    class="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-amber-400"
+                    :aria-invalid="termsError ? 'true' : 'false'"
+                    aria-describedby="accept_terms_error"
+                    @change="termsError = ''"
+                />
+                <span class="text-sm leading-relaxed text-foreground">
+                    I have read and agree to the
+                    <a :href="privacy.url()" target="_blank" rel="noopener" class="font-semibold text-amber-500 underline underline-offset-2 hover:text-amber-400" @click.stop>Privacy Policy</a>
+                    and
+                    <a :href="terms.url()" target="_blank" rel="noopener" class="font-semibold text-amber-500 underline underline-offset-2 hover:text-amber-400" @click.stop>Terms of Service</a>.
+                    <span class="text-amber-500" aria-hidden="true">*</span>
+                </span>
+            </label>
+            <p v-if="termsError" id="accept_terms_error" class="mt-1 text-xs text-red-400" role="alert">{{ termsError }}</p>
+        </div>
+
         <div class="flex gap-3 pt-2">
             <button
                 type="button"
@@ -154,7 +191,7 @@ async function submit() {
             </button>
             <button
                 type="button"
-                :disabled="submitting"
+                :disabled="submitting || !acceptedTerms"
                 class="flex-1 rounded-xl bg-amber-400 py-3.5 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-300 active:scale-95 disabled:opacity-60"
                 @click="submit"
             >

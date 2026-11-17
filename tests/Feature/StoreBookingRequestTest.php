@@ -34,6 +34,7 @@ function validBookingPayload(): array
         ],
         'payment_method' => 'mpesa',
         'mpesa_phone' => '0700000001',
+        'accept_terms' => true,
     ];
 }
 
@@ -166,3 +167,15 @@ test('contact_phone max 30 characters enforced', function () {
 
     expect($validator->errors()->has('contact_phone'))->toBeTrue();
 });
+
+test('accept_terms must be accepted', function (mixed $value) {
+    $data = validBookingPayload();
+    $data['accept_terms'] = $value;
+
+    $validator = validateBookingRequest($data);
+
+    expect($validator->errors()->has('accept_terms'))->toBeTrue();
+})->with([
+    'missing' => [null],
+    'unchecked' => [false],
+]);
