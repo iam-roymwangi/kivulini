@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SEOHead from '@/components/SEOHead.vue';
 import MasonryGallery from '@/components/events/MasonryGallery.vue';
 import ModernPagination from '@/components/events/ModernPagination.vue';
 import type { EventMedia } from '@/types/events';
@@ -11,13 +10,6 @@ defineProps<{
 </script>
 
 <template>
-    <SEOHead
-        title="Past Trips Photo Gallery"
-        description="Browse photos from Kivulini Adventures' past hikes, road trips, and vacations across Kenya and East Africa."
-        keywords="Kivulini Adventures gallery, Kenya trip photos, hiking photos Kenya, adventure gallery East Africa"
-        canonical="https://kivuliniadventures.com/gallery"
-        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
-    />
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

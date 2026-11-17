@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import SEOHead from '@/components/SEOHead.vue';
 import { GalleryHorizontal, MapPin, Users, Star, Flag } from '@lucide/vue';
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
@@ -58,14 +57,6 @@ defineProps<{
 </script>
 
 <template>
-    <SEOHead
-        title="Kivulini Adventures | Explore Kenya with Curated Trips"
-        description="Kivulini Adventures curates road trips, hikes, and getaway vacations across Kenya. Discover upcoming experiences, browse past trips, and book your next adventure."
-        keywords="Kivulini Adventures, Kenya trips, hiking Kenya, road trips Kenya, group travel Kenya, vacations Kenya"
-        canonical="https://kivuliniadventures.com/"
-        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
-        twitter-card="summary_large_image"
-    />
 
     <main class="bg-background text-foreground transition-colors">
         <HeroSection />

@@ -2,6 +2,7 @@
 
 use App\Models\Booking;
 use App\Models\Event;
+use App\Models\EventQuestion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
@@ -92,6 +93,24 @@ test('store rejects a booking when the privacy policy and terms are not accepted
 
     expect(Booking::count())->toBe(0)
         ->and($event->fresh()->booked_slots)->toBe(0);
+});
+
+test('store accepts optional questions left blank', function () {
+    fakeBookingStkPush();
+
+    $event = makeEvent();
+    $dietary = EventQuestion::create(['event_id' => $event->id, 'question_text' => 'Dietary preference', 'type' => 'text', 'is_required' => true]);
+    $medical = EventQuestion::create(['event_id' => $event->id, 'question_text' => 'Medical conditions', 'type' => 'text', 'is_required' => false]);
+
+    $this->postJson("/events/{$event->id}/bookings", validPayload([
+        'responses' => [
+            ['event_question_id' => $dietary->id, 'answer' => 'Vegetarian'],
+            ['event_question_id' => $medical->id, 'answer' => ''],
+        ],
+    ]))->assertCreated();
+
+    expect(Booking::sole()->responses()->pluck('answer', 'event_question_id')->all())
+        ->toBe([$dietary->id => 'Vegetarian']);
 });
 
 test('store returns 422 when event is sold out', function () {

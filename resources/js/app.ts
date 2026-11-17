@@ -8,13 +8,16 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = 'Kivulini Adventures';
 
 // Initialize theme before mounting so onMounted hooks read the correct dark class
 initializeTheme();
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    // Public pages send complete, already-branded titles from the server (see App\Support\Seo).
+    title: (title) => (!title ? appName : title.includes(appName) ? title : `${title} - ${appName}`),
+    // Keep the server-built SEO tags (page prop "head") in sync on client-side navigation.
+    serverHead: true,
     layout: (name) => {
         switch (true) {
             case name === 'Welcome':
@@ -36,11 +39,15 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });
         app.use(plugin);
-        app.mount(el);
+
+        if (el) {
+            app.mount(el);
+        }
 
         // Dismiss the initial HTML preloader once Vue has mounted (client-only)
         if (typeof document !== 'undefined') {
             const preloader = document.getElementById('app-preloader');
+
             if (preloader) {
                 preloader.classList.add('fade-out');
                 preloader.addEventListener('transitionend', () => preloader.remove(), { once: true });

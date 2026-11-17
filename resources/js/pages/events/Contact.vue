@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
 import { AlertCircle, CheckCircle2, Mail, MapPin, Phone, Send } from '@lucide/vue';
-import SEOHead from '@/components/SEOHead.vue';
+import { ref, reactive } from 'vue';
 
 const submitted = ref(false);
 const processing = ref(false);
@@ -15,18 +14,28 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validate(): boolean {
     Object.keys(errors).forEach((k) => delete errors[k]);
-    if (!form.name.trim()) { errors.name = 'Your name is required.'; }
+
+    if (!form.name.trim()) {
+ errors.name = 'Your name is required.'; 
+}
+
     if (!form.email.trim()) {
         errors.email = 'Email address is required.';
     } else if (!emailRegex.test(form.email)) {
         errors.email = 'Please enter a valid email address.';
     }
-    if (!form.message.trim()) { errors.message = 'Message cannot be empty.'; }
+
+    if (!form.message.trim()) {
+ errors.message = 'Message cannot be empty.'; 
+}
+
     return Object.keys(errors).length === 0;
 }
 
 async function submitForm() {
-    if (!validate()) { return; }
+    if (!validate()) {
+ return; 
+}
 
     processing.value = true;
     failed.value = false;
@@ -71,13 +80,6 @@ async function submitForm() {
 </script>
 
 <template>
-    <SEOHead
-        title="Contact Us"
-        description="Get in touch with Kivulini Adventures. Ask about upcoming trips, group bookings, safety, or partnerships."
-        keywords="contact Kivulini Adventures, Kenya trips inquiry, group bookings Kenya, adventure travel contact"
-        canonical="https://kivuliniadventures.com/contact"
-        twitter-card="summary"
-    />
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

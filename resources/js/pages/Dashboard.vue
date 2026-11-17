@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { dashboard } from '@/routes';
+import { index as adminBookingsIndex } from '@/routes/admin/bookings';
 import { index as adminEventsIndex, create as adminEventsCreate } from '@/routes/admin/events';
 import { 
     Coins, 
@@ -179,7 +180,9 @@ function formatDate(dateStr: string) {
                         <Activity class="h-5 w-5 text-amber-500" />
                         <h2 class="text-lg font-bold text-foreground">Recent Bookings</h2>
                     </div>
-                    <p class="text-xs text-muted-foreground">Last 5 reservations</p>
+                    <Link :href="adminBookingsIndex.url()" class="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 hover:underline">
+                        View all bookings <ArrowUpRight class="h-3.5 w-3.5" />
+                    </Link>
                 </div>
 
                 <div class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm dark:border-slate-800">

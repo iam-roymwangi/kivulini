@@ -53,6 +53,11 @@ class CreateBooking
             $lockedEvent->increment('booked_slots', $data['quantity']);
 
             foreach ($data['responses'] ?? [] as $response) {
+                // Optional questions left blank arrive as null; store no answer rather than an empty row.
+                if (blank($response['answer'] ?? null)) {
+                    continue;
+                }
+
                 $booking->responses()->create([
                     'event_question_id' => $response['event_question_id'],
                     'answer' => $response['answer'],

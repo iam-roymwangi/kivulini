@@ -116,14 +116,19 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>Kivulini Adventures</title>
+            {{-- Without SSR, print the page's server-built SEO tags so crawlers see them in the raw HTML. --}}
+            @forelse ($page['props']['head'] ?? [] as $headTag)
+                {!! $headTag !!}
+            @empty
+                <title>Kivulini Adventures</title>
+            @endforelse
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
         <div id="app-preloader" aria-hidden="true">
             <div class="preloader-inner">
-                <img class="preloader-logo-light" src="/assets/images/logo-dark.png" alt="Kivulini Adventures">
-                <img class="preloader-logo-dark"  src="/assets/images/kivulini_logo.png"     alt="Kivulini Adventures">
+                <img class="preloader-logo-light" src="/assets/images/logo-dark.png" alt="">
+                <img class="preloader-logo-dark"  src="/assets/images/kivulini_logo.png" alt="">
                 <div class="preloader-dots">
                     <span></span>
                     <span></span>

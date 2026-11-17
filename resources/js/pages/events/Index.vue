@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, X } from '@lucide/vue';
-import SEOHead from '@/components/SEOHead.vue';
+import { ref, computed } from 'vue';
 import CategoryFilter from '@/components/events/CategoryFilter.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import HeroSection from '@/components/events/HeroSection.vue';
@@ -59,6 +58,7 @@ const filteredEvents = computed(() => {
 
     // Search (title + location)
     const q = searchQuery.value.trim().toLowerCase();
+
     if (q) {
         data = data.filter(
             (e) =>
@@ -73,6 +73,7 @@ const filteredEvents = computed(() => {
         const [min, max] = priceBuckets[priceRange.value];
         data = data.filter((e) => {
             const p = parseFloat(e.price);
+
             return p >= min && p <= max;
         });
     }
@@ -100,6 +101,7 @@ const activeFilterLabel = computed(() => {
         hiking: 'Hiking',
         vacation: 'Vacations',
     };
+
     return map[activeFilter.value] ?? 'Events';
 });
 
@@ -113,13 +115,6 @@ const testimonials = [
 
 <template>
 
-    <SEOHead
-        title="Explore Upcoming Trips & Adventures in Kenya"
-        description="Discover and book curated hikes, road trips, and getaway vacations across Kenya and East Africa with Kivulini Adventures."
-        keywords="Kenya adventures, hiking Kenya, road trips East Africa, group travel Kenya, Kivulini"
-        canonical="https://kivuliniadventures.com/events"
-        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
-    />
 
     <!-- Hero -->
     <HeroSection v-model="activeFilter" />

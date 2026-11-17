@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import SEOHead from '@/components/SEOHead.vue';
 import { MapPin, Phone, Mail, Mountain, Users, Heart, Compass, Star, Sparkles, ArrowRight } from '@lucide/vue';
 
 const coreValues = [
@@ -92,10 +91,6 @@ const completedAdventures = [
 </script>
 
 <template>
-    <SEOHead title="About Us"
-        description="Kivulini Adventures is a Kenyan adventure and travel experiences brand built around shared outings, carefully chosen destinations and good company. No Tourist Traps. Real Adventures."
-        keywords="about Kivulini Adventures, Kenya adventure brand, group travel Kenya, road trips Kenya, Kivulini story"
-        canonical="https://kivuliniadventures.com/about" twitter-card="summary" />
 
     <div class="bg-background transition-colors">
 

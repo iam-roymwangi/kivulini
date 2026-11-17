@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, X } from '@lucide/vue';
-import SEOHead from '@/components/SEOHead.vue';
+import { ref, computed, watch } from 'vue';
 import CategoryFilter from '@/components/events/CategoryFilter.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import type { PlatformEvent } from '@/types';
@@ -54,6 +53,7 @@ const filteredEvents = computed(() => {
     let data = [...props.events.data];
 
     const q = searchQuery.value.trim().toLowerCase();
+
     if (q) {
         data = data.filter((e) =>
             e.title.toLowerCase().includes(q) ||
@@ -64,7 +64,11 @@ const filteredEvents = computed(() => {
 
     if (priceRange.value !== 'all') {
         const [min, max] = priceBuckets[priceRange.value];
-        data = data.filter((e) => { const p = parseFloat(e.price); return p >= min && p <= max; });
+        data = data.filter((e) => {
+ const p = parseFloat(e.price);
+
+ return p >= min && p <= max; 
+});
     }
 
     data.sort((a, b) => {
@@ -91,13 +95,6 @@ const typeLabel = computed(() => ({
 </script>
 
 <template>
-    <SEOHead
-        title="Upcoming Trips & Events"
-        description="Browse all upcoming hikes, road trips, and vacations in Kenya. Filter by category, price, and date to find your perfect adventure."
-        keywords="Kenya trips, upcoming events Kenya, hiking, road trips, group travel, Kivulini Adventures"
-        canonical="https://kivuliniadventures.com/events"
-        og-image="https://kivuliniadventures.com/assets/images/og-home.webp"
-    />
 
     <div class="bg-background pb-24 pt-32 transition-colors">
         <div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

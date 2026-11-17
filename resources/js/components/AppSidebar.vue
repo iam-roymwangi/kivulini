@@ -10,6 +10,7 @@ import {
     ShoppingBag,
     Star,
     Package,
+    Ticket,
 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -25,6 +26,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as adminBookingsIndex } from '@/routes/admin/bookings';
 import {
     index as adminEventsIndex,
     create as adminEventsCreate,
@@ -50,6 +52,11 @@ const mainNavItems: NavItem[] = [
         title: 'Create Event',
         href: adminEventsCreate.url(),
         icon: PlusCircle,
+    },
+    {
+        title: 'Event Bookings',
+        href: adminBookingsIndex.url(),
+        icon: Ticket,
     },
     {
         title: 'Manage Gallery',

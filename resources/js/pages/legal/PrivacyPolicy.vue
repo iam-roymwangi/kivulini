@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import SEOHead from '@/components/SEOHead.vue';
 </script>
 
 <template>
-    <SEOHead
-        title="Privacy Policy"
-        description="Learn how Kivulini Adventures collects, uses and protects your personal data under the Kenya Data Protection Act, 2019."
-        keywords="Kivulini Adventures privacy policy, data protection Kenya, personal data adventure travel"
-        canonical="https://kivuliniadventures.com/privacy"
-        twitter-card="summary"
-    />
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-4xl px-4 md:px-8 lg:px-12">

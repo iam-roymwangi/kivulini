@@ -33,7 +33,17 @@ class Booking extends Model implements MpesaPayable
         'payment_status',
         'payment_reference',
         'terms_accepted_at',
+        'follow_up_status',
+        'follow_up_notes',
+        'followed_up_at',
     ];
+
+    /**
+     * Admin follow-up states, in the order they are shown.
+     *
+     * @var list<string>
+     */
+    public const FOLLOW_UP_STATUSES = ['new', 'contacted', 'follow_up', 'resolved'];
 
     /**
      * @return array<string, string>
@@ -45,6 +55,7 @@ class Booking extends Model implements MpesaPayable
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
             'terms_accepted_at' => 'datetime',
+            'followed_up_at' => 'datetime',
         ];
     }
 

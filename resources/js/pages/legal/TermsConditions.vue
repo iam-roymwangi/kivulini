@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import SEOHead from '@/components/SEOHead.vue';
 </script>
 
 <template>
-    <SEOHead
-        title="Terms and Conditions"
-        description="Read the Terms and Conditions for all bookings, trips, events and shop purchases made with Kivulini Adventures."
-        keywords="Kivulini Adventures terms and conditions, booking policy Kenya, adventure travel terms"
-        canonical="https://kivuliniadventures.com/terms"
-        twitter-card="summary"
-    />
 
     <div class="bg-background pt-32 pb-24 transition-colors">
         <div class="mx-auto max-w-4xl px-4 md:px-8 lg:px-12">

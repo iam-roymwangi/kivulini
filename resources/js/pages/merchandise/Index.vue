@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, X, ShoppingBag, Tag } from '@lucide/vue';
-import SEOHead from '@/components/SEOHead.vue';
+import { ref, computed } from 'vue';
 import { show as merchandiseShow } from '@/routes/merchandise';
 import type { MerchandiseItem, MerchandiseType } from '@/types/merchandise';
 
@@ -47,6 +46,7 @@ function clearFilters() {
 const allColors = computed(() => {
     const set = new Set<string>();
     props.merchandise.data.forEach((item) => item.colors.forEach((c) => set.add(c)));
+
     return Array.from(set).sort();
 });
 
@@ -57,11 +57,22 @@ const allSizes = computed(() => {
     const sorted = Array.from(set).sort((a, b) => {
         const ai = sizeOrder.indexOf(a);
         const bi = sizeOrder.indexOf(b);
-        if (ai === -1 && bi === -1) { return a.localeCompare(b); }
-        if (ai === -1) { return 1; }
-        if (bi === -1) { return -1; }
+
+        if (ai === -1 && bi === -1) {
+ return a.localeCompare(b); 
+}
+
+        if (ai === -1) {
+ return 1; 
+}
+
+        if (bi === -1) {
+ return -1; 
+}
+
         return ai - bi;
     });
+
     return sorted;
 });
 
@@ -81,6 +92,7 @@ const filteredItems = computed(() => {
     }
 
     const q = searchQuery.value.trim().toLowerCase();
+
     if (q) {
         data = data.filter(
             (item) =>
@@ -110,13 +122,6 @@ const filteredItems = computed(() => {
 </script>
 
 <template>
-    <SEOHead
-        title="Merchandise – Wear the Adventure"
-        description="Shop Kivulini Adventures merchandise — t-shirts, hoodies, hats and more. Wear your adventures."
-        keywords="Kivulini Adventures merch, Kenya adventure apparel, hiking t-shirts Kenya, adventure hoodies"
-        canonical="https://kivuliniadventures.com/merchandise"
-        og-image="https://kivuliniadventures.com/assets/images/merch-hero.webp"
-    />
 
     <!-- Hero Banner -->
     <section class="relative overflow-hidden px-4 pb-60 lg:pt-142 pt-82 text-white md:px-8 lg:px-12">

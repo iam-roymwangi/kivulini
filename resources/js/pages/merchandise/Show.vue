@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { ArrowLeft, ShoppingBag, Tag, Ruler, Palette, Package, ChevronLeft, ChevronRight, X } from '@lucide/vue';
-import { index as merchandiseIndex } from '@/routes/merchandise';
-import SEOHead from '@/components/SEOHead.vue';
+import { ref, computed } from 'vue';
 import MerchandiseCheckout from '@/components/merchandise/MerchandiseCheckout.vue';
+import { index as merchandiseIndex } from '@/routes/merchandise';
 import type { MerchandiseItem, MerchandiseImage } from '@/types/merchandise';
 
 const props = defineProps<{
@@ -21,6 +20,7 @@ const TYPE_LABELS: Record<string, string> = {
 // ── Gallery state ─────────────────────────────────────────────────────────────
 const images = computed<MerchandiseImage[]>(() => {
     const imgs = props.merchandise.images ?? [];
+
     return [...imgs].sort((a, b) => a.sort_order - b.sort_order);
 });
 
@@ -47,35 +47,36 @@ function nextLightbox() {
 }
 
 function onKeydown(e: KeyboardEvent) {
-    if (!lightboxOpen.value) { return; }
-    if (e.key === 'ArrowLeft') { prevLightbox(); }
-    if (e.key === 'ArrowRight') { nextLightbox(); }
-    if (e.key === 'Escape') { lightboxOpen.value = false; }
+    if (!lightboxOpen.value) {
+ return; 
+}
+
+    if (e.key === 'ArrowLeft') {
+ prevLightbox(); 
+}
+
+    if (e.key === 'ArrowRight') {
+ nextLightbox(); 
+}
+
+    if (e.key === 'Escape') {
+ lightboxOpen.value = false; 
+}
 }
 
 // ── Selection state ───────────────────────────────────────────────────────────
 const selectedSize = ref('');
 const selectedColor = ref('');
-const page = usePage();
-
 const isInStock = computed(() => props.merchandise.stock > 0);
 const canOrder = computed(() => {
     const needsSize = (props.merchandise.sizes ?? []).length > 0;
     const needsColor = (props.merchandise.colors ?? []).length > 0;
+
     return isInStock.value && (!needsSize || selectedSize.value !== '') && (!needsColor || selectedColor.value !== '');
 });
 </script>
 
 <template>
-    <SEOHead
-        :title="merchandise.name"
-        :description="merchandise.description ?? `Shop ${merchandise.name} from Kivulini Adventures.`"
-        :keywords="`${merchandise.name}, Kivulini Adventures merch, Kenya adventure apparel`"
-        :canonical="`https://kivuliniadventures.com${page.url}`"
-        og-type="product"
-        :og-image="merchandise.cover_image_url ?? undefined"
-        twitter-card="summary_large_image"
-    />
 
     <!-- Keyboard handler for lightbox -->
     <div tabindex="-1" class="outline-none" @keydown="onKeydown">

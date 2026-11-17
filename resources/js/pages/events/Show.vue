@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
-import SEOHead from '@/components/SEOHead.vue';
 import BookingBox from '@/components/events/BookingBox.vue';
 import BookingDrawer from '@/components/events/BookingDrawer.vue';
 import EventHeroGallery from '@/components/events/EventHeroGallery.vue';
@@ -16,8 +14,6 @@ const props = defineProps<{
 const eventData = computed<PlatformEvent>(() => {
     return props.event && 'data' in props.event ? props.event.data : props.event;
 });
-
-const page = usePage();
 
 const isCompleted = computed(() => eventData.value.status === 'completed');
 
@@ -34,15 +30,6 @@ function openBooking(qty: number, tierId: number | null) {
 
 <template>
 
-    <SEOHead
-        :title="eventData.title"
-        :description="eventData.summary"
-        :keywords="`${eventData.title}, ${eventData.location}, Kenya adventures, ${eventData.type?.replace('_', ' ')}`"
-        :canonical="`https://kivuliniadventures.com${page.url}`"
-        og-type="article"
-        :og-image="eventData.media?.[0]?.url"
-        twitter-card="summary_large_image"
-    />
 
     <div class="pt-24 pb-16">
         <!-- Hero gallery -->
